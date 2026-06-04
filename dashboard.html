@@ -42,6 +42,43 @@
       <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 누적 광고 수익</div><div class="v r" id="m-adrev">$0</div><div class="sub"><span class="livedot"></span> 실시간 누적</div></div>
     </div>
 
+    <!-- TONX → XONT 미러 채굴 -->
+    <div class="dash-card reveal mirror-card">
+      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> 토큰 채굴 — TONX <span class="r">→</span> XONT 미러링</h3><span class="tagx">시청자 채굴량 = 노드 풀 발행량 (1:1)</span></div>
+      <div class="mirror">
+        <div class="mside">
+          <div class="ms-tag"><svg class="icon"><use href="#i-eye"/></svg> 시청자 채굴 · <b>TONX</b></div>
+          <div class="ms-big" id="tonx-today">0</div>
+          <div class="ms-sub"><span class="livedot"></span> 오늘 시청자 전체 채굴량 · 실시간</div>
+          <div class="supply">
+            <div class="sl"><span>총 발행 한도</span><span><b id="tonx-supply-pct">0.000%</b> / 100억</span></div>
+            <div class="sbar"><i id="tonx-supply-bar" style="width:0%"></i></div>
+            <div class="sl2">누적 채굴 <b id="tonx-mined-total">0</b> TONX</div>
+          </div>
+        </div>
+        <div class="mirror-mid">
+          <div class="mm-ratio">1 : 1</div>
+          <div class="mm-arrow"><svg class="icon"><use href="#i-arrow-ur"/></svg></div>
+          <div class="mm-label">동일 수량<br>미러 발행</div>
+        </div>
+        <div class="mside nodes">
+          <div class="ms-tag"><svg class="icon"><use href="#i-server"/></svg> 노드 풀 발행 · <b>XONT</b></div>
+          <div class="ms-big r" id="xont-pool-today">0</div>
+          <div class="ms-sub">전체 노드 <b id="mirror-total-nodes">2,188</b>개에 <b>균등 분배 (÷N)</b></div>
+          <div class="pernode">
+            <div class="pn"><div class="l">노드 1개 채굴 (오늘)</div><div class="v" id="pernode-day">0.00 <span class="u">XONT</span></div></div>
+            <div class="pn"><div class="l">내 몫 (×<span id="mirror-mynodes">5</span>, 오늘)</div><div class="v r" id="my-mine-day">0.00 <span class="u">XONT</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="formula-line"><svg class="icon"><use href="#i-zap"/></svg><span>노드 1개 채굴 = <b>오늘 시청자 채굴 TONX ÷ 전체 노드 수</b> · 내 채굴 = 노드 1개 채굴 <b>× 내 노드 수</b> — 시청자가 많아질수록 노드 배분도 자동 증가</span></div>
+      <div class="swap-row">
+        <div class="sw-l"><svg class="icon"><use href="#i-coins"/></svg> <b>TONX ⇄ XONT</b> 스왑</div>
+        <div class="sw-mid">스왑 비율 <b class="r">추후 공개 (TBD)</b></div>
+        <button class="sw-btn" disabled>스왑 준비 중</button>
+      </div>
+    </div>
+
     <div class="dash-grid">
       <div class="dash-card reveal">
         <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-trending"/></svg></span> 내 노드 수익 (1차 3,000개 풀)</h3><span class="tagx">매출 10% · 노드 지분 분배</span></div>
@@ -90,6 +127,50 @@
         <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-radio"/></svg></span> 현재 송출 중인 콘텐츠</h3><span class="tagx"><span class="livedot"></span> LIVE</span></div>
         <div class="nodelist" id="stream-list"></div>
       </div>
+    </div>
+
+    <!-- 추천 네트워크 (2단계) -->
+    <div class="dash-card reveal" id="ref-card">
+      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 추천 네트워크 <span class="tagn">2단계</span></h3><span class="tagx">1단계 10% · 2단계 3%</span></div>
+      <div class="ref-grid">
+        <div class="ref-left">
+          <div class="ref-code">
+            <div class="rc-l">내 추천 코드</div>
+            <div class="rc-row">
+              <span class="rc-code" id="ref-code">TONTV-8K2P</span>
+              <button class="rc-copy" id="ref-copy-code"><svg class="icon"><use href="#i-share"/></svg> 복사</button>
+            </div>
+            <div class="rc-link">
+              <span id="ref-link">https://tontv.tonyai.cc/?ref=TONTV-8K2P</span>
+              <button class="rc-copy ghost" id="ref-copy-link">링크</button>
+            </div>
+          </div>
+          <div class="ref-stats">
+            <div class="rs">
+              <div class="rs-h"><span class="badge b1">1단계</span> 직접 추천 · 10%</div>
+              <div class="rs-row"><span>인원</span><b id="r1-people">0명</b></div>
+              <div class="rs-row"><span>노드 수</span><b id="r1-nodes">0개</b></div>
+              <div class="rs-row hi"><span>누적 보상</span><b id="r1-reward">0.00 XONT</b></div>
+            </div>
+            <div class="rs">
+              <div class="rs-h"><span class="badge b2">2단계</span> 간접 추천 · 3%</div>
+              <div class="rs-row"><span>인원</span><b id="r2-people">0명</b></div>
+              <div class="rs-row"><span>노드 수</span><b id="r2-nodes">0개</b></div>
+              <div class="rs-row hi"><span>누적 보상</span><b id="r2-reward">0.00 XONT</b></div>
+            </div>
+          </div>
+          <div class="ref-total">
+            <div class="l"><svg class="icon"><use href="#i-coins"/></svg> 추천 총 보상 · 실시간 적립</div>
+            <div class="v">+<span id="ref-total-x">0.00</span> <span class="u">XONT</span></div>
+            <div class="usd" id="ref-total-usd">≈ $0.00 · 익월 10일 지급</div>
+          </div>
+        </div>
+        <div class="ref-right">
+          <div class="rr-head"><span>내가 추천한 노드 사업자</span><span id="ref-people-count">0명 · 노드 0개</span></div>
+          <div class="ref-list" id="ref-list"></div>
+        </div>
+      </div>
+      <p class="ref-foot"><svg class="icon"><use href="#i-alert"/></svg><span>추천 보상은 피추천자 노드의 XONT 채굴에서 <b>1단계 10% · 2단계 3%</b>가 나에게 환원됩니다. 자기추천 · 무한 다단계는 차단됩니다.</span></p>
     </div>
 
     <div class="dash-grid-2">

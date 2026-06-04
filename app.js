@@ -12,6 +12,9 @@
   const rand  = (a, b) => a + Math.random() * (b - a);
 
   const XONT_PRICE = 0.85;                                            // demo USD price (dashboard)
+  const TONX_SUPPLY = 1e10;                                           // 100억 TONX 총 발행 한도
+  const VIEWER_MINT = 0.0006;                                         // 시청자 1인당 TONX 채굴 / s (demo)
+  const REF1_PCT = 0.10, REF2_PCT = 0.03;                            // 추천 보상: 1단계 10% · 2단계 3%
   const toast = (m, t) => (window.toast ? window.toast(m, t) : 0);    // shared toast (defined in layout.js)
   document.documentElement.classList.add('has-js');                  // enables scroll-reveal
 
@@ -301,7 +304,6 @@
   if (document.body.dataset.page === 'dashboard') {
   const state = {
     xont: 12480.55,        // available wallet balance
-    rate: 0.42,            // XONT mined / sec (visual)
     myNodes: 5,
     totalNodes: 2188,      // sold of 3,000 (1st batch)
     pool: 182400,          // node pool USD this month (so far)
@@ -312,16 +314,37 @@
     subs: 2184300,
     advertisers: 1286,
     adRevTotal: 4218500,   // cumulative ad revenue
+    tonxToday: 4218600,    // 오늘 시청자 전체 TONX 채굴량 (≡ 노드풀 XONT 발행량, 1:1 미러)
+    tonxTotal: 1284500000, // 누적 TONX 채굴 (총 발행 한도 100억 대비)
     stakes: [
       { amt: 2000, mo: 6,  apy: 15, reward: 31.84 },
       { amt: 1000, mo: 12, apy: 24, reward: 58.10 },
     ],
     nodes: [],
+    // 내가 추천한 노드 사업자 (2단계) — 1단계 직접 추천, 2단계는 1단계가 추천
+    referrals: [
+      { name: '김민준', addr: 'EQAb…3kT', tier: 1, nodes: 8,  reward: 4218.5 },
+      { name: '최예나', addr: 'UQC7…9xR', tier: 1, nodes: 12, reward: 6531.2 },
+      { name: '이서연', addr: 'EQDe…1mP', tier: 1, nodes: 5,  reward: 2740.8 },
+      { name: '박지후', addr: 'UQF2…7kL', tier: 1, nodes: 3,  reward: 1602.3 },
+      { name: '정도윤', addr: 'EQGh…4nQ', tier: 2, nodes: 6,  reward: 980.4 },
+      { name: '오시우', addr: 'UQK9…2vT', tier: 2, nodes: 4,  reward: 651.7 },
+      { name: '한소율', addr: 'EQLm…8wC', tier: 2, nodes: 2,  reward: 326.1 },
+    ],
   };
+  // 노드는 균등 채굴(÷N) — 현재 채굴 속도는 모두 같고, 누적은 가동 시점에 따라 다름
+  const nodeSeed = [9820, 7640, 5210, 3180, 1290];
   for (let i = 1; i <= state.myNodes; i++)
-    state.nodes.push({ id: i, x: rand(820, 1340), r: rand(0.06, 0.12) });
+    state.nodes.push({ id: i, x: nodeSeed[i - 1] ?? rand(1000, 9000) });
 
-  const share = () => state.myNodes / state.totalNodes;   // pool fraction
+  const share        = () => state.myNodes / state.totalNodes;     // pool fraction
+  // ----- TONX → XONT 미러 채굴 모델 -----
+  const viewerRate   = () => state.viewers * VIEWER_MINT;          // 전체 시청자 TONX 채굴 / s
+  const perNodeRate  = () => viewerRate() / state.totalNodes;      // 노드 1개 XONT 채굴 / s (÷N 균등)
+  const myRate       = () => perNodeRate() * state.myNodes;        // 내 지갑 XONT 채굴 / s
+  const perNodeToday = () => state.tonxToday / state.totalNodes;   // 노드 1개 오늘 채굴 (÷N)
+  // 추천 보상 적립 속도(/s): 피추천자 노드의 XONT 채굴에서 1·2단계 비율 환원
+  const refRate = r => (r.tier === 1 ? REF1_PCT : REF2_PCT) * r.nodes * perNodeRate();
 
   /* ---- count-up intro for big metrics ---- */
   function countUp(el, target, dur = 1400, pre = '', suf = '') {
@@ -351,10 +374,64 @@
         </div>
         <div class="nr">
           <div class="nx" id="nx-${n.id}">${fmt2(n.x)} <span class="u">XONT</span></div>
-          <div class="mining"><span class="sdot"></span> 채굴중 +${n.r.toFixed(2)}/s</div>
+          <div class="mining"><span class="sdot"></span> 채굴중 +<span id="nrate-${n.id}">${perNodeRate().toFixed(3)}</span>/s</div>
         </div>
       </div>`).join('');
     const tag = $('#node-count-tag'); if (tag) tag.textContent = state.myNodes + '개 노드';
+  }
+
+  /* ---- 추천 네트워크 (2단계) 렌더 ---- */
+  function renderReferrals() {
+    const box = $('#ref-list'); if (!box) return;
+    box.innerHTML = state.referrals.map((r, i) => `
+      <div class="refrow">
+        <div class="li">
+          <div class="ridx b${r.tier}">${r.tier}</div>
+          <div>
+            <div class="rn">${r.name} <span class="rmask">${r.addr}</span></div>
+            <div class="rs2"><span class="badge-sm b${r.tier}">${r.tier}단계</span> · 노드 ${r.nodes}개</div>
+          </div>
+        </div>
+        <div class="rr">
+          <div class="rx">+<span id="rfr-${i}">${fmt2(r.reward)}</span> <span class="u">XONT</span></div>
+          <div class="rl2">내 보상 적립</div>
+        </div>
+      </div>`).join('');
+  }
+
+  /* ---- TONX → XONT 미러 채굴 패널 페인트 ---- */
+  function paintMirror() {
+    const today = state.tonxToday, pn = perNodeToday();
+    $('#tonx-today')        && ($('#tonx-today').textContent        = fmt(today));
+    $('#xont-pool-today')   && ($('#xont-pool-today').textContent   = fmt(today));        // 1:1 미러
+    $('#tonx-mined-total')  && ($('#tonx-mined-total').textContent  = fmt(state.tonxTotal));
+    const pct = state.tonxTotal / TONX_SUPPLY * 100;
+    $('#tonx-supply-pct')   && ($('#tonx-supply-pct').textContent   = pct.toFixed(3) + '%');
+    $('#tonx-supply-bar')   && ($('#tonx-supply-bar').style.width   = clamp(pct, 0, 100) + '%');
+    $('#mirror-total-nodes')&& ($('#mirror-total-nodes').textContent= fmt(state.totalNodes));
+    $('#mirror-mynodes')    && ($('#mirror-mynodes').textContent    = state.myNodes);
+    $('#pernode-day')       && ($('#pernode-day').innerHTML         = fmt2(pn) + ' <span class="u">XONT</span>');
+    $('#my-mine-day')       && ($('#my-mine-day').innerHTML         = fmt2(pn * state.myNodes) + ' <span class="u">XONT</span>');
+  }
+
+  /* ---- 추천 보상 요약 + 행별 적립 페인트 ---- */
+  function paintReferrals() {
+    let p1 = 0, n1 = 0, w1 = 0, p2 = 0, n2 = 0, w2 = 0;
+    state.referrals.forEach((r, i) => {
+      if (r.tier === 1) { p1++; n1 += r.nodes; w1 += r.reward; }
+      else              { p2++; n2 += r.nodes; w2 += r.reward; }
+      const el = $('#rfr-' + i); if (el) el.textContent = fmt2(r.reward);
+    });
+    const total = w1 + w2;
+    $('#r1-people') && ($('#r1-people').textContent = p1 + '명');
+    $('#r1-nodes')  && ($('#r1-nodes').textContent  = fmt(n1) + '개');
+    $('#r1-reward') && ($('#r1-reward').textContent = fmt2(w1) + ' XONT');
+    $('#r2-people') && ($('#r2-people').textContent = p2 + '명');
+    $('#r2-nodes')  && ($('#r2-nodes').textContent  = fmt(n2) + '개');
+    $('#r2-reward') && ($('#r2-reward').textContent = fmt2(w2) + ' XONT');
+    $('#ref-total-x')   && ($('#ref-total-x').textContent   = fmt2(total));
+    $('#ref-total-usd') && ($('#ref-total-usd').textContent = '≈ $' + fmt2(total * XONT_PRICE) + ' · 익월 10일 지급');
+    $('#ref-people-count') && ($('#ref-people-count').textContent = (p1 + p2) + '명 · 노드 ' + fmt(n1 + n2) + '개');
   }
 
   // live streaming list
@@ -391,7 +468,8 @@
       </div>`).join('');
   }
 
-  renderNodes(); renderStreams(); renderStakes();
+  renderNodes(); renderStreams(); renderStakes(); renderReferrals();
+  paintMirror(); paintReferrals();
 
   // initial count-up for platform metrics — triggered by the scroll scan
   let counted = false;
@@ -417,7 +495,7 @@
     $('#stake-bal') && ($('#stake-bal').textContent = fmt2(b));
     $('#xfer-bal') && ($('#xfer-bal').textContent = fmt2(b));
   }
-  $('#xont-rate') && ($('#xont-rate').textContent = state.rate.toFixed(2));
+  $('#xont-rate') && ($('#xont-rate').textContent = myRate().toFixed(2));
   refreshBalances();
 
   /* ---- the live heartbeat (every 120ms) ---- */
@@ -426,10 +504,7 @@
     tick++;
     const dt = 0.12;
 
-    // wallet mining
-    state.xont += state.rate * dt;
-
-    // platform metrics jitter (trend up)
+    // platform metrics jitter (trend up) — 시청자 수가 채굴량을 견인
     state.viewers   = clamp(state.viewers + rand(-90, 140), 280000, 999999);
     state.streams   = clamp(state.streams + rand(-30, 45), 38000, 99999);
     state.adRevTotal += rand(8, 26);
@@ -438,12 +513,25 @@
     if (Math.random() < 0.006) state.content += 1;
     if (Math.random() < 0.008 && state.totalNodes < 3000) state.totalNodes += 1;
 
-    // node pool + my share accrual
+    // ---- TONX → XONT 미러 채굴 ----
+    const vr = viewerRate(), pnr = perNodeRate();
+    state.tonxToday += vr * dt;          // 시청자 오늘 채굴 TONX (= 노드풀 XONT 발행, 1:1)
+    state.tonxTotal += vr * dt;          // 누적 채굴 (총 발행 한도 대비)
+    state.xont      += myRate() * dt;    // 내 지갑 = 노드 1개 채굴(÷N) × 내 노드 수
+
+    // node pool + my share accrual (USD 매출 분배: 구독+광고 10%)
     state.pool += state.poolRate * dt;
     const mine = state.pool * share();
 
-    // per-node mined
-    state.nodes.forEach(n => { n.x += n.r * dt; const el = $('#nx-' + n.id); if (el) el.firstChild.textContent = fmt2(n.x) + ' '; });
+    // per-node mined — 모든 노드 동일 속도(÷N), 누적만 다름
+    state.nodes.forEach(n => {
+      n.x += pnr * dt;
+      const el = $('#nx-' + n.id); if (el) el.firstChild.textContent = fmt2(n.x) + ' ';
+      const rl = $('#nrate-' + n.id); if (rl) rl.textContent = pnr.toFixed(3);
+    });
+
+    // ---- 추천 보상 적립 (1단계 10% · 2단계 3%) ----
+    state.referrals.forEach(r => { r.reward += refRate(r) * dt; });
 
     // stream viewers jitter
     STREAMS.forEach((s, i) => { s.v = clamp(s.v + rand(-40, 55), 2000, 99999); const el = $('#sv-' + i); if (el) el.textContent = fmt(s.v); });
@@ -474,6 +562,11 @@
     $('#lg-sub') && ($('#lg-sub').textContent = '$' + fmt(state.pool * 0.24));
     $('#lg-tok') && ($('#lg-tok').textContent = '$' + fmt(state.pool * 0.14));
     $('#lg-mine') && ($('#lg-mine').textContent = '$' + fmt2(mine));
+
+    // TONX→XONT 미러 채굴 · 추천 보상 · 내 채굴 속도
+    paintMirror();
+    paintReferrals();
+    $('#xont-rate') && ($('#xont-rate').textContent = myRate().toFixed(2));
 
     // hero mirrors (throttled)
     if (tick % 5 === 0) {
@@ -550,6 +643,26 @@
     xferAmt.value = ''; xferAddr.value = ''; calcXfer();
     toast(`${fmt2(a)} XONT 전송 완료 → ${addr.slice(0, 6)}…${addr.slice(-4)}`);
   });
+
+  /* =========================================================
+     10. REFERRAL — 코드/링크 복사
+     ========================================================= */
+  const copyText = (txt, ok) => {
+    const done = () => toast(ok);
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(txt).then(done, () => fallbackCopy(txt, done));
+    else fallbackCopy(txt, done);
+  };
+  function fallbackCopy(txt, cb) {
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* noop */ }
+    document.body.removeChild(ta); cb();
+  }
+  $('#ref-copy-code')?.addEventListener('click', () =>
+    copyText($('#ref-code')?.textContent.trim() || '', '추천 코드를 복사했습니다'));
+  $('#ref-copy-link')?.addEventListener('click', () =>
+    copyText($('#ref-link')?.textContent.trim() || '', '추천 링크를 복사했습니다'));
 
   } /* ===== end: dashboard page only ===== */
 })();
