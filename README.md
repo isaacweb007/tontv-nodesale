@@ -3,7 +3,19 @@
 텔레그램 Watch-to-Earn 숏폼 드라마 OTT **TonTV**의 노드 세일 공개 웹사이트.
 IR/노드세일 덱의 디자인 시스템(흰 뉴모피즘 · 잉크 블랙 · Netflix 레드 · 시네마틱 숏폼)을 그대로 계승했습니다.
 
-## 실행
+## 🌐 라이브 배포
+
+- **사이트:** https://isaacweb007.github.io/tontv-nodesale/
+- **레포:** https://github.com/isaacweb007/tontv-nodesale (GitHub Pages · `main` 브랜치 루트)
+
+업데이트는 그냥 커밋/푸시하면 Pages가 자동 재빌드합니다:
+```bash
+cd tontv-node-sale
+git add -A && git commit -m "update" && git push   # ~1분 후 반영
+```
+> 커스텀 도메인(예: `www.ton-tv.com`) 연결: 레포 루트에 `CNAME` 파일(도메인 1줄) 추가 + DNS에서 `isaacweb007.github.io`로 CNAME 레코드 설정. (원하시면 설정해 드립니다.)
+
+## 실행 (로컬)
 
 순수 정적 멀티 페이지 사이트입니다. 빌드 불필요. (멀티 페이지 + 공유 아이콘 스프라이트가 `<use>`로 참조되므로 **로컬 서버로 여는 것을 권장** — file:// 직접 열기에서도 대부분 동작하지만 서버가 가장 안전)
 
