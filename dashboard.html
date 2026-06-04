@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>노드 사업자 대시보드 — 내 노드 · 수익 · 지갑 실시간 | TonTV</title>
+<meta name="description" content="톤티비 플랫폼 실시간 지표, 내 노드 수익 배분, 노드별 XONT 채굴, 스테이킹과 전송까지 한 화면에서. (데모 데이터)">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="dashboard">
+
+<section class="dash" id="dashboard" style="padding-top:108px">
+  <div class="wrap">
+    <div class="crumb" style="font-size:12.5px;color:#8a909b;margin-bottom:16px;display:flex;gap:9px;align-items:center">
+      <a href="index.html" style="color:#8a909b">홈</a><span style="opacity:.4">/</span><span style="color:#cfd2d8">대시보드</span>
+    </div>
+    <div class="sec-head reveal" style="margin-bottom:30px">
+      <span class="eyebrow">노드 사업자 대시보드</span>
+      <h2>내 노드 · 수익 · 지갑을 <span class="r">실시간</span>으로</h2>
+      <p>톤티비 플랫폼 지표와 내 노드 수익 배분, XONT 지갑 · 스테이킹 · 전송을 한 화면에서.</p>
+    </div>
+
+    <div class="dash-top reveal">
+      <div class="who">
+        <div class="av">TV</div>
+        <div><div class="nm">노드 사업자 <span style="color:var(--red-2)">#1842</span></div><div class="id" id="wallet-id">EQ로 시작 · 지갑 연결됨</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="live-badge"><span class="d"></span> LIVE · 실시간 갱신</span>
+        <button class="btn btn-red" id="connect-wallet" style="padding:11px 20px;font-size:14px"><svg class="icon"><use href="#i-check"/></svg> 지갑 연결됨</button>
+      </div>
+    </div>
+
+    <div class="metrics reveal">
+      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-eye"/></svg></span> 전체 노드 접속자</div><div class="v" id="m-viewers">0</div><div class="sub"><span class="livedot"></span> 지금 시청 중</div></div>
+      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-radio"/></svg></span> 동시 스트리밍</div><div class="v r" id="m-stream">0</div><div class="sub"><span class="livedot"></span> LIVE 송출</div></div>
+      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-film"/></svg></span> 총 콘텐츠 수</div><div class="v" id="m-content">0</div><div class="sub"><span class="up">▲ +38</span> 신규 / 주</div></div>
+      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-star"/></svg></span> 누적 구독자</div><div class="v" id="m-subs">0</div><div class="sub"><span class="up">▲ +2.4%</span> 주간</div></div>
+      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-megaphone"/></svg></span> 광고주 수</div><div class="v" id="m-adv">0</div><div class="sub"><span class="up">▲ +17</span> 신규 / 주</div></div>
+      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 누적 광고 수익</div><div class="v r" id="m-adrev">$0</div><div class="sub"><span class="livedot"></span> 실시간 누적</div></div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card reveal">
+        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-trending"/></svg></span> 내 노드 수익 (1차 3,000개 풀)</h3><span class="tagx">매출 10% · 노드 지분 분배</span></div>
+        <div class="mynode-top">
+          <div class="mn-stat"><div class="l">보유 노드</div><div class="v" id="my-nodes">5 <span class="u">개</span></div></div>
+          <div class="mn-stat"><div class="l">노드풀 점유율</div><div class="v" id="my-share">0.167<span class="u">%</span></div></div>
+          <div class="mn-stat"><div class="l">현재 총 노드</div><div class="v" id="total-nodes">2,188</div></div>
+        </div>
+        <div class="accrue">
+          <div class="l"><svg class="icon"><use href="#i-coins"/></svg> 이번 달 실시간 수익 배분 (광고+구독)</div>
+          <div class="big">$<span class="c" id="my-accrue">0.00</span></div>
+          <div class="xeq">≈ <b id="my-accrue-x">0.00</b> XONT · 익월 10일 지갑 지급</div>
+          <div class="prog">
+            <div class="pl"><span>정산 진행</span><span id="dday">다음 정산까지 D-6</span></div>
+            <div class="prbar"><i id="accrue-prog" style="width:80%"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-card reveal">
+        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-wallet"/></svg></span> 내 XONT 지갑</h3><span class="tagx">톤체인</span></div>
+        <div class="wallet-bal">
+          <div>
+            <div class="l">보유 잔액</div>
+            <div class="xt"><span id="xont-bal">0.00</span><span class="s">XONT</span></div>
+            <div class="usd" id="xont-usd">≈ $0.00</div>
+          </div>
+          <div style="text-align:right">
+            <div class="l" style="justify-content:flex-end">채굴 속도</div>
+            <div style="color:#5ee08a;font-weight:800;font-size:15px">+<span id="xont-rate">0.42</span>/s</div>
+          </div>
+        </div>
+        <div class="wallet-actions">
+          <button class="wbtn send" data-scroll="#xfer-card"><svg class="icon"><use href="#i-arrow-ur"/></svg> 전송</button>
+          <button class="wbtn stake" data-scroll="#stake-card"><svg class="icon"><use href="#i-lock"/></svg> 스테이킹</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-grid-2">
+      <div class="dash-card reveal">
+        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-zap"/></svg></span> 노드별 XONT 채굴 현황</h3><span class="tagx" id="node-count-tag">5개 노드</span></div>
+        <div class="nodelist" id="node-list"></div>
+      </div>
+      <div class="dash-card reveal">
+        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-radio"/></svg></span> 현재 송출 중인 콘텐츠</h3><span class="tagx"><span class="livedot"></span> LIVE</span></div>
+        <div class="nodelist" id="stream-list"></div>
+      </div>
+    </div>
+
+    <div class="dash-grid-2">
+      <div class="dash-card reveal" id="stake-card">
+        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-lock"/></svg></span> XONT 스테이킹</h3><span class="tagx">최대 24% APY</span></div>
+        <div class="field">
+          <label>락업 기간 선택</label>
+          <div class="tiersel" id="tiersel">
+            <button class="tsel" data-mo="1" data-apy="6"><div class="m">1개월</div><div class="a">6%</div></button>
+            <button class="tsel" data-mo="3" data-apy="10"><div class="m">3개월</div><div class="a">10%</div></button>
+            <button class="tsel on" data-mo="6" data-apy="15"><div class="m">6개월</div><div class="a">15%</div></button>
+            <button class="tsel" data-mo="12" data-apy="24"><div class="m">12개월</div><div class="a">24%</div></button>
+          </div>
+        </div>
+        <div class="field">
+          <label>스테이킹 수량</label>
+          <div class="inp-amt">
+            <input type="text" inputmode="decimal" id="stake-amt" placeholder="0.00">
+            <span class="unit">XONT</span>
+            <button class="max" id="stake-max">MAX</button>
+          </div>
+          <div class="balhint"><span>보유 <b id="stake-bal">0.00</b> XONT</span><span>예상 만기 수령 <b id="stake-est" style="color:var(--red-2)">0.00</b> XONT</span></div>
+        </div>
+        <button class="btn btn-red btn-block" id="stake-btn">스테이킹하기</button>
+        <div class="active-stakes">
+          <div class="t">진행 중인 스테이킹 · 적립 보상 실시간</div>
+          <div id="stake-list"></div>
+        </div>
+      </div>
+
+      <div class="dash-card reveal" id="xfer-card">
+        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-arrow-ur"/></svg></span> XONT 전송</h3><span class="tagx">다른 지갑으로</span></div>
+        <div class="field">
+          <label>받는 지갑 주소 (톤체인)</label>
+          <input type="text" class="inp" id="xfer-addr" placeholder="EQ... 또는 UQ... 주소 입력">
+        </div>
+        <div class="field">
+          <label>전송 수량</label>
+          <div class="inp-amt">
+            <input type="text" inputmode="decimal" id="xfer-amt" placeholder="0.00">
+            <span class="unit">XONT</span>
+            <button class="max" id="xfer-max">MAX</button>
+          </div>
+          <div class="balhint"><span>보유 <b id="xfer-bal">0.00</b> XONT</span><span>네트워크 수수료 <b>0.05 TON</b></span></div>
+        </div>
+        <div class="est"><span class="l">받는 사람 수령 금액</span><span class="v" id="xfer-receive">0.00 XONT</span></div>
+        <button class="btn btn-red btn-block" id="xfer-btn">전송하기</button>
+        <p style="font-size:11.5px;color:#7f858f;margin-top:14px;line-height:1.5"><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#i-alert"/></svg> 주소를 다시 한 번 확인하세요. 블록체인 전송은 되돌릴 수 없습니다.</p>
+      </div>
+    </div>
+
+    <div class="dash-card reveal">
+      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 톤티비 매출 실시간 분배 (이번 달 노드 풀)</h3><span class="tagx">구독 · 광고 · 토큰</span></div>
+      <div class="adrev">
+        <div class="donut">
+          <div class="cc"><div class="l">노드 풀 (10%)</div><div class="v" id="donut-total">$0</div></div>
+        </div>
+        <div class="legend">
+          <div class="lr"><span class="ll"><span class="sw" style="background:var(--red)"></span> 광고 매출</span><span class="lv" id="lg-ad">$0</span></div>
+          <div class="lr"><span class="ll"><span class="sw" style="background:#f5c451"></span> 구독 매출</span><span class="lv" id="lg-sub">$0</span></div>
+          <div class="lr"><span class="ll"><span class="sw" style="background:#3a82f6"></span> 토큰·생태계</span><span class="lv" id="lg-tok">$0</span></div>
+          <div class="lr" style="border-top:1px solid #2a2d34;padding-top:14px;margin-top:4px"><span class="ll" style="color:#fff;font-weight:800">내 노드 몫 (실시간)</span><span class="lv" style="color:var(--red-2)" id="lg-mine">$0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="dash-note reveal">※ 본 대시보드는 <span class="r">데모 데이터</span>로 동작합니다. 2026년 9월 정식 가동 시 온체인 실데이터(접속자 · 매출 · XONT 잔액)와 연동됩니다.</p>
+  </div>
+</section>
+
+<script src="layout.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
