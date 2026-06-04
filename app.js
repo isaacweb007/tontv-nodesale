@@ -230,7 +230,7 @@
 
   const posterHTML = (d, rank, uid) => `
     <article class="poster ${rank ? 'rank' : ''}" title="${d.t}" tabindex="0">
-      <div class="art">${scene(d.k, uid)}</div><div class="grad"></div>
+      <div class="art">${scene(d.k, uid)}<img class="poster-img" src="assets/posters/${d.k}.jpg" alt="${d.t}" loading="lazy" onerror="this.remove()"></div><div class="grad"></div>
       ${rank ? `<span class="num">${rank}</span>` : ''}
       <div class="top">
         <span class="ep">${d.ep}</span>
