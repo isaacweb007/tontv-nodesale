@@ -1146,6 +1146,31 @@ section[id]{scroll-margin-top:84px}
 body[data-page="admin"] .float-cta{display:none}
 body[data-page="admin"]{padding-bottom:0}
 
+/* 어드민 테이블 → 모바일 카드 모드 (가로 스크롤 대신 라벨:값 스택) */
+@media(max-width:680px){
+  .atable-wrap{overflow:visible;border:none;border-radius:0}
+  .atable{min-width:0;display:block}
+  .atable thead{display:none}
+  .atable tbody{display:block}
+  .atable tr{display:block;background:#16181c;border:1px solid #2a2d34;border-radius:12px;padding:5px;margin-bottom:11px}
+  .atable tbody tr:hover{background:#16181c}
+  .atable td{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 11px;border:none;border-top:1px solid #20232a;white-space:normal;text-align:right;color:#cdd1d8}
+  .atable td::before{content:attr(data-label);color:#8a909b;font-size:11.5px;font-weight:700;text-align:left;white-space:nowrap;flex:0 0 auto}
+  .atable td.cell-head{justify-content:flex-start;border-top:none;background:#1b1d22;border-radius:9px;padding:11px 12px;margin-bottom:4px}
+  .atable td.cell-head::before{display:none}
+  .atable td.empty{justify-content:center;border:none;color:#7f858f}
+  .atable td.empty::before{display:none}
+  .atable .mono{font-size:12px}
+  .atable .act{min-height:40px;padding:10px 16px;margin-left:8px}
+  .act{min-height:40px;padding:10px 15px}
+  .cp{min-height:38px}
+  .run-row{flex-direction:column;align-items:stretch}
+  .run-row .btn{width:100%;justify-content:center}
+  .swap-set .btn{width:100%;justify-content:center}
+  .mb-actions{width:100%}
+  .mb-actions .btn{flex:1;justify-content:center}
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */

@@ -121,7 +121,9 @@
     tabs.forEach(t => t.classList.toggle('on', t.dataset.tab === name));
     panels.forEach(p => { const on = p.dataset.panel === name; p.classList.toggle('on', on); p.hidden = !on; });
     if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name);
-    $('.admin-main')?.scrollTo?.(0, 0);
+    // 모바일 가로 탭바: 활성 탭을 가운데로 (세로 스크롤은 유발하지 않음)
+    const at = tabs.find(t => t.dataset.tab === name);
+    if (at && window.innerWidth <= 1024) at.scrollIntoView({ inline: 'center', block: 'nearest' });
   };
   tabs.forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
   const initial = (location.hash || '').replace('#', '');
@@ -196,6 +198,7 @@
       </tr>`).join('') || emptyRow(7);
     $$('#apps-body [data-ap]').forEach(b => b.addEventListener('click', () => approveApp(+b.dataset.ap)));
     $$('#apps-body [data-rj]').forEach(b => b.addEventListener('click', () => rejectApp(+b.dataset.rj)));
+    labelTable($('#apps-body'));
   }
   function approveApp(id) {
     const a = S.applications.find(x => x.id === id); if (!a || a.status !== 'pending') return;
@@ -236,6 +239,7 @@
       </tr>`).join('') || emptyRow(7);
     $$('#deps-body [data-dc]').forEach(b => b.addEventListener('click', () => confirmDeposit(b.dataset.dc)));
     $$('#deps-body [data-df]').forEach(b => b.addEventListener('click', () => failDeposit(b.dataset.df)));
+    labelTable($('#deps-body'));
   }
   function confirmDeposit(id) {
     const d = S.deposits.find(x => x.id === id); if (!d || d.status !== 'unconfirmed') return;
@@ -275,6 +279,7 @@
       </tr>`).join('') || emptyRow(7);
     $$('#ops-body [data-sp]').forEach(b => b.addEventListener('click', () => { S.operators[+b.dataset.sp].status = 'suspended'; pushLog('i-ban', `사업자 ${S.operators[+b.dataset.sp].name} 정지`); toast('사업자 계정을 정지했습니다', 'err'); renderOperators(); }));
     $$('#ops-body [data-av]').forEach(b => b.addEventListener('click', () => { S.operators[+b.dataset.av].status = 'active'; pushLog('i-user-check', `사업자 ${S.operators[+b.dataset.av].name} 활성화`); toast('사업자 계정을 활성화했습니다'); renderOperators(); }));
+    labelTable($('#ops-body'));
   }
 
   // 토큰 분배
@@ -293,6 +298,7 @@
         <td class="ta-num">${fmt2(d.tonx / d.nodes)}</td>
         <td>${badge(d.status)}</td>
       </tr>`).join('');
+    labelTable($('#dist-body'));
   }
   function runDistribution() {
     if (S.distHistory[0]?.date === '2026-06-04') { toast('오늘 분배는 이미 실행되었습니다', 'err'); return; }
@@ -320,6 +326,7 @@
         <td class="muted">${s.pay}</td>
         <td>${badge(s.status)}</td>
       </tr>`).join('');
+    labelTable($('#settle-body'));
   }
   function runSettlement() {
     const s = S.settleHistory.find(x => x.status === 'scheduled');
@@ -365,11 +372,23 @@
         <td class="muted">${t.time}</td>
         <td>${badge(t.status)}</td>
       </tr>`).join('');
+    labelTable($('#tx-body'));
   }
 
   /* ===================== 로그 헬퍼 ===================== */
   function pushLog(i, t) { S.logs.unshift({ i, t, time: '방금' }); S.logs = S.logs.slice(0, 8); if ($('#log-list')) renderOverview(); }
   function emptyRow(cols) { return `<tr><td colspan="${cols}" class="empty">표시할 항목이 없습니다</td></tr>`; }
+  // 모바일 카드 모드: thead 라벨을 각 td에 data-label 로 부여 + 첫 셀은 카드 헤더
+  function labelTable(tb) {
+    if (!tb) return;
+    const heads = [...tb.closest('table').querySelectorAll('thead th')].map(th => th.textContent.trim());
+    tb.querySelectorAll('tr').forEach(tr => {
+      const cells = [...tr.children];
+      if (cells.length === 1 && cells[0].hasAttribute('colspan')) return;   // 빈 행
+      cells.forEach((td, i) => { if (heads[i]) td.setAttribute('data-label', heads[i]); });
+      if (cells[0]) cells[0].classList.add('cell-head');
+    });
+  }
 
   /* ===================== 인터랙션 바인딩 ===================== */
   // 검색 + 필터
