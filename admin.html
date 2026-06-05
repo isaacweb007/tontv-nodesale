@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>운영자 어드민 콘솔 — 신청 · 입금 · 사업자 · 토큰 · 분배 관리 | TonTV</title>
+<meta name="description" content="톤티비 노드세일 운영자 콘솔(데모). 노드 신청 승인, USDT 입금 확인, 사업자 관리, TONX→XONT 토큰 분배, 광고수익 정산, 토큰·지갑 관리를 한 곳에서.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="admin">
+
+<section class="admin" id="admin" style="padding-top:108px">
+  <div class="wrap">
+    <div class="crumb" style="font-size:12.5px;color:#8a909b;margin-bottom:16px;display:flex;gap:9px;align-items:center">
+      <a href="index.html" style="color:#8a909b">홈</a><span style="opacity:.4">/</span><span style="color:#cfd2d8">운영자 어드민</span>
+    </div>
+
+    <div class="admin-head">
+      <div>
+        <span class="eyebrow" style="color:var(--red-2)"><svg class="icon" style="vertical-align:-.15em"><use href="#i-shield"/></svg> 운영자 콘솔 <span class="demo-pill">DEMO</span></span>
+        <h2>플랫폼 <span class="r">전체 관리</span>를 한 화면에서</h2>
+        <p>노드 신청 · 입금 · 사업자 · 토큰 분배 · 광고수익 정산 · 토큰/지갑까지 운영자가 직접 관리합니다.</p>
+      </div>
+      <div class="admin-who">
+        <span class="live-badge"><span class="d"></span> LIVE</span>
+        <div class="op"><div class="av"><svg class="icon"><use href="#i-shield"/></svg></div>
+          <div><div class="nm">운영자 <span style="color:var(--red-2)">@admin</span></div><div class="id">TonGram Ventures · 슈퍼관리자</div></div></div>
+      </div>
+    </div>
+
+    <div class="admin-secnote">
+      <svg class="icon"><use href="#i-alert"/></svg>
+      <span><b>데모 운영자 콘솔입니다.</b> 표시된 모든 신청·입금·잔액·트랜잭션은 예시 데이터이며, 모든 동작은 화면 내 데모로만 반영됩니다. 정식 운영 시에는 <b>관리자 인증(2FA)·권한 분리·서버 검증</b>이 적용됩니다.</span>
+    </div>
+
+    <div class="admin-shell">
+      <!-- ===== sidebar tabs ===== -->
+      <aside class="admin-side" id="admin-tabs">
+        <button class="atab on" data-tab="overview"><svg class="icon"><use href="#i-bars"/></svg> <span>개요</span></button>
+        <button class="atab" data-tab="apps"><svg class="icon"><use href="#i-inbox"/></svg> <span>노드 신청</span><i class="tcount" id="tc-apps">0</i></button>
+        <button class="atab" data-tab="deposits"><svg class="icon"><use href="#i-dollar"/></svg> <span>입금 관리</span><i class="tcount" id="tc-deps">0</i></button>
+        <button class="atab" data-tab="operators"><svg class="icon"><use href="#i-users"/></svg> <span>노드 사업자</span></button>
+        <button class="atab" data-tab="distribute"><svg class="icon"><use href="#i-coins"/></svg> <span>토큰 분배</span></button>
+        <button class="atab" data-tab="adrev"><svg class="icon"><use href="#i-megaphone"/></svg> <span>광고수익 분배</span></button>
+        <button class="atab" data-tab="token"><svg class="icon"><use href="#i-key"/></svg> <span>토큰 관리</span></button>
+        <button class="atab" data-tab="wallet"><svg class="icon"><use href="#i-wallet"/></svg> <span>지갑 관리</span></button>
+        <button class="atab" data-tab="settings"><svg class="icon"><use href="#i-settings"/></svg> <span>설정</span></button>
+      </aside>
+
+      <!-- ===== panels ===== -->
+      <div class="admin-main">
+
+        <!-- 1. 개요 -->
+        <section class="apanel on" data-panel="overview">
+          <div class="metrics am-metrics">
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-server"/></svg></span> 판매 노드</div><div class="v" id="o-nodes">0</div><div class="sub"><span class="up" id="o-nodes-cap">/ 3,000</span> 1차 풀</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 누적 입금</div><div class="v r" id="o-deposit">$0</div><div class="sub"><span class="livedot"></span> 트레저리 유입</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-inbox"/></svg></span> 대기 신청</div><div class="v" id="o-pending">0</div><div class="sub">승인 대기 건</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-clock"/></svg></span> 미확인 입금</div><div class="v" id="o-unconf">0</div><div class="sub">확인 필요</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-users"/></svg></span> 활성 사업자</div><div class="v" id="o-ops">0</div><div class="sub">노드 보유</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-pie"/></svg></span> 이번 달 노드풀</div><div class="v r" id="o-pool">$0</div><div class="sub">매출 10%</div></div>
+          </div>
+
+          <div class="dash-grid-2">
+            <div class="dash-card">
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-alert"/></svg></span> 처리 대기 (액션 필요)</h3><span class="tagx" id="todo-count">0건</span></div>
+              <div class="nodelist" id="todo-list"></div>
+            </div>
+            <div class="dash-card">
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 최근 활동 로그</h3><span class="tagx"><span class="livedot"></span> 실시간</span></div>
+              <div class="nodelist" id="log-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. 노드 신청 -->
+        <section class="apanel" data-panel="apps" hidden>
+          <div class="atoolbar">
+            <div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="apps-q" placeholder="신청자 · 지갑 검색"></div>
+            <div class="aseg" id="apps-filter">
+              <button class="on" data-f="all">전체</button>
+              <button data-f="pending">대기</button>
+              <button data-f="approved">승인</button>
+              <button data-f="rejected">거절</button>
+            </div>
+            <span class="acount" id="apps-count">0건</span>
+          </div>
+          <div class="atable-wrap">
+            <table class="atable">
+              <thead><tr><th>신청자</th><th>지갑</th><th>수량</th><th>금액 (USDT)</th><th>신청일</th><th>상태</th><th class="ta-r">처리</th></tr></thead>
+              <tbody id="apps-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 3. 입금 관리 -->
+        <section class="apanel" data-panel="deposits" hidden>
+          <div class="mini-stats">
+            <div class="ms"><div class="l">트레저리 누적 유입</div><div class="v r" id="d-total">$0</div></div>
+            <div class="ms"><div class="l">오늘 유입</div><div class="v" id="d-today">$0</div></div>
+            <div class="ms"><div class="l">미확인</div><div class="v" id="d-unconf">0</div></div>
+            <div class="ms"><div class="l">확인 완료</div><div class="v" id="d-conf">0</div></div>
+          </div>
+          <div class="atoolbar">
+            <div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="deps-q" placeholder="주문 · TX 해시 검색"></div>
+            <div class="aseg" id="deps-filter">
+              <button class="on" data-f="all">전체</button>
+              <button data-f="unconfirmed">미확인</button>
+              <button data-f="confirmed">확인</button>
+              <button data-f="failed">실패</button>
+            </div>
+            <span class="acount" id="deps-count">0건</span>
+          </div>
+          <div class="atable-wrap">
+            <table class="atable">
+              <thead><tr><th>주문</th><th>금액</th><th>네트워크</th><th>TX 해시</th><th>시각</th><th>상태</th><th class="ta-r">처리</th></tr></thead>
+              <tbody id="deps-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. 노드 사업자 -->
+        <section class="apanel" data-panel="operators" hidden>
+          <div class="mini-stats">
+            <div class="ms"><div class="l">총 사업자</div><div class="v" id="op-total">0</div></div>
+            <div class="ms"><div class="l">활성</div><div class="v" style="color:#5ee08a" id="op-active">0</div></div>
+            <div class="ms"><div class="l">정지</div><div class="v" style="color:var(--red-2)" id="op-susp">0</div></div>
+            <div class="ms"><div class="l">총 노드</div><div class="v" id="op-nodes">0</div></div>
+          </div>
+          <div class="atoolbar">
+            <div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="ops-q" placeholder="사업자 · 지갑 검색"></div>
+            <div class="aseg" id="ops-filter">
+              <button class="on" data-f="all">전체</button>
+              <button data-f="active">활성</button>
+              <button data-f="suspended">정지</button>
+            </div>
+            <span class="acount" id="ops-count">0건</span>
+          </div>
+          <div class="atable-wrap">
+            <table class="atable">
+              <thead><tr><th>사업자</th><th>지갑</th><th>노드</th><th>KYC</th><th>가입일</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
+              <tbody id="ops-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 5. 토큰 분배 -->
+        <section class="apanel" data-panel="distribute" hidden>
+          <div class="dash-card mirror-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> TONX <span class="r">→</span> XONT 미러 분배</h3><span class="tagx">시청자 채굴량 = 노드 풀 발행 (1:1)</span></div>
+            <div class="mirror">
+              <div class="mside"><div class="ms-tag"><svg class="icon"><use href="#i-eye"/></svg> 오늘 시청자 채굴 · <b>TONX</b></div><div class="ms-big" id="ad-tonx">0</div><div class="ms-sub"><span class="livedot"></span> 전체 시청자 합산 · 실시간</div></div>
+              <div class="mirror-mid"><div class="mm-ratio">1 : 1</div><div class="mm-arrow"><svg class="icon"><use href="#i-arrow-ur"/></svg></div><div class="mm-label">동일 수량<br>미러 발행</div></div>
+              <div class="mside nodes"><div class="ms-tag"><svg class="icon"><use href="#i-server"/></svg> 노드 풀 발행 · <b>XONT</b></div><div class="ms-big r" id="ad-xont">0</div><div class="ms-sub">전체 노드 <b id="ad-nodes">0</b>개 균등 분배 (÷N)</div>
+                <div class="pernode"><div class="pn"><div class="l">노드 1개 (오늘)</div><div class="v" id="ad-per">0</div></div><div class="pn"><div class="l">분배 상태</div><div class="v r" id="ad-state" style="font-size:14px">대기</div></div></div></div>
+            </div>
+            <div class="run-row">
+              <label class="atoggle"><input type="checkbox" id="ad-auto" checked><span class="tk"></span> 자동 분배 (매일 00:00 KST)</label>
+              <button class="btn btn-red" id="ad-run"><svg class="icon"><use href="#i-refresh"/></svg> 오늘 분배 실행</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 분배 이력</h3><span class="tagx">최근 분배 라운드</span></div>
+            <div class="atable-wrap">
+              <table class="atable">
+                <thead><tr><th>일자</th><th>시청자 TONX</th><th>발행 XONT</th><th>노드수</th><th>노드당</th><th>상태</th></tr></thead>
+                <tbody id="dist-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. 광고수익 분배 -->
+        <section class="apanel" data-panel="adrev" hidden>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 이번 달 매출 분배 (노드 풀)</h3><span class="tagx">매출 10% · 노드 지분</span></div>
+            <div class="adrev">
+              <div class="donut"><div class="cc"><div class="l">노드 풀 (10%)</div><div class="v" id="ar-pool">$0</div></div></div>
+              <div class="legend">
+                <div class="lr"><span class="ll"><span class="sw" style="background:var(--red)"></span> 광고 매출</span><span class="lv" id="ar-ad">$0</span></div>
+                <div class="lr"><span class="ll"><span class="sw" style="background:#f5c451"></span> 구독 매출</span><span class="lv" id="ar-sub">$0</span></div>
+                <div class="lr"><span class="ll"><span class="sw" style="background:#3a82f6"></span> 토큰·생태계</span><span class="lv" id="ar-tok">$0</span></div>
+                <div class="lr" style="border-top:1px solid #2a2d34;padding-top:14px;margin-top:4px"><span class="ll" style="color:#fff;font-weight:800">노드당 배분 (3,000개)</span><span class="lv" style="color:var(--red-2)" id="ar-per">$0</span></div>
+              </div>
+            </div>
+            <div class="run-row">
+              <div class="dlabel"><svg class="icon"><use href="#i-calendar"/></svg> 다음 월 정산 <b id="ar-dday">D-6</b> · 익월 10일 자동 지급</div>
+              <button class="btn btn-red" id="ar-run"><svg class="icon"><use href="#i-refresh"/></svg> 월 정산 실행</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 정산 이력</h3><span class="tagx">월별 노드 풀 지급</span></div>
+            <div class="atable-wrap">
+              <table class="atable">
+                <thead><tr><th>정산 월</th><th>총 매출</th><th>노드 풀(10%)</th><th>노드수</th><th>노드당</th><th>지급일</th><th>상태</th></tr></thead>
+                <tbody id="settle-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. 토큰 관리 -->
+        <section class="apanel" data-panel="token" hidden>
+          <div class="dash-grid-2" style="margin-bottom:20px">
+            <div class="dash-card">
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-eye"/></svg></span> TONX (시청자 토큰)</h3><span class="tagx">총발행 100억</span></div>
+              <div class="tk-stat"><div class="r1"><span>총 발행 한도</span><b>10,000,000,000</b></div>
+                <div class="sbar"><i id="tk-tonx-bar" style="width:0%"></i></div>
+                <div class="r2"><span>누적 채굴 <b id="tk-tonx-mined">0</b></span><span id="tk-tonx-pct">0%</span></div>
+                <div class="r3"><div><div class="l">유통량</div><div class="v" id="tk-tonx-circ">0</div></div><div><div class="l">홀더</div><div class="v" id="tk-tonx-holders">0</div></div></div>
+              </div>
+            </div>
+            <div class="dash-card">
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-server"/></svg></span> XONT (노드 토큰)</h3><span class="tagx">노드 채굴·정산</span></div>
+              <div class="tk-stat"><div class="r1"><span>총 발행량</span><b id="tk-xont-supply">0</b></div>
+                <div class="r3" style="margin-top:14px"><div><div class="l">유통량</div><div class="v" id="tk-xont-circ">0</div></div><div><div class="l">스테이킹 락업</div><div class="v" id="tk-xont-stake">0</div></div></div>
+                <div class="r3"><div><div class="l">데모 시세</div><div class="v" id="tk-xont-price">$0.85</div></div><div><div class="l">홀더</div><div class="v" id="tk-xont-holders">0</div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-arrow-ur"/></svg></span> TONX ⇄ XONT 스왑 비율 설정</h3><span class="tagx" id="swap-state-tag">미설정 (TBD)</span></div>
+            <p class="amini-desc">현재 스왑은 <b>비활성</b> 상태입니다. 비율을 설정·활성화하면 사용자 대시보드에 노출됩니다.</p>
+            <div class="swap-set">
+              <div class="field"><label>1 XONT 당 TONX</label><div class="inp-amt"><input type="text" inputmode="decimal" id="swap-ratio" placeholder="예: 12.5"><span class="unit">TONX</span></div></div>
+              <label class="atoggle"><input type="checkbox" id="swap-active"><span class="tk"></span> 스왑 활성화</label>
+              <button class="btn btn-red" id="swap-save">비율 저장</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-sliders"/></svg></span> 발행 · 소각 (운영)</h3><span class="tagx">데모</span></div>
+            <div class="mintburn">
+              <div class="field"><label>토큰</label><div class="aseg sm" id="mb-token"><button class="on" data-t="XONT">XONT</button><button data-t="TONX">TONX</button></div></div>
+              <div class="field"><label>수량</label><div class="inp-amt"><input type="text" inputmode="decimal" id="mb-amt" placeholder="0"><span class="unit" id="mb-unit">XONT</span></div></div>
+              <div class="mb-actions"><button class="btn btn-red" id="mb-mint"><svg class="icon"><use href="#i-plus"/></svg> 발행</button><button class="btn btn-ghost-dark" id="mb-burn"><svg class="icon"><use href="#i-flame"/></svg> 소각</button></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. 지갑 관리 -->
+        <section class="apanel" data-panel="wallet" hidden>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-wallet"/></svg></span> 트레저리 지갑</h3><span class="tagx">운영 지갑 잔액</span></div>
+            <div class="walletlist" id="wallet-list"></div>
+          </div>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-key"/></svg></span> 입금 주소 관리 (USDT-TRC20)</h3><span class="tagx">신청 모달 노출 주소</span></div>
+            <div class="addr-manage">
+              <div class="cur"><div class="l">현재 입금 주소</div><div class="copy-field"><span class="val" id="cur-addr">—</span><button class="cp" id="adm-copy-addr">복사</button></div></div>
+              <div class="field"><label>새 입금 주소로 교체</label><input class="inp" id="new-addr" placeholder="T... TRC20 주소 입력"></div>
+              <button class="btn btn-red" id="addr-save"><svg class="icon"><use href="#i-check"/></svg> 주소 교체</button>
+              <p class="amini-desc" style="margin-top:10px"><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#i-alert"/></svg> 교체 시 신청 모달의 입금 주소가 즉시 변경됩니다. 정식 운영에서는 멀티시그·화이트리스트 검증이 필요합니다.</p>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 최근 트랜잭션</h3><span class="tagx">유입 · 지급 · 발행</span></div>
+            <div class="atable-wrap">
+              <table class="atable">
+                <thead><tr><th>유형</th><th>지갑</th><th>금액</th><th>상대 / TX</th><th>시각</th><th>상태</th></tr></thead>
+                <tbody id="tx-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9. 설정 -->
+        <section class="apanel" data-panel="settings" hidden>
+          <div class="dash-grid-2">
+            <div class="dash-card">
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-server"/></svg></span> 노드 세일</h3></div>
+              <div class="field"><label>노드 1개 가격 (USD)</label><div class="inp-amt"><input type="text" inputmode="numeric" id="set-price" value="1000"><span class="unit">USD</span></div></div>
+              <div class="field"><label>1차 판매 한도 (개)</label><div class="inp-amt"><input type="text" inputmode="numeric" id="set-cap1" value="3000"><span class="unit">개</span></div></div>
+              <div class="field"><label>총 발행 상한 (개)</label><div class="inp-amt"><input type="text" inputmode="numeric" id="set-cap-total" value="50000"><span class="unit">개</span></div></div>
+              <div class="field"><label>가동 시점</label><input class="inp" id="set-launch" value="2026. 9"></div>
+            </div>
+            <div class="dash-card">
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 추천 · 스테이킹</h3></div>
+              <div class="set2col">
+                <div class="field"><label>1단계 추천 (%)</label><div class="inp-amt"><input type="text" inputmode="decimal" id="set-ref1" value="10"><span class="unit">%</span></div></div>
+                <div class="field"><label>2단계 추천 (%)</label><div class="inp-amt"><input type="text" inputmode="decimal" id="set-ref2" value="3"><span class="unit">%</span></div></div>
+              </div>
+              <label class="amini-label">스테이킹 APY (%)</label>
+              <div class="apy-grid">
+                <div class="apf"><span>1개월</span><input id="set-apy1" value="6"></div>
+                <div class="apf"><span>3개월</span><input id="set-apy3" value="10"></div>
+                <div class="apf"><span>6개월</span><input id="set-apy6" value="15"></div>
+                <div class="apf"><span>12개월</span><input id="set-apy12" value="24"></div>
+              </div>
+              <label class="atoggle" style="margin-top:16px"><input type="checkbox" id="set-maint"><span class="tk"></span> 점검 모드 (사용자 구매 일시 중지)</label>
+            </div>
+          </div>
+          <div class="set-save-row">
+            <button class="btn btn-red btn-lg" id="set-save"><svg class="icon"><use href="#i-check"/></svg> 설정 저장</button>
+            <span class="amini-desc">변경은 데모로만 반영됩니다.</span>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <p class="dash-note">※ 본 어드민은 <span class="r">데모 데이터</span>로 동작하는 운영자 콘솔 프로토타입입니다. 정식 가동 시 관리자 인증·권한·온체인 데이터와 연동됩니다.</p>
+  </div>
+</section>
+
+<script src="layout.js"></script>
+<script src="app.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
