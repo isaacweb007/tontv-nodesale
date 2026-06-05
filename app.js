@@ -260,10 +260,56 @@
     const wk = ['penthouse', 'revenge', 'palace', 'neonstreet', 'hourglass', 'garden', 'petals', 'boardroom', 'cosmic', 'moonpalace', 'redoffice', 'cinderella'];
     wall.innerHTML = wk.map((k, i) => `<i>${scene(k, 'w' + i)}</i>`).join('');
   }
-  /* hero phone mockup — SVG film still sits BEHIND an optional AI photo overlay
-     (the <img> in markup; if it fails to load it removes itself → SVG shows) */
+  /* hero phone mockup — cycles the 10 TOP10 dramas every 2s.
+     Each frame = SVG film still (always renders) BEHIND an AI photo overlay
+     (<img>; removes itself on error → SVG shows). Title · 채굴 배지 · 좋아요/댓글 ·
+     진행 바가 함께 바뀐다. 크로스페이드 · prefers-reduced-motion 존중. */
   const psScene = $('#ps-scene');
-  if (psScene) psScene.insertAdjacentHTML('afterbegin', scene('penthouse', 'ph'));
+  if (psScene) {
+    const tEl = $('.ps-bottom .t'), mineEl = $('#ps-mine'), progEl = $('.ps-progress i');
+    const sideB = $$('.ps-side b');                       // [0]=좋아요, [1]=댓글
+    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // per-드라마 engagement (좋아요 · 댓글 · 채굴량) — TOP10 순서와 1:1
+    const META = [
+      { like: '24.1K', cmt: '3.8K', x: 12 }, { like: '31.6K', cmt: '5.1K', x: 15 },
+      { like: '27.3K', cmt: '4.2K', x: 11 }, { like: '22.8K', cmt: '3.4K', x: 13 },
+      { like: '19.5K', cmt: '2.9K', x: 14 }, { like: '18.1K', cmt: '2.6K', x: 10 },
+      { like: '20.4K', cmt: '3.1K', x: 12 }, { like: '16.7K', cmt: '2.3K', x: 16 },
+      { like: '15.2K', cmt: '2.1K', x: 11 }, { like: '13.9K', cmt: '1.9K', x: 13 },
+    ];
+    const imgSrc = k => k === 'penthouse' ? 'assets/penthouse-still.jpg' : `assets/posters/${k}.jpg`;
+    const restartProgress = () => {
+      if (!progEl || reduce) return;
+      progEl.style.animation = 'none'; progEl.style.width = '0%';
+      void progEl.offsetWidth;                            // force reflow
+      progEl.style.transition = 'width 2s linear'; progEl.style.width = '100%';
+    };
+    const paintHero = i => {
+      const d = TOP10[i], m = META[i] || META[0];
+      psScene.innerHTML = scene(d.k, 'ph' + i) +
+        `<img class="ps-img" src="${imgSrc(d.k)}" alt="${d.t} 장면" onerror="this.remove()">`;
+      if (tEl) tEl.textContent = `${d.t} · ${d.ep}`;
+      if (mineEl) mineEl.textContent = `+${m.x} XONT 채굴중`;
+      if (sideB[0]?.lastChild) sideB[0].lastChild.textContent = m.like;
+      if (sideB[1]?.lastChild) sideB[1].lastChild.textContent = m.cmt;
+      restartProgress();
+    };
+    // 초기 프레임(penthouse)은 마크업의 이미지 그대로 — SVG 씬만 뒤에 깔고 진행바 시작
+    psScene.insertAdjacentHTML('afterbegin', scene(TOP10[0].k, 'ph0'));
+    restartProgress();
+    let hi = 0;
+    setInterval(() => {
+      hi = (hi + 1) % TOP10.length;
+      if (reduce) { paintHero(hi); return; }              // 모션 최소화: 즉시 전환
+      psScene.style.transition = 'opacity .4s ease'; psScene.style.opacity = '0';
+      if (tEl) { tEl.style.transition = 'opacity .4s ease'; tEl.style.opacity = '0'; }
+      setTimeout(() => {
+        paintHero(hi);
+        psScene.style.opacity = '1';
+        if (tEl) tEl.style.opacity = '1';
+      }, 380);
+    }, 2000);
+  }
 
   /* =========================================================
      3. REVEAL on scroll (robust scroll-scan, no IntersectionObserver)
