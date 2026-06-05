@@ -1044,6 +1044,19 @@ section[id]{scroll-margin-top:84px}
   .buy{padding:40px 24px}
   .modal-body{padding:22px}
   .qr-zone{flex-direction:column;text-align:center}
+  /* --- 모바일 폴리시: 레일 헤더 줄바꿈 · 탭 타깃 44px · 고정 CTA 클리어런스 --- */
+  .rail-head{flex-wrap:wrap;gap:8px 14px}
+  .rail-head .lbl{flex-wrap:wrap}
+  .burger{width:44px;height:44px;align-items:center;justify-content:center;padding:0;gap:5px}
+  .nav .btn{min-height:42px}
+  .wbtn{min-height:46px}
+  .tsel{min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .rc-copy{min-height:44px}
+  .sw-btn{min-height:44px}
+  .inp-amt .max{padding:11px 14px;font-size:12px}
+  .copy-field .cp{padding:11px 16px}
+  .modal-x{width:40px;height:40px}
+  body{padding-bottom:84px}        /* 하단 고정 CTA가 마지막 콘텐츠를 가리지 않도록 */
 }
 @media(max-width:520px){
   .brand-div,.brand .tag{display:none}
@@ -1054,6 +1067,7 @@ section[id]{scroll-margin-top:84px}
   .wrap{padding:0 18px}
   .sec-head.row{flex-direction:column;align-items:flex-start;gap:10px}
   .cta-band{padding:36px 22px}
+  .rail-head .lbl{font-size:17px}
 }
 
 @media(prefers-reduced-motion:reduce){
