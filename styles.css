@@ -1150,6 +1150,55 @@ section[id]{scroll-margin-top:84px}
 body[data-page="admin"] .float-cta{display:none}
 body[data-page="admin"]{padding-bottom:0}
 
+/* =========================================================
+   ADMIN · 프리미엄 폴리시 (데이터 타이포 · 포커스 · 마이크로 인터랙션)
+   ========================================================= */
+.admin{--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+/* 데이터·숫자는 모노 + 탭ular figures (운영 콘솔 정밀감) */
+.admin .mono,.admin .ta-num,.admin .am-metrics .metric .v,.admin .mini-stats .ms .v,
+.admin .ms-big,.admin .pernode .v,.admin .tk-stat .r1 b,.admin .tk-stat .r3 .v,
+.admin .wrow .wb,.admin .wrow .wa,.admin .rc-code,.admin .donut .cc .v,.admin .ref-total .v{
+  font-family:var(--font-mono);font-feature-settings:"tnum" 1,"zero" 1;letter-spacing:-.015em}
+
+/* focus-visible 링 — 키보드 접근성 + 폴리시 (브랜드 레드) */
+.admin a:focus-visible,.atab:focus-visible,.aseg button:focus-visible,.act:focus-visible,
+.admin .btn:focus-visible,.cp:focus-visible,.rc-copy:focus-visible,.sw-btn:focus-visible,
+.atable th.sortable:focus-visible,.nav-admin:focus-visible{outline:2px solid var(--red-2);outline-offset:2px;border-radius:9px}
+.admin .inp:focus-visible,.admin .asearch:focus-within,.admin .inp-amt:focus-within{outline:2px solid rgba(232,17,45,.5);outline-offset:1px}
+.atoggle input:focus-visible+.tk{outline:2px solid var(--red-2);outline-offset:2px}
+
+/* 마이크로 인터랙션 — 부드러운 전이 + press 피드백 */
+.atab,.aseg button,.act,.metric,.wrow{transition:background .16s var(--ease),color .15s,border-color .2s,transform .2s var(--ease),box-shadow .2s var(--ease)}
+.act:active,.aseg button:active,.atab:active{transform:scale(.97)}
+.am-metrics .metric:hover{border-color:#3a3d45;transform:translateY(-2px);box-shadow:0 10px 28px -16px rgba(0,0,0,.7)}
+.atable tbody tr{transition:background .15s}
+.atable tbody tr:hover td.cell-head{box-shadow:inset 3px 0 0 var(--red-2)}
+.wrow:hover{border-color:#3a3d45;transform:translateY(-1px)}
+
+/* KPI 스파크라인 (미니 추세) */
+.am-metrics .metric{padding-bottom:32px}
+.am-metrics .metric>:not(.spark){position:relative;z-index:1}
+.am-metrics .metric .spark{position:absolute;left:0;right:0;bottom:0;height:30px;width:100%;opacity:.9;z-index:0;pointer-events:none}
+.am-metrics .metric .mdelta{font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:3px}
+.mdelta.up{color:#5ee08a}.mdelta.down{color:#ff8a96}
+
+/* 정렬 가능한 테이블 헤더 */
+.atable th.sortable{cursor:pointer;user-select:none;transition:color .15s}
+.atable th.sortable:hover{color:#e6e8ec}
+.atable th .sar{display:inline-block;margin-left:5px;font-size:8px;opacity:.32;transition:.18s var(--ease);transform:translateY(-1px)}
+.atable th[aria-sort] .sar{opacity:1;color:var(--red-2)}
+.atable th[aria-sort="descending"] .sar{transform:translateY(-1px) rotate(180deg)}
+
+/* 상태 배지 — 선행 상태 도트 */
+.stbadge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;flex:0 0 auto;opacity:.95}
+.stbadge.amber::before{animation:pulse 1.8s infinite}
+
+/* 정교한 빈 상태 */
+.empty-ico{display:flex;flex-direction:column;align-items:center;gap:9px;color:#6f757f;padding:28px 10px}
+.empty-ico .icon{width:30px;height:30px;opacity:.45}
+.empty-ico b{color:#9aa0ab;font-size:13.5px;font-weight:700}
+.empty-ico span{font-size:12px}
+
 /* 어드민 테이블 → 모바일 카드 모드 (가로 스크롤 대신 라벨:값 스택) */
 @media(max-width:680px){
   .atable-wrap{overflow:visible;border:none;border-radius:0}

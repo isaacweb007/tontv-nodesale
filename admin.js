@@ -180,9 +180,10 @@
   // 노드 신청
   let appsFilter = 'all', appsQ = '';
   function renderApps() {
-    const rows = S.applications.filter(a =>
+    let rows = S.applications.filter(a =>
       (appsFilter === 'all' || a.status === appsFilter) &&
       (!appsQ || a.name.includes(appsQ) || a.wallet.toLowerCase().includes(appsQ.toLowerCase()) || String(a.id).includes(appsQ)));
+    rows = applySort('apps', rows);
     $('#apps-count').textContent = rows.length + '건';
     $('#apps-body').innerHTML = rows.map(a => `
       <tr>
@@ -221,9 +222,10 @@
     $('#d-today').textContent = '$' + fmt(all.filter(d => d.time.startsWith('06-04')).reduce((s, d) => s + d.amount, 0));
     $('#d-unconf').textContent = all.filter(d => d.status === 'unconfirmed').length;
     $('#d-conf').textContent = all.filter(d => d.status === 'confirmed').length;
-    const rows = all.filter(d =>
+    let rows = all.filter(d =>
       (depsFilter === 'all' || d.status === depsFilter) &&
       (!depsQ || d.id.toLowerCase().includes(depsQ.toLowerCase()) || d.tx.includes(depsQ) || String(d.order).includes(depsQ)));
+    rows = applySort('deps', rows);
     $('#deps-count').textContent = rows.length + '건';
     $('#deps-body').innerHTML = rows.map(d => `
       <tr>
@@ -261,9 +263,10 @@
     $('#op-active').textContent = fmt(1828);
     $('#op-susp').textContent = S.operators.filter(o => o.status === 'suspended').length + 12;
     $('#op-nodes').textContent = fmt(S.totalNodes);
-    const rows = S.operators.filter(o =>
+    let rows = S.operators.filter(o =>
       (opsFilter === 'all' || o.status === opsFilter) &&
       (!opsQ || o.name.includes(opsQ) || o.wallet.toLowerCase().includes(opsQ.toLowerCase())));
+    rows = applySort('ops', rows);
     $('#ops-count').textContent = `${rows.length}명 표시 · 전체 1,842`;
     $('#ops-body').innerHTML = rows.map((o, i) => `
       <tr>
@@ -377,7 +380,49 @@
 
   /* ===================== 로그 헬퍼 ===================== */
   function pushLog(i, t) { S.logs.unshift({ i, t, time: '방금' }); S.logs = S.logs.slice(0, 8); if ($('#log-list')) renderOverview(); }
-  function emptyRow(cols) { return `<tr><td colspan="${cols}" class="empty">표시할 항목이 없습니다</td></tr>`; }
+  function emptyRow(cols) { return `<tr><td colspan="${cols}" class="empty"><div class="empty-ico"><svg class="icon"><use href="#i-inbox"/></svg><b>표시할 항목이 없습니다</b><span>필터를 조정하거나 검색어를 지워보세요</span></div></td></tr>`; }
+
+  /* ===================== 테이블 정렬 (클릭/키보드) ===================== */
+  const SORT = { apps: { i: null, d: 1 }, deps: { i: null, d: 1 }, ops: { i: null, d: 1 } };
+  const SORT_COLS = {  // 컬럼 인덱스 → 정렬 접근자 (null = 정렬 불가)
+    apps: [a => a.name, a => a.wallet, a => a.qty, a => a.qty, a => a.date, a => a.status, null],
+    deps: [d => d.id, d => d.amount, null, d => d.tx, d => d.time, d => d.status, null],
+    ops: [o => o.name, o => o.wallet, o => o.nodes, o => o.kyc, o => o.joined, o => o.status, null],
+  };
+  function applySort(key, arr) {
+    const s = SORT[key]; if (s.i == null) return arr;
+    const acc = SORT_COLS[key][s.i]; if (!acc) return arr;
+    return [...arr].sort((a, b) => { const x = acc(a), y = acc(b); return (x < y ? -1 : x > y ? 1 : 0) * s.d; });
+  }
+  function bindSort(key, bodyId, reRender) {
+    const table = $('#' + bodyId).closest('table');
+    [...table.querySelectorAll('thead th')].forEach((th, i) => {
+      if (!SORT_COLS[key][i]) return;
+      th.classList.add('sortable'); th.tabIndex = 0; th.setAttribute('role', 'button');
+      if (!th.querySelector('.sar')) th.insertAdjacentHTML('beforeend', '<span class="sar" aria-hidden="true">▲</span>');
+      const go = () => {
+        const s = SORT[key]; if (s.i === i) s.d *= -1; else { s.i = i; s.d = 1; }
+        [...table.querySelectorAll('thead th')].forEach(h => h.removeAttribute('aria-sort'));
+        th.setAttribute('aria-sort', s.d === 1 ? 'ascending' : 'descending');
+        reRender();
+      };
+      th.onclick = go;
+      th.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } };
+    });
+  }
+
+  /* ===================== KPI 스파크라인 (미니 추세) ===================== */
+  function spark(seed, up) {
+    const n = 22, pts = []; let v = 46;
+    for (let i = 0; i < n; i++) { v += (Math.sin(seed + i * 0.6) + Math.cos(seed * 1.7 + i * 0.33)) * 7 + (up ? 1.4 : -1.4); v = Math.max(10, Math.min(90, v)); pts.push(v); }
+    const W = 200, H = 30, col = up ? '#22c55e' : '#ef4444';
+    const line = pts.map((p, i) => `${(i / (n - 1) * W).toFixed(1)},${(H - p / 100 * H).toFixed(1)}`).join(' ');
+    const u = 'spk' + Math.round(seed * 97);
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".30"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><polyline points="0,${H} ${line} ${W},${H}" fill="url(#${u})"/><polyline points="${line}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/></svg>`;
+  }
+  function injectSparklines() {
+    $$('.am-metrics .metric').forEach((m, i) => { if (!m.querySelector('.spark')) m.insertAdjacentHTML('beforeend', spark(i * 1.3 + 0.6, true)); });
+  }
   // 모바일 카드 모드: thead 라벨을 각 td에 data-label 로 부여 + 첫 셀은 카드 헤더
   function labelTable(tb) {
     if (!tb) return;
@@ -466,4 +511,8 @@
   /* ===================== 초기 렌더 ===================== */
   renderOverview(); renderApps(); renderDeposits(); renderOperators();
   renderDist(); renderAdrev(); renderToken(); renderWallets();
+  injectSparklines();
+  bindSort('apps', 'apps-body', renderApps);
+  bindSort('deps', 'deps-body', renderDeposits);
+  bindSort('ops', 'ops-body', renderOperators);
 })();
