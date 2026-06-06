@@ -744,6 +744,10 @@ section[id]{scroll-margin-top:84px}
 .stkrow .reward .rv{color:#5ee08a;font-weight:800;font-size:13.5px;font-variant-numeric:tabular-nums}
 .stkrow .reward .rl{font-size:10.5px;color:#7f858f}
 
+.sim-banner{display:flex;gap:12px;align-items:flex-start;background:rgba(245,196,81,.1);border:1px solid rgba(245,196,81,.34);border-radius:14px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#e7cf94;line-height:1.6}
+.sim-banner .icon{color:var(--gold);flex:0 0 auto;margin-top:2px;width:18px;height:18px}
+.sim-banner b{color:#fff}
+.ex-tag{font-size:10px;font-weight:800;color:var(--gold);background:rgba(245,196,81,.16);border:1px solid rgba(245,196,81,.34);border-radius:6px;padding:2px 7px;vertical-align:2px;letter-spacing:.03em}
 .dash-note{margin-top:24px;text-align:center;font-size:12.5px;color:#7f858f}
 .dash-note .r{color:var(--red-2);font-weight:700}
 

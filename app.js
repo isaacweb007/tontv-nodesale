@@ -632,8 +632,8 @@
   $('#connect-wallet')?.addEventListener('click', () => {
     connected = !connected;
     const btn = $('#connect-wallet'), id = $('#wallet-id');
-    if (connected) { btn.innerHTML = '<svg class="icon"><use href="#i-check"/></svg> 지갑 연결됨'; btn.classList.add('btn-red'); id.textContent = 'EQ로 시작 · 지갑 연결됨'; toast('TON Connect · 지갑이 연결되었습니다'); }
-    else { btn.textContent = '지갑 연결'; id.textContent = '연결 안 됨 — 클릭하여 연결'; toast('지갑 연결이 해제되었습니다', 'err'); }
+    if (connected) { btn.innerHTML = '<svg class="icon"><use href="#i-check"/></svg> 지갑 연결됨'; btn.classList.add('btn-red'); id.textContent = '예시 계정 · 지갑 연결됨 (데모)'; toast('TON Connect · 지갑이 연결되었습니다 (시뮬레이션)'); }
+    else { btn.textContent = '지갑 연결'; id.textContent = '예시 계정 · 연결 안 됨'; toast('지갑 연결이 해제되었습니다', 'err'); }
   });
   const needWallet = () => { if (!connected) { toast('먼저 지갑을 연결하세요', 'err'); return true; } return false; };
 
