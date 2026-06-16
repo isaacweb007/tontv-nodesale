@@ -260,6 +260,33 @@
     const wk = ['penthouse', 'revenge', 'palace', 'neonstreet', 'hourglass', 'garden', 'petals', 'boardroom', 'cosmic', 'moonpalace', 'redoffice', 'cinderella'];
     wall.innerHTML = wk.map((k, i) => `<i>${scene(k, 'w' + i)}</i>`).join('');
   }
+
+  /* hero headline typewriter (index only) — styled segments(자산/인프라) preserved + cursor */
+  const heroH1 = $('.hero-copy h1');
+  if (heroH1) {
+    const twReduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const L1 = [{ t: '시청이 ' }, { t: '자산', c: 'r' }, { t: '이 되는 플랫폼,' }];
+    const L2 = [{ t: '그 ' }, { t: '인프라를 소유', c: 'u' }, { t: '하세요.' }];
+    const segLen = a => a.reduce((s, x) => s + [...x.t].length, 0);
+    const L1n = segLen(L1), TOTAL = L1n + segLen(L2);
+    const escH = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const lineHTML = (segs, k) => { let o = '', c = 0; for (const s of segs) { const ch = [...s.t], tk = Math.max(0, Math.min(ch.length, k - c)), sh = ch.slice(0, tk).join(''); if (sh) o += s.c ? `<span class="${s.c}">${escH(sh)}</span>` : escH(sh); c += ch.length; } return o; };
+    const renderH = n => n <= L1n ? lineHTML(L1, n) : lineHTML(L1, L1n) + '<br>' + lineHTML(L2, n - L1n);
+    heroH1.innerHTML = renderH(TOTAL);                 // full state first → reserve height (no layout shift)
+    heroH1.style.minHeight = heroH1.offsetHeight + 'px';
+    if (!twReduce) {
+      heroH1.innerHTML = '<span class="tw"></span><span class="tw-cursor" aria-hidden="true"></span>';
+      const tw = $('.tw', heroH1), cur = $('.tw-cursor', heroH1);
+      let n = 0;
+      const typeNext = () => {
+        n++; tw.innerHTML = renderH(n);
+        if (n >= TOTAL) { setTimeout(() => cur && cur.remove(), 2400); return; }
+        setTimeout(typeNext, n === L1n ? 280 : 50 + Math.random() * 46);
+      };
+      setTimeout(typeNext, 280);
+    }
+  }
+
   /* hero phone mockup — cycles the 10 TOP10 dramas every 2s.
      Each frame = SVG film still (always renders) BEHIND an AI photo overlay
      (<img>; removes itself on error → SVG shows). Title · 채굴 배지 · 좋아요/댓글 ·
