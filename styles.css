@@ -1467,3 +1467,45 @@ body[data-page="admin"]{padding-bottom:0}
   .post-pager{grid-template-columns:1fr}
   .post-pager .nx{text-align:left}
 }
+
+/* ============================================================
+   RESOURCES / MEDIA KIT — posters + brochure (resources.html)
+   ============================================================ */
+.btn-sm{padding:9px 16px;font-size:13px}
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+.res-poster{margin:0;display:flex;flex-direction:column}
+.res-shot{display:block;position:relative;border-radius:18px;overflow:hidden;background:#0a0506;
+  box-shadow:var(--shadow-up);aspect-ratio:2/3;transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.res-shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
+.res-shot::after{content:"";position:absolute;inset:0;border-radius:18px;pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+  background:linear-gradient(120deg,rgba(255,255,255,.10),rgba(255,255,255,0) 32%)}
+.res-shot:hover{transform:translateY(-6px);box-shadow:-9px -9px 22px var(--nm-lite),12px 16px 34px var(--nm-dark)}
+.res-shot:hover img{transform:scale(1.05)}
+.res-cap{padding:20px 4px 4px}
+.res-kicker{font-family:var(--font-display);font-size:11.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--red)}
+.res-head{font-family:var(--font-display);font-size:clamp(18px,2.1vw,21px);font-weight:800;letter-spacing:.02em;
+  color:var(--text);margin:8px 0 8px;line-height:1.2}
+.res-sub{font-size:13.5px;line-height:1.6;color:var(--text-soft);margin-bottom:16px}
+.res-dl{display:inline-flex;align-items:center;gap:7px}
+.res-dl .icon{width:15px;height:15px}
+
+.res-brochure{display:grid;grid-template-columns:1.2fr .9fr;gap:40px;align-items:center}
+.res-broshot{display:block;position:relative;border-radius:20px;overflow:hidden;background:#0a0506;
+  box-shadow:var(--shadow-up);aspect-ratio:3/2;transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.res-broshot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
+.res-broshot:hover{transform:translateY(-5px);box-shadow:-9px -9px 22px var(--nm-lite),12px 16px 34px var(--nm-dark)}
+.res-broshot:hover img{transform:scale(1.04)}
+.res-broinfo .res-kicker{font-size:12px}
+.res-bigtitle{font-family:var(--font-display);font-size:clamp(26px,3.6vw,40px);font-weight:800;
+  letter-spacing:-.02em;line-height:1.08;color:var(--text);margin:10px 0 16px}
+.res-broinfo>p{font-size:15px;line-height:1.75;color:var(--text-soft);margin-bottom:20px}
+.res-points{list-style:none;margin:0 0 26px;padding:0;display:flex;flex-direction:column;gap:11px}
+.res-points li{display:flex;align-items:center;gap:11px;font-size:14.5px;font-weight:500;color:var(--text)}
+.res-points .icon{width:20px;height:20px;flex:0 0 auto;color:#fff;background:var(--red);border-radius:50%;
+  padding:4px;box-shadow:0 4px 12px rgba(232,17,45,.35)}
+
+@media(max-width:980px){ .res-grid{grid-template-columns:repeat(2,1fr);gap:24px} }
+@media(max-width:760px){ .res-brochure{grid-template-columns:1fr;gap:26px} }
+@media(max-width:560px){ .res-grid{grid-template-columns:1fr;max-width:360px;margin:0 auto} }

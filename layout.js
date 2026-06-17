@@ -84,6 +84,7 @@
       <a href="node.html" data-page="node">노드 세일</a>
       <a href="content.html" data-page="content">콘텐츠</a>
       <a href="blog.html" data-page="blog">블로그</a>
+      <a href="resources.html" data-page="resources">자료실</a>
       <a href="dashboard.html" data-page="dashboard">대시보드</a>
       <a href="admin.html" data-page="admin" class="nav-admin"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg> 어드민</a>
     </nav>
@@ -102,7 +103,7 @@
       <div class="footer-cols">
         <div class="fcol"><h5>둘러보기</h5>
           <a href="about.html">톤티비 소개</a><a href="content.html">콘텐츠</a>
-          <a href="blog.html">블로그</a>
+          <a href="blog.html">블로그</a><a href="resources.html">자료실</a>
           <a href="node.html">노드 세일</a><a href="dashboard.html">대시보드</a></div>
         <div class="fcol"><h5>노드 세일</h5>
           <a href="#" data-open-modal>노드 신청하기</a><a href="node.html#staking">스테이킹</a>
