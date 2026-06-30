@@ -125,15 +125,13 @@
         <button class="modal-x" data-close-modal aria-label="닫기"><svg class="icon"><use href="#i-x"/></svg></button>
         <h3>톤티비 노드 신청</h3><p>USDT(TRC20)로 입금하면 노드 배정 후 XONT가 지급됩니다.</p></div>
       <div class="modal-body">
-        <div class="mlabel">구매 수량 선택</div>
-        <div class="qty-grid" id="qty-grid">
-          <button class="qchip on" data-qty="1"><div class="q">1</div><div class="qs">$1,000</div></button>
-          <button class="qchip" data-qty="3"><div class="q">3</div><div class="qs">$3,000</div></button>
-          <button class="qchip" data-qty="5"><div class="q">5</div><div class="qs">$5,000</div></button>
-          <button class="qchip" data-qty="10"><div class="q">10</div><div class="qs">$10,000</div></button>
+        <div class="mlabel">신청 플랜 선택</div>
+        <div class="tier-grid" id="tier-grid">
+          <button class="tierchip on" data-tier="basic" data-price="1000" data-nodes="1"><div class="tt">베이직</div><div class="te">Basic</div><div class="tp">$1,000</div><div class="tnd">노드 1개</div></button>
+          <button class="tierchip" data-tier="pro" data-price="2000" data-nodes="2"><div class="tt">프로</div><div class="te">Pro</div><div class="tp">$2,000</div><div class="tnd">노드 2개</div></button>
+          <button class="tierchip" data-tier="max" data-price="3000" data-nodes="3"><div class="tt">맥스</div><div class="te">Max</div><div class="tp">$3,000</div><div class="tnd">노드 3개</div></button>
         </div>
-        <div class="qcustom"><label for="qty-custom">직접 입력</label><input type="number" id="qty-custom" min="1" max="3000" placeholder="수량"><span class="u">개</span></div>
-        <div class="total-box"><div class="l">결제 금액<b><span id="total-qty">1</span>개 노드 × $1,000</b></div><div class="amt"><span id="total-amt">1,000</span><span class="u">USDT</span></div></div>
+        <div class="total-box"><div class="l">결제 금액<b id="total-tier">베이직 · 노드 1개</b></div><div class="amt"><span id="total-amt">1,000</span><span class="u">USDT</span></div></div>
         <div class="net-badge"><div class="ic">₮</div><div class="nt"><b>USDT · TRC20 (TRON)</b><span>반드시 트론(TRC20) 네트워크로만 전송하세요</span></div><span class="tron">TRON</span></div>
         <div class="qr-zone"><div class="qr"><img src="assets/usdt-trc20-qr.svg" alt="USDT TRC20 입금 주소 QR"></div>
           <div class="qi"><div class="l">QR 스캔으로 간편 입금</div><div class="scan">트론 지갑(예: TronLink · OKX · Binance)에서 QR을 스캔하고 <b>정확히 위 금액</b>의 USDT를 전송하세요.</div></div></div>
@@ -240,10 +238,17 @@
 
   /* ---------------- deposit modal ---------------- */
   const modal = $('#modal');
-  let qty = 1;
+  let qty = 1, selectedTier = 'basic';
   const fmt = n => Math.round(n).toLocaleString('en-US');
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const updateTotal = () => { $('#total-qty').textContent = fmt(qty); $('#total-amt').textContent = fmt(qty * NODE_PRICE); };
+  const TIER_NAMES = { basic: '베이직', pro: '프로', max: '맥스' };
+  const updateTotal = () => {
+    const chip = $('#tier-grid .tierchip.on');
+    const nodes = +((chip && chip.dataset.nodes) || 1);
+    const price = +((chip && chip.dataset.price) || 1000);
+    qty = nodes;
+    $('#total-tier') && ($('#total-tier').textContent = (TIER_NAMES[selectedTier] || '베이직') + ' · 노드 ' + nodes + '개');
+    $('#total-amt') && ($('#total-amt').textContent = fmt(price));
+  };
   const openModal = () => { $('#modal-step1').style.display = 'block'; $('#modal-step2').style.display = 'none'; modal.classList.add('open'); document.body.style.overflow = 'hidden'; };
   const closeModal = () => { modal.classList.remove('open'); document.body.style.overflow = ''; };
 
@@ -252,15 +257,10 @@
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  $$('#qty-grid .qchip').forEach(c => c.addEventListener('click', () => {
-    $$('#qty-grid .qchip').forEach(x => x.classList.remove('on')); c.classList.add('on');
-    qty = +c.dataset.qty; $('#qty-custom').value = ''; updateTotal();
+  $$('#tier-grid .tierchip').forEach(c => c.addEventListener('click', () => {
+    $$('#tier-grid .tierchip').forEach(x => x.classList.remove('on')); c.classList.add('on');
+    selectedTier = c.dataset.tier; updateTotal();
   }));
-  $('#qty-custom').addEventListener('input', e => {
-    const v = clamp(parseInt(e.target.value) || 0, 0, 3000);
-    if (v > 0) { qty = v; $$('#qty-grid .qchip').forEach(x => x.classList.remove('on')); }
-    updateTotal();
-  });
   $('#copy-addr').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(DEPOSIT_ADDRESS); }
     catch { const r = document.createRange(); r.selectNode($('#dep-addr')); getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); getSelection().removeAllRanges(); }
@@ -282,7 +282,7 @@
     const orig = btn.textContent; btn.disabled = true; btn.textContent = '신청 처리 중…';
     try {
       const m = await import('/lib/supabase.js');
-      await m.createNodeApplication({ quantity: qty });   // deposits에 pending 기록
+      await m.createNodeApplication({ tier: selectedTier });   // deposits에 pending 기록
       showDepositDone();
       window.toast && window.toast('노드 신청이 접수되었습니다 · 승인 대기');
     } catch (e) {

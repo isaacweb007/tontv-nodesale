@@ -1578,3 +1578,15 @@ body[data-page="admin"]{padding-bottom:0}
 .la-no:hover{background:#2f323a}
 .la-empty{color:#8a909b;font-size:13.5px;text-align:center;padding:18px 10px}
 .la-empty a{color:var(--red-2);font-weight:700}
+
+/* 노드 신청 모달 — 플랜(베이직/프로/맥스) 선택 */
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.tierchip{background:var(--card);box-shadow:var(--shadow-sm);border-radius:14px;padding:15px 8px 13px;text-align:center;border:2px solid transparent;transition:.2s;cursor:pointer}
+.tierchip:hover{transform:translateY(-2px)}
+.tierchip.on{border-color:var(--red);box-shadow:var(--shadow-in)}
+.tierchip .tt{font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--text);line-height:1.1}
+.tierchip.on .tt{color:var(--red)}
+.tierchip .te{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.tierchip .tp{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text);margin-top:9px}
+.tierchip.on .tp{color:var(--red)}
+.tierchip .tnd{font-size:10.5px;color:var(--muted);font-weight:700;margin-top:3px}
