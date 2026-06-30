@@ -268,9 +268,28 @@
     window.toast('입금 주소가 복사되었습니다');
     setTimeout(() => { b.textContent = '복사'; b.classList.remove('done'); }, 1800);
   });
-  $('#confirm-deposit').addEventListener('click', () => {
+  const showDepositDone = () => {
     $('#rec-qty').textContent = fmt(qty); $('#rec-amt').textContent = fmt(qty * NODE_PRICE); $('#rec-xont').textContent = fmt(qty * NODE_PRICE);
     $('#modal-step1').style.display = 'none'; $('#modal-step2').style.display = 'block'; modal.querySelector('.modal').scrollTop = 0;
+  };
+  $('#confirm-deposit').addEventListener('click', async () => {
+    const btn = $('#confirm-deposit');
+    if (!sbHasSession()) {                       // 노드 신청은 로그인 필요
+      window.toast && window.toast('노드 신청은 로그인 후 가능합니다', 'err');
+      setTimeout(() => location.href = 'login.html', 800);
+      return;
+    }
+    const orig = btn.textContent; btn.disabled = true; btn.textContent = '신청 처리 중…';
+    try {
+      const m = await import('/lib/supabase.js');
+      await m.createNodeApplication({ quantity: qty });   // deposits에 pending 기록
+      showDepositDone();
+      window.toast && window.toast('노드 신청이 접수되었습니다 · 승인 대기');
+    } catch (e) {
+      window.toast && window.toast('신청 실패: ' + (e && e.message || e), 'err');
+    } finally {
+      btn.disabled = false; btn.textContent = orig;
+    }
   });
   updateTotal();
 

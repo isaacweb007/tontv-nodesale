@@ -434,6 +434,19 @@
       state.xont = (bal && Number(bal.xont_balance)) || 0;
       $('#node-count-tag') && ($('#node-count-tag').textContent = state.myNodes + '개 노드');
       if (typeof renderNodes === 'function') renderNodes();
+
+      // 내 노드 신청 내역
+      const deps = await m.getMyDeposits();
+      const apBox = $('#my-apps-list'), apCard = $('#my-apps-card');
+      if (apBox && apCard) {
+        const ST = { pending: ['승인 대기', 'wait'], confirmed: ['승인 완료', 'ok'], failed: ['거절됨', 'err'] };
+        apBox.innerHTML = deps.length ? deps.map(d => {
+          const s = ST[d.status] || [d.status, ''];
+          const dt = new Date(d.created_at).toLocaleDateString('ko-KR');
+          return `<div class="approw"><div class="ai"><b>노드 ${d.quantity}개</b><span>${fmt(d.amount_usdt)} USDT · ${dt}</span></div><span class="appst ${s[1]}">${s[0]}</span></div>`;
+        }).join('') : '<div class="appempty">아직 신청 내역이 없습니다. <button class="lnk" onclick="document.querySelector(\'.float-cta [data-open-modal]\')?.click()">노드 신청하기 →</button></div>';
+        apCard.style.display = '';
+      }
     } catch (e) { /* RLS 잠금 또는 네트워크 — 데모 유지 */ }
   }).catch(() => {});
 
