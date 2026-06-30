@@ -86,6 +86,7 @@
       <a href="blog.html" data-page="blog">블로그</a>
       <a href="resources.html" data-page="resources">자료실</a>
       <a href="dashboard.html" data-page="dashboard">대시보드</a>
+      <a href="login.html" data-page="login">로그인</a>
       <a href="admin.html" data-page="admin" class="nav-admin"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg> 어드민</a>
     </nav>
     <div class="nav-cta">
