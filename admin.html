@@ -53,6 +53,15 @@
       <span><b>데모 운영자 콘솔입니다.</b> 표시된 모든 신청·입금·잔액·트랜잭션은 예시 데이터이며, 모든 동작은 화면 내 데모로만 반영됩니다. 정식 운영 시에는 <b>관리자 인증(2FA)·권한 분리·서버 검증</b>이 적용됩니다.</span>
     </div>
 
+    <!-- ===== 실시간 노드 신청 승인 (실데이터 · 관리자 전용) ===== -->
+    <div class="live-apps" id="live-apps" hidden>
+      <div class="la-head">
+        <h3><svg class="icon"><use href="#i-inbox"/></svg> 실시간 노드 신청 <span class="la-real">실데이터</span></h3>
+        <span class="la-meta" id="la-meta">불러오는 중…</span>
+      </div>
+      <div class="la-body" id="la-body"></div>
+    </div>
+
     <div class="admin-shell">
       <!-- ===== sidebar tabs ===== -->
       <aside class="admin-side" id="admin-tabs">
@@ -325,5 +334,57 @@
 <script src="layout.js"></script>
 <script src="app.js"></script>
 <script src="admin.js"></script>
+<script type="module">
+/* 실시간 노드 신청 승인 (실데이터 · 관리자 전용) */
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const panel = $('#live-apps'), body = $('#la-body'), meta = $('#la-meta');
+  if (!panel) return;
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ST = { pending: ['승인 대기', 'wait'], confirmed: ['승인 완료', 'ok'], failed: ['거절됨', 'err'] };
+
+  import('./lib/supabase.js').then(async (m) => {
+    const session = await m.getSession().catch(() => null);
+    panel.hidden = false;
+    if (!session) { meta.textContent = '관리자 로그인 필요'; body.innerHTML = '<div class="la-empty">관리자 계정으로 <a href="login.html">로그인</a> 후 신청을 승인할 수 있습니다.</div>'; return; }
+    let admin = false;
+    try {
+      const { data: me } = await m.supabase.from('node_operators').select('is_admin').eq('auth_user_id', session.user.id).maybeSingle();
+      admin = !!(me && me.is_admin);
+    } catch (e) {}
+    if (!admin) { meta.textContent = '권한 없음'; body.innerHTML = '<div class="la-empty">이 계정은 관리자 권한이 없습니다.</div>'; return; }
+
+    async function load() {
+      const { data: deps, error } = await m.supabase
+        .from('deposits')
+        .select('id, quantity, amount_usdt, status, created_at, node_operators(display_name, email, phone)')
+        .order('created_at', { ascending: false }).limit(50);
+      if (error) { meta.textContent = '오류: ' + error.message; return; }
+      const pending = deps.filter((d) => d.status === 'pending').length;
+      meta.textContent = `대기 ${pending}건 · 전체 ${deps.length}건`;
+      body.innerHTML = deps.length ? deps.map((d) => {
+        const op = d.node_operators || {};
+        const s = ST[d.status] || [d.status, ''];
+        const acts = d.status === 'pending'
+          ? `<div class="la-acts"><button class="la-ok" data-approve="${d.id}">승인</button><button class="la-no" data-reject="${d.id}">거절</button></div>`
+          : `<span class="appst ${s[1]}">${s[0]}</span>`;
+        return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone)}</span></div><div class="la-qty">노드 <b>${d.quantity}</b>개 · ${Number(d.amount_usdt).toLocaleString()} USDT</div>${acts}</div>`;
+      }).join('') : '<div class="la-empty">아직 신청이 없습니다.</div>';
+    }
+    async function setStatus(id, status) {
+      const { error } = await m.supabase.from('deposits').update({ status }).eq('id', id);
+      if (error) { window.toast && window.toast('실패: ' + error.message, 'err'); return; }
+      window.toast && window.toast(status === 'confirmed' ? '승인 완료 · 노드 생성됨' : '거절 처리됨');
+      load();
+    }
+    body.addEventListener('click', (e) => {
+      const a = e.target.closest('[data-approve]'), r = e.target.closest('[data-reject]');
+      if (a) setStatus(a.dataset.approve, 'confirmed');
+      else if (r) setStatus(r.dataset.reject, 'failed');
+    });
+    load();
+  }).catch(() => { panel.hidden = false; meta.textContent = '연결 실패'; });
+})();
+</script>
 </body>
 </html>
