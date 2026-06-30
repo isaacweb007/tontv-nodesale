@@ -1590,3 +1590,19 @@ body[data-page="admin"]{padding-bottom:0}
 .tierchip .tp{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text);margin-top:9px}
 .tierchip.on .tp{color:var(--red)}
 .tierchip .tnd{font-size:10.5px;color:var(--muted);font-weight:700;margin-top:3px}
+
+/* 내 계정 (account.html) */
+.acct-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.acct-rows{display:flex;flex-direction:column}
+.acct-rows .ar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid #24262c}
+.acct-rows .ar:last-child{border-bottom:none}
+.acct-rows .ar .k{color:#8a909b;font-size:13px;flex:0 0 auto}
+.acct-rows .ar .v{color:#fff;font-size:14px;font-weight:600;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct-ref{margin-top:18px}
+.acct-ref .arl{font-size:12px;color:#8a909b;margin-bottom:8px}
+.acct-ref .arc{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#16181c;border:1px solid #24262c;border-radius:11px;padding:10px 12px;margin-bottom:8px}
+.acct-ref .arc span{font-size:12.5px;color:#cfd2d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.acct-ref .arc.ghost span{color:#8a909b}
+.acct-ref .arc .cp{flex:0 0 auto;font-size:11.5px;font-weight:800;color:#fff;background:var(--red);border:none;border-radius:7px;padding:6px 11px;cursor:pointer;transition:background .2s}
+.acct-ref .arc .cp:hover{background:var(--red-2)}
+@media(max-width:760px){ .acct-grid{grid-template-columns:1fr} }

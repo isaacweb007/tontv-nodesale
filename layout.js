@@ -182,7 +182,7 @@
   (() => {
     const link = $('#nav-auth'); if (!link || !sbHasSession()) return;
     link.textContent = '내 계정';
-    link.setAttribute('href', 'dashboard.html');
+    link.setAttribute('href', 'account.html');
     if (!$('#nav-logout')) {
       const out = document.createElement('a');
       out.id = 'nav-logout'; out.href = '#'; out.textContent = '로그아웃';
