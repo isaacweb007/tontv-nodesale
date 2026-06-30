@@ -86,7 +86,7 @@
       <a href="blog.html" data-page="blog">블로그</a>
       <a href="resources.html" data-page="resources">자료실</a>
       <a href="dashboard.html" data-page="dashboard">대시보드</a>
-      <a href="login.html" data-page="login">로그인</a>
+      <a href="login.html" data-page="login" id="nav-auth">로그인</a>
       <a href="admin.html" data-page="admin" class="nav-admin"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg> 어드민</a>
     </nav>
     <div class="nav-cta">
@@ -174,6 +174,29 @@
   /* active nav */
   const page = document.body.dataset.page || 'home';
   $$('#nav-links a').forEach(a => { if (a.dataset.page === page) a.setAttribute('aria-current', 'page'), a.classList.add('active'); });
+
+  /* ---- auth-aware nav: 로그인 ↔ 내 계정 / 로그아웃 (localStorage 세션 기반, SDK 미로딩) ---- */
+  const sbAuthKey = () => { try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) return k; } } catch (e) {} return null; };
+  const sbHasSession = () => {
+    const k = sbAuthKey(); if (!k) return false;
+    try { const j = JSON.parse(localStorage.getItem(k)); const exp = (j && (j.expires_at ?? (j.currentSession && j.currentSession.expires_at))); return exp ? exp * 1000 > Date.now() : true; } catch (e) { return false; }
+  };
+  (() => {
+    const link = $('#nav-auth'); if (!link || !sbHasSession()) return;
+    link.textContent = '내 계정';
+    link.setAttribute('href', 'dashboard.html');
+    if (!$('#nav-logout')) {
+      const out = document.createElement('a');
+      out.id = 'nav-logout'; out.href = '#'; out.textContent = '로그아웃';
+      out.addEventListener('click', (e) => {
+        e.preventDefault();
+        const k = sbAuthKey(); if (k) { try { localStorage.removeItem(k); } catch (_) {} }
+        window.toast && window.toast('로그아웃되었습니다');
+        setTimeout(() => location.href = 'index.html', 350);
+      });
+      link.insertAdjacentElement('afterend', out);
+    }
+  })();
 
   /* ---------------- toast (global) ---------------- */
   const toastWrap = $('#toast-wrap');

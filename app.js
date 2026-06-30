@@ -410,6 +410,33 @@
   for (let i = 1; i <= state.myNodes; i++)
     state.nodes.push({ id: i, x: nodeSeed[i - 1] ?? rand(1000, 9000) });
 
+  /* ---- 로그인 사용자: 실제 프로필 · 노드 · 잔액으로 개인화 (비로그인은 공개 시뮬레이션 유지) ---- */
+  import('/lib/supabase.js').then(async (m) => {
+    let session = null;
+    try { session = await m.getSession(); } catch (e) { return; }
+    if (!session) return;
+    try {
+      const prof = await m.getMyProfile();
+      if (prof) {
+        const nm = document.querySelector('.dash-top .nm');
+        if (nm) nm.textContent = prof.display_name || '내 계정';
+        $('#wallet-id') && ($('#wallet-id').textContent = (prof.email || '내 계정') + ' · 로그인됨');
+        if (prof.referral_code) {
+          $('#ref-code') && ($('#ref-code').textContent = prof.referral_code);
+          $('#ref-link') && ($('#ref-link').textContent = 'https://tontv.tonyai.cc/?ref=' + prof.referral_code);
+        }
+      }
+      // 본인 노드/잔액 (RLS로 본인 행만; 신규 사용자는 0개 → 정직하게 0 표시)
+      const { data: myNodes } = await m.supabase.from('nodes').select('id, status');
+      const { data: bal } = await m.supabase.from('wallet_balances').select('xont_balance').maybeSingle();
+      state.myNodes = (myNodes && myNodes.length) || 0;
+      state.nodes = (myNodes || []).map((n, i) => ({ id: i + 1, x: 0 }));
+      state.xont = (bal && Number(bal.xont_balance)) || 0;
+      $('#node-count-tag') && ($('#node-count-tag').textContent = state.myNodes + '개 노드');
+      if (typeof renderNodes === 'function') renderNodes();
+    } catch (e) { /* RLS 잠금 또는 네트워크 — 데모 유지 */ }
+  }).catch(() => {});
+
   const share        = () => state.myNodes / state.totalNodes;     // pool fraction
   // ----- TONX → XONT 미러 채굴 모델 -----
   const viewerRate   = () => state.viewers * VIEWER_MINT;          // 전체 시청자 TONX 채굴 / s
