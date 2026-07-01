@@ -144,8 +144,8 @@
         <div class="mlabel">신청 플랜 선택</div>
         <div class="tier-grid" id="tier-grid">
           <button class="tierchip on" data-tier="basic" data-price="1000" data-nodes="1"><div class="tt">베이직</div><div class="te">Basic</div><div class="tp">$1,000</div><div class="tnd">노드 1개</div></button>
-          <button class="tierchip" data-tier="pro" data-price="2000" data-nodes="2"><div class="tt">프로</div><div class="te">Pro</div><div class="tp">$2,000</div><div class="tnd">노드 2개</div></button>
-          <button class="tierchip" data-tier="max" data-price="3000" data-nodes="3"><div class="tt">맥스</div><div class="te">Max</div><div class="tp">$3,000</div><div class="tnd">노드 3개</div></button>
+          <button class="tierchip" data-tier="pro" data-price="2000" data-nodes="2"><span class="tbonus">+5% XONT</span><div class="tt">프로</div><div class="te">Pro</div><div class="tp">$2,000</div><div class="tnd">노드 2개</div></button>
+          <button class="tierchip" data-tier="max" data-price="3000" data-nodes="3"><span class="tbonus">+10% XONT</span><div class="tt">맥스</div><div class="te">Max</div><div class="tp">$3,000</div><div class="tnd">노드 3개</div></button>
         </div>
         <div class="total-box"><div class="l">결제 금액<b id="total-tier">베이직 · 노드 1개</b></div><div class="amt"><span id="total-amt">1,000</span><span class="u">USDT</span></div></div>
         <div class="mlabel" style="margin-top:2px">입금 네트워크 선택</div>
@@ -260,6 +260,10 @@
   /* ---------------- deposit modal ---------------- */
   const modal = $('#modal');
   let qty = 1, selectedTier = 'basic', selectedChain = 'tron';
+  let _tk = { per: 10000, pro: 5, max: 10 };   // XONT 지급/보너스 (DB에서 최신화)
+  import('./lib/supabase.js').then(m => m.getTokenConfig ? m.getTokenConfig() : null).then(c => {
+    if (c) _tk = { per: Number(c.xont_per_1000_usd) || 10000, pro: Number(c.xont_bonus_pro_pct) || 0, max: Number(c.xont_bonus_max_pct) || 0 };
+  }).catch(() => {});
   const fmt = n => Math.round(n).toLocaleString('en-US');
   const TIER_NAMES = { basic: '베이직', pro: '프로', max: '맥스' };
   const updateTotal = () => {
@@ -323,7 +327,9 @@
     setTimeout(() => { b.textContent = '복사'; b.classList.remove('done'); }, 1800);
   });
   const showDepositDone = () => {
-    $('#rec-qty').textContent = fmt(qty); $('#rec-amt').textContent = fmt(qty * NODE_PRICE); $('#rec-xont').textContent = fmt(qty * NODE_PRICE);
+    const bonus = selectedTier === 'pro' ? _tk.pro : selectedTier === 'max' ? _tk.max : 0;
+    const grant = qty * _tk.per * (1 + bonus / 100);
+    $('#rec-qty').textContent = fmt(qty); $('#rec-amt').textContent = fmt(qty * NODE_PRICE); $('#rec-xont').textContent = fmt(grant);
     $('#modal-step1').style.display = 'none'; $('#modal-step2').style.display = 'block'; modal.querySelector('.modal').scrollTop = 0;
   };
   $('#confirm-deposit').addEventListener('click', async () => {

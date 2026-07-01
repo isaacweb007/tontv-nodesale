@@ -240,8 +240,10 @@
             </div>
             <div class="dash-card">
               <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-server"/></svg></span> XONT (노드 토큰)</h3><span class="tagx" id="t-xont-price-tag">$0</span></div>
-              <div class="tk-stat"><div class="r1"><span>총 발행량</span><b id="t-xont-supply">0</b></div>
-                <div class="r2" style="margin-top:8px"><span>노드당 지급 $1,000 = <b id="t-xont-per">0</b> XONT</span></div></div>
+              <div class="tk-stat"><div class="r1"><span>총 발행 상한</span><b id="t-xont-supply">0</b></div>
+                <div class="sbar"><i id="t-xont-bar" style="width:0%"></i></div>
+                <div class="r2" style="margin-top:8px"><span>누적 발행 <b id="t-xont-mined">0</b></span><span id="t-xont-pct">0%</span></div>
+                <div class="r2" style="margin-top:6px"><span>노드당 $1,000 = <b id="t-xont-per">0</b> XONT · 프로 <b class="r" id="t-xont-pro">+0%</b> · 맥스 <b class="r" id="t-xont-max">+0%</b></span></div></div>
             </div>
           </div>
           <div class="dash-card">
@@ -249,6 +251,9 @@
             <div class="cfg-grid">
               <div class="cfg-f"><label>XONT 시세 ($)</label><input class="inp" id="t-price" type="number" step="0.001"></div>
               <div class="cfg-f"><label>$1,000당 지급 XONT</label><input class="inp" id="t-per" type="number" step="1"></div>
+              <div class="cfg-f"><label>총 발행 상한</label><input class="inp" id="t-supply" type="number" step="1000000"></div>
+              <div class="cfg-f"><label>프로 보너스 (%)</label><input class="inp" id="t-pro" type="number" step="0.1"></div>
+              <div class="cfg-f"><label>맥스 보너스 (%)</label><input class="inp" id="t-max" type="number" step="0.1"></div>
             </div>
             <button class="btn btn-red" id="token-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 저장</button>
           </div>
@@ -489,7 +494,7 @@ async function loadOrg() {
 /* ---------------- 매출 승인 ---------------- */
 let DEPOSITS = [], salesFilter = 'all';
 async function loadSales() {
-  try { DEPOSITS = await db.adminListDeposits(); renderSales();
+  try { await cfg(); DEPOSITS = await db.adminListDeposits(); renderSales();
     $$('#sales-filter button').forEach((b) => b.addEventListener('click', () => { $$('#sales-filter button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); salesFilter = b.dataset.f; renderSales(); }));
   } catch (e) { toast('신청 로드 실패: ' + e.message, 'err'); }
 }
@@ -497,12 +502,15 @@ function renderSales() {
   const ST = { pending:['승인 대기','wait'], confirmed:['승인 완료','ok'], failed:['거절됨','err'] };
   const rows = DEPOSITS.filter((d) => salesFilter === 'all' || d.status === salesFilter);
   $('#sales-count').textContent = rows.length + '건';
+  const per = Number((CFG && CFG.xont_per_1000_usd) || 0);
   $('#sales-body').innerHTML = rows.length ? rows.map((d) => {
     const op = d.node_operators || {}; const s = ST[d.status] || [d.status, ''];
+    const bpct = /프로|pro/i.test(d.tier || '') ? Number((CFG && CFG.xont_bonus_pro_pct) || 0) : /맥스|max/i.test(d.tier || '') ? Number((CFG && CFG.xont_bonus_max_pct) || 0) : 0;
+    const grant = d.quantity * per * (1 + bpct / 100);
     const acts = d.status === 'pending'
       ? `<div class="la-acts"><button class="la-ok" data-approve="${d.id}">승인</button><button class="la-no" data-reject="${d.id}">거절</button></div>`
       : `<span class="appst ${s[1]}">${s[0]}</span>`;
-    return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone||'')}</span></div><div class="la-qty">${d.tier ? esc(d.tier)+' · ' : ''}노드 <b>${d.quantity}</b>개 · ${fmt(d.amount_usdt)} USDT${d.network ? ' · <b>'+esc(d.network)+'</b>' : ''}</div>${acts}</div>`;
+    return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone||'')}</span></div><div class="la-qty">${d.tier ? esc(d.tier)+' · ' : ''}노드 <b>${d.quantity}</b>개 · ${fmt(d.amount_usdt)} USDT · 지급 <b class="r">${fmt(grant)}</b> XONT${bpct ? ' <span style="color:#7ee0a8">(+'+bpct+'%)</span>' : ''}${d.network ? ' · <b>'+esc(d.network)+'</b>' : ''}</div>${acts}</div>`;
   }).join('') : '<div class="la-empty">신청이 없습니다.</div>';
   $$('#sales-body [data-approve]').forEach((b) => b.addEventListener('click', () => setDep(b.dataset.approve, 'confirmed')));
   $$('#sales-body [data-reject]').forEach((b) => b.addEventListener('click', () => setDep(b.dataset.reject, 'failed')));
@@ -672,16 +680,26 @@ async function openMember(id) {
 
 /* ---------------- 토큰 관리 ---------------- */
 async function loadToken() {
-  const c = await cfg();
+  paintToken(await cfg());
+  $('#token-save').addEventListener('click', async () => {
+    try { CFG = await db.adminUpdateConfig({ xont_price_usd:+$('#t-price').value, xont_per_1000_usd:+$('#t-per').value, xont_total_supply:+$('#t-supply').value, xont_bonus_pro_pct:+$('#t-pro').value, xont_bonus_max_pct:+$('#t-max').value }); toast('저장되었습니다'); paintToken(CFG); } catch (e) { toast('실패: '+e.message,'err'); }
+  });
+}
+function paintToken(c) {
   $('#t-tonx-supply').textContent = fmt(c.tonx_total_supply || 0);
   $('#t-tonx-mined').textContent = fmt(c.tonx_minted || 0);
-  $('#t-xont-supply').textContent = fmt(c.xont_minted || 0);
+  const supply = Number(c.xont_total_supply || 0), minted = Number(c.xont_minted || 0);
+  const pct = supply > 0 ? (minted / supply * 100) : 0;
+  $('#t-xont-supply').textContent = fmt(supply);
+  $('#t-xont-mined').textContent = fmt(minted);
+  $('#t-xont-pct').textContent = pct.toFixed(2) + '%';
+  $('#t-xont-bar').style.width = Math.min(100, pct) + '%';
   $('#t-xont-price-tag').textContent = '$' + (c.xont_price_usd || 0);
   $('#t-xont-per').textContent = fmt(c.xont_per_1000_usd || 0);
+  $('#t-xont-pro').textContent = '+' + (c.xont_bonus_pro_pct || 0) + '%';
+  $('#t-xont-max').textContent = '+' + (c.xont_bonus_max_pct || 0) + '%';
   $('#t-price').value = c.xont_price_usd; $('#t-per').value = c.xont_per_1000_usd;
-  $('#token-save').addEventListener('click', async () => {
-    try { CFG = await db.adminUpdateConfig({ xont_price_usd:+$('#t-price').value, xont_per_1000_usd:+$('#t-per').value }); toast('저장되었습니다'); loadToken(); } catch (e) { toast('실패: '+e.message,'err'); }
-  });
+  $('#t-supply').value = c.xont_total_supply; $('#t-pro').value = c.xont_bonus_pro_pct; $('#t-max').value = c.xont_bonus_max_pct;
 }
 
 /* ---------------- 스테이킹 ---------------- */

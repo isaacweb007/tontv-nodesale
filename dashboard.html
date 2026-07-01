@@ -144,7 +144,7 @@
             <div style="color:#f5c451;font-weight:800;font-size:16px"><span id="w-staked">0</span> XONT</div>
           </div>
         </div>
-        <div class="wnote"><svg class="icon"><use href="#i-coins"/></svg> 노드 구매 시 <b>$1,000당 <span id="w-per">10,000</span> XONT</b> 지급 ($0.1 시세)</div>
+        <div class="wnote"><svg class="icon"><use href="#i-coins"/></svg> 노드 구매 시 <b>$1,000당 <span id="w-per">10,000</span> XONT</b> 지급 · 프로 <b class="r" id="w-bpro">+5%</b> · 맥스 <b class="r" id="w-bmax">+10%</b> 추가</div>
       </div>
 
       <!-- 스테이킹 -->
@@ -241,6 +241,8 @@
     // 지갑
     $('#w-price').textContent = price;
     $('#w-per').textContent = fmt(perK);
+    $('#w-bpro') && ($('#w-bpro').textContent = '+' + (cfg.xont_bonus_pro_pct ?? 5) + '%');
+    $('#w-bmax') && ($('#w-bmax').textContent = '+' + (cfg.xont_bonus_max_pct ?? 10) + '%');
     $('#w-bal').textContent = fmt2(balance);
     $('#w-usd').textContent = '≈ $' + fmt2(balance * price);
     $('#w-staked').textContent = fmt2(stakedXont);
