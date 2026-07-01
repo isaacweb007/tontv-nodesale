@@ -150,8 +150,8 @@
         <div class="total-box"><div class="l">결제 금액<b id="total-tier">베이직 · 노드 1개</b></div><div class="amt"><span id="total-amt">1,000</span><span class="u">USDT</span></div></div>
         <div class="mlabel" style="margin-top:2px">입금 네트워크 선택</div>
         <div class="chain-grid" id="chain-grid">
-          <button class="chainchip on" data-chain="tron"><div class="cn">TRON</div><div class="ce">USDT · TRC20</div></button>
-          <button class="chainchip" data-chain="evm"><div class="cn">Ethereum / BSC</div><div class="ce">USDT · ERC20 / BEP20</div></button>
+          <button class="chainchip on" data-chain="tron"><span class="ck"><svg class="icon"><use href="#i-check"/></svg></span><div class="cn">TRON</div><div class="ce">USDT · TRC20</div></button>
+          <button class="chainchip" data-chain="evm"><span class="ck"><svg class="icon"><use href="#i-check"/></svg></span><div class="cn">Ethereum / BSC</div><div class="ce">USDT · ERC20 / BEP20</div></button>
         </div>
         <div class="net-badge"><div class="ic">₮</div><div class="nt"><b id="net-name">USDT · TRC20 (TRON)</b><span id="net-sub">반드시 트론(TRC20) 네트워크로만 전송하세요</span></div><span class="tron" id="net-short">TRON</span></div>
         <div class="qr-zone"><div class="qr"><img id="dep-qr" src="assets/usdt-trc20-qr.svg" alt="USDT 입금 주소 QR"></div>
