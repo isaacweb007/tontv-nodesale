@@ -131,13 +131,13 @@
               </div>
             </div>
             <div class="org-graph-wrap" id="org-graph-wrap"><div id="og-canvas"><svg id="org-graph-svg" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
-            <p class="amini-desc" style="margin-top:10px">노드를 클릭하면 회원 상세를 볼 수 있습니다.</p>
+            <p class="amini-desc" style="margin-top:10px"><b>드래그</b>로 이동 · <b>마우스 휠</b>로 확대/축소 · 노드 <b>클릭</b> 시 회원 상세</p>
           </div>
 
           <div class="dash-card org-view" data-oview="rewards" hidden>
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> 추천수당 내역</h3><span class="tagx" id="org-meta">—</span></div>
             <div class="atable-wrap"><table class="atable">
-              <thead><tr><th>추천인</th><th>단계</th><th>피추천인</th><th>보상 XONT</th><th>일자</th></tr></thead>
+              <thead><tr><th>수령자</th><th>내용</th><th class="ta-r">지급 XONT</th><th>일시</th></tr></thead>
               <tbody id="org-body"></tbody></table></div>
           </div>
         </section>
@@ -539,11 +539,13 @@ function renderMembers() {
 }
 
 /* ---------------- 조직도 (트리 · 그래프 · 추천수당) ---------------- */
-let ORG_NODES = [], ORG_CHILDREN = {}, ORG_ROOTS = [], orgView = 'tree', orgGraphBuilt = false, orgZoom = 1;
+let ORG_NODES = [], ORG_CHILDREN = {}, ORG_ROOTS = [], orgView = 'tree', orgGraphBuilt = false;
+let ogZoom = 1, ogPanX = 0, ogPanY = 0, ogDown = false, ogMoved = false, ogSX = 0, ogSY = 0, ogStartCX = 0, ogStartCY = 0;
+const ogClamp = (z) => Math.max(0.3, Math.min(2.5, z));
 
 async function loadOrg() {
   try {
-    const [nodes, rewards] = await Promise.all([db.adminOrgTree(), db.adminListReferrals()]);
+    const [nodes, rewards] = await Promise.all([db.adminOrgTree(), db.adminListReferralCommissions()]);
     buildOrgTree(nodes);
     renderOrgStats();
     renderOrgTree();
@@ -562,9 +564,10 @@ async function loadOrg() {
       $$('#org-tree .tn-kids').forEach((k) => { k.hidden = !anyCollapsed; });
       $$('#org-tree .tn-toggle:not(.tn-leaf)').forEach((t) => t.textContent = anyCollapsed ? '▾' : '▸');
     });
-    $('#org-zoom-in').addEventListener('click', () => setOrgZoom(orgZoom + 0.15));
-    $('#org-zoom-out').addEventListener('click', () => setOrgZoom(orgZoom - 0.15));
-    $('#org-zoom-reset').addEventListener('click', () => setOrgZoom(1));
+    setupOrgGraphInteractions();
+    $('#org-zoom-in').addEventListener('click', () => ogZoomAtCenter(1.2));
+    $('#org-zoom-out').addEventListener('click', () => ogZoomAtCenter(1 / 1.2));
+    $('#org-zoom-reset').addEventListener('click', () => { ogZoom = 1; ogCenterGraph(); });
   } catch (e) { toast('조직도 로드 실패: ' + e.message, 'err'); }
 }
 
@@ -632,8 +635,9 @@ function renderOrgTree() {
 }
 
 function renderOrgRewards(rewards) {
-  $('#org-meta').textContent = rewards.length + '건';
-  $('#org-body').innerHTML = rewards.length ? rewards.map((x) => `<tr><td><b>${esc(x.referrer?.display_name) || '—'}</b><div class="muted sm">${esc(x.referrer?.email||'')}</div></td><td>${x.level}단계</td><td>${esc(x.referee?.display_name) || '—'}<div class="muted sm">${esc(x.referee?.email||'')}</div></td><td>${fmt2(x.reward_xont)}</td><td>${day(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="5" class="la-empty">추천 내역이 없습니다.</td></tr>';
+  const total = rewards.reduce((a, x) => a + Number(x.amount || 0), 0);
+  $('#org-meta').textContent = rewards.length + '건 · 총 ' + fmt2(total) + ' XONT';
+  $('#org-body').innerHTML = rewards.length ? rewards.map((x) => `<tr><td><b>${esc(x.node_operators?.display_name) || '—'}</b><div class="muted sm">${esc(x.node_operators?.email || '')}</div></td><td>${esc(x.counterparty || '추천수당')}</td><td class="ta-r" style="color:#5ee08a;font-weight:800">+${fmt2(x.amount)}</td><td>${dt(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">추천수당 내역이 없습니다.</td></tr>';
 }
 
 /* ---- 조직 그래프 (SVG, 순수 클라이언트 레이아웃) ---- */
@@ -684,24 +688,56 @@ function renderOrgGraph() {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('width', W); svg.setAttribute('height', H);
   svg.innerHTML = edges + nodes;
-  $('#og-canvas').style.width = (W * orgZoom) + 'px'; $('#og-canvas').style.height = (H * orgZoom) + 'px';
-  svg.style.transform = `scale(${orgZoom})`;
-  svg.querySelectorAll('[data-op]').forEach((g) => g.addEventListener('click', () => openMember(g.dataset.op)));
+  const canvas = $('#og-canvas');
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  canvas.dataset.w = W; canvas.dataset.h = H;
+  svg.style.transform = '';
+  svg.querySelectorAll('[data-op]').forEach((g) => g.addEventListener('click', () => { if (!ogMoved) openMember(g.dataset.op); }));
+  ogCenterGraph();
   applyOrgGraphFilter();
 }
 function applyOrgGraphFilter() {
   if (!orgGraphBuilt) return;
   const svg = $('#org-graph-svg'); if (!svg) return;
   const q = ($('#org-q').value || '').trim().toLowerCase();
-  svg.querySelectorAll('.og-node').forEach((g) => { g.style.opacity = (!q || g.textContent.toLowerCase().includes(q)) ? '1' : '.25'; });
+  svg.querySelectorAll('.og-node').forEach((g) => { g.style.opacity = (!q || g.textContent.toLowerCase().includes(q)) ? '1' : '.22'; });
 }
-function setOrgZoom(z) {
-  orgZoom = Math.max(0.4, Math.min(2, Math.round(z * 100) / 100));
-  $('#org-zoom-reset').textContent = Math.round(orgZoom * 100) + '%';
-  if (!orgGraphBuilt) return;
-  const svg = $('#org-graph-svg'); const vb = (svg.getAttribute('viewBox') || '0 0 0 0').split(' ');
-  $('#og-canvas').style.width = (vb[2] * orgZoom) + 'px'; $('#og-canvas').style.height = (vb[3] * orgZoom) + 'px';
-  svg.style.transform = `scale(${orgZoom})`;
+function applyOgTransform() {
+  const c = $('#og-canvas'); if (c) c.style.transform = `translate(${ogPanX}px, ${ogPanY}px) scale(${ogZoom})`;
+  const rz = $('#org-zoom-reset'); if (rz) rz.textContent = Math.round(ogZoom * 100) + '%';
+}
+function ogCenterGraph() {
+  const wrap = $('#org-graph-wrap'), c = $('#og-canvas'); if (!wrap || !c) return;
+  const W = Number(c.dataset.w) || 0;
+  ogPanX = Math.max(16, (wrap.clientWidth - W * ogZoom) / 2);
+  ogPanY = 24;
+  applyOgTransform();
+}
+function ogZoomAtCenter(factor) {
+  const wrap = $('#org-graph-wrap'); if (!wrap) return;
+  const r = wrap.getBoundingClientRect(), cx = r.width / 2, cy = r.height / 2;
+  const prev = ogZoom; ogZoom = ogClamp(ogZoom * factor); const sr = ogZoom / prev;
+  ogPanX = cx - (cx - ogPanX) * sr; ogPanY = cy - (cy - ogPanY) * sr;
+  applyOgTransform();
+}
+function setupOrgGraphInteractions() {
+  const wrap = $('#org-graph-wrap'); if (!wrap || wrap.dataset.wired) return; wrap.dataset.wired = '1';
+  wrap.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const r = wrap.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    const prev = ogZoom; ogZoom = ogClamp(ogZoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12)); const sr = ogZoom / prev;
+    ogPanX = mx - (mx - ogPanX) * sr; ogPanY = my - (my - ogPanY) * sr;
+    applyOgTransform();
+  }, { passive: false });
+  wrap.addEventListener('pointerdown', (e) => {
+    ogDown = true; ogMoved = false; ogSX = e.clientX - ogPanX; ogSY = e.clientY - ogPanY; ogStartCX = e.clientX; ogStartCY = e.clientY;
+  });
+  wrap.addEventListener('pointermove', (e) => {
+    if (!ogDown) return;
+    if (!ogMoved && Math.hypot(e.clientX - ogStartCX, e.clientY - ogStartCY) > 4) { ogMoved = true; wrap.classList.add('dragging'); }
+    if (ogMoved) { ogPanX = e.clientX - ogSX; ogPanY = e.clientY - ogSY; applyOgTransform(); }
+  });
+  window.addEventListener('pointerup', () => { if (ogDown) { ogDown = false; wrap.classList.remove('dragging'); } });
 }
 
 /* ---------------- 매출 승인 ---------------- */
