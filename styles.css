@@ -1698,6 +1698,13 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .alloc-gh{display:flex;justify-content:space-between;align-items:center;padding:9px 4px;border-bottom:2px solid #2a2d34;margin-bottom:6px}
 .alloc-gh b{font-size:14.5px;color:#eef0f3;font-weight:800}
 .alloc-gh .r{font-weight:800;font-size:15px}
+/* 판매 금액 배분 현황 */
+.dist-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.dist-dates{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dist-dates .inp{width:auto;padding:8px 11px;font-size:12.5px;color-scheme:dark}
+.dist-sep{color:#8a909b;font-weight:700}
+.mini-stats .ms .v .u{font-size:12px;color:#8a909b;font-weight:700}
+.la-qty .dist-pct{display:block;font-size:11px;color:#8a909b;font-weight:700;text-align:right;margin-top:2px}
 /* 매출 배분 투명성 (대시보드) */
 .alloc-view{display:flex;flex-direction:column;gap:10px;margin-top:6px}
 .alloc-bar{display:flex;height:14px;border-radius:8px;overflow:hidden;background:#1b1e23}

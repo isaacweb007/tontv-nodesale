@@ -186,6 +186,28 @@
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 노드판매 매출 배분</h3><span class="tagx" id="alloc-total">합계 0%</span></div>
             <div id="alloc-groups"></div>
           </div>
+
+          <!-- 판매 금액 배분 현황 -->
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 판매 금액 배분 현황</h3><span class="tagx" id="dist-range-label">—</span></div>
+            <div class="dist-controls">
+              <div class="aseg sm" id="dist-period">
+                <button data-p="day">일간</button>
+                <button data-p="week">주간</button>
+                <button data-p="month">월간</button>
+                <button data-p="all" class="on">전체</button>
+              </div>
+              <div class="dist-dates">
+                <input class="inp" type="date" id="dist-from" aria-label="시작일">
+                <span class="dist-sep">~</span>
+                <input class="inp" type="date" id="dist-to" aria-label="종료일">
+                <button class="btn btn-red" id="dist-search">조회</button>
+              </div>
+            </div>
+            <div class="mini-stats" id="dist-stats"></div>
+            <div id="dist-groups"></div>
+          </div>
+
           <div class="dash-card">
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-plus"/></svg></span> 배분 항목 추가/편집</h3><span class="tagx" id="alloc-edit-tag">신규</span></div>
             <input type="hidden" id="al-id">
@@ -911,15 +933,102 @@ function renderCenterHeads() {
 }
 
 /* ---------------- 노드판매 매출 배분 ---------------- */
+let ALLOC_ROWS = [];   // 배분 비율 (revenue_allocations)
+let SALES = [];        // 승인된 판매 내역 (deposits, status=confirmed)
+let DIST_PERIOD = 'all';
+
 async function loadAllocations() {
   $('#al-save').addEventListener('click', saveAlloc);
   $('#al-new').addEventListener('click', allocNew);
-  renderAlloc();
+  // 배분 현황 컨트롤 배선
+  $$('#dist-period button').forEach((b) => b.addEventListener('click', () => {
+    DIST_PERIOD = b.dataset.p;
+    $$('#dist-period button').forEach((x) => x.classList.toggle('on', x === b));
+    applyDistPeriod();
+    renderDistribution();
+  }));
+  $('#dist-search').addEventListener('click', () => {
+    DIST_PERIOD = 'custom';
+    $$('#dist-period button').forEach((x) => x.classList.remove('on'));
+    renderDistribution();
+  });
+  applyDistPeriod();
+  await renderAlloc();
+  try { SALES = await db.adminListConfirmedSales(); } catch (e) { toast('판매 내역 로드 실패: ' + e.message, 'err'); }
+  renderDistribution();
+}
+
+// 기간 프리셋 → 시작/종료 날짜 입력값 세팅
+function applyDistPeriod() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+  let from = null;
+  if (DIST_PERIOD === 'day') from = new Date(y, m, d);
+  else if (DIST_PERIOD === 'week') { const wd = (now.getDay() + 6) % 7; from = new Date(y, m, d - wd); } // 월요일 기준
+  else if (DIST_PERIOD === 'month') from = new Date(y, m, 1);
+  else if (DIST_PERIOD === 'all') { $('#dist-from').value = ''; $('#dist-to').value = ''; return; }
+  else return; // custom: 입력값 유지
+  $('#dist-from').value = from ? toDateInput(from) : '';
+  $('#dist-to').value = toDateInput(now);
+}
+const toDateInput = (dt) => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+
+function distRange() {
+  const fv = $('#dist-from').value, tv = $('#dist-to').value;
+  const start = fv ? new Date(fv + 'T00:00:00') : null;
+  const end = tv ? new Date(tv + 'T23:59:59.999') : null;
+  return { start, end };
+}
+
+function renderDistribution() {
+  const { start, end } = distRange();
+  const rows = SALES.filter((s) => {
+    const t = new Date(s.sale_at).getTime();
+    if (start && t < start.getTime()) return false;
+    if (end && t > end.getTime()) return false;
+    return true;
+  });
+  const totalUsdt = rows.reduce((a, s) => a + Number(s.amount_usdt || 0), 0);
+  const totalNodes = rows.reduce((a, s) => a + Number(s.quantity || 0), 0);
+  const saleCount = rows.length;
+  const pctSum = ALLOC_ROWS.reduce((a, r) => a + Number(r.pct || 0), 0);
+
+  // 라벨
+  const labelMap = { day: '오늘', week: '이번 주', month: '이번 달', all: '전체 기간', custom: '지정 기간' };
+  const rl = $('#dist-from').value && $('#dist-to').value
+    ? `${$('#dist-from').value} ~ ${$('#dist-to').value}`
+    : (DIST_PERIOD === 'all' ? '전체 기간' : '—');
+  $('#dist-range-label').textContent = `${labelMap[DIST_PERIOD] || ''} · ${rl}`;
+
+  // 요약 통계
+  $('#dist-stats').innerHTML = [
+    ['총 판매액', fmt(totalUsdt) + ' <span class="u">USDT</span>'],
+    ['판매 건수', fmt(saleCount) + ' <span class="u">건</span>'],
+    ['판매 노드', fmt(totalNodes) + ' <span class="u">개</span>'],
+    ['배분 합계율', (Math.round(pctSum * 10) / 10) + ' <span class="u">%</span>'],
+  ].map(([l, v]) => `<div class="ms"><div class="l">${l}</div><div class="v">${v}</div></div>`).join('');
+
+  // 배분 내역
+  if (!ALLOC_ROWS.length) { $('#dist-groups').innerHTML = '<div class="la-empty">배분 항목이 없습니다. 위에서 먼저 배분 비율을 등록하세요.</div>'; return; }
+  if (!saleCount) { $('#dist-groups').innerHTML = '<div class="la-empty">선택한 기간에 승인된 판매 내역이 없습니다.</div>'; return; }
+
+  const groups = {};
+  ALLOC_ROWS.forEach((r) => { (groups[r.group_name] = groups[r.group_name] || []).push(r); });
+  $('#dist-groups').innerHTML = Object.entries(groups).map(([g, items]) => {
+    const gpct = items.reduce((a, r) => a + Number(r.pct || 0), 0);
+    const gamt = totalUsdt * gpct / 100;
+    return `<div class="alloc-grp"><div class="alloc-gh"><b>${esc(g)}</b><span class="r">${fmt2(gamt)} USDT · ${Math.round(gpct*10)/10}%</span></div>` +
+      items.map((r) => {
+        const amt = totalUsdt * Number(r.pct || 0) / 100;
+        return `<div class="la-row"><div class="la-who"><b>${esc(r.item_name)}</b><span>${esc(r.note || '')}${r.kind ? ' · ' + esc(r.kind) : ''}</span></div><div class="la-qty"><b class="r">${fmt2(amt)} USDT</b><span class="dist-pct">${r.pct}%</span></div></div>`;
+      }).join('') + `</div>`;
+  }).join('');
 }
 function allocNew() { ['al-id','al-group','al-item','al-pct','al-kind','al-note'].forEach((i) => $('#'+i).value=''); $('#al-sort').value='0'; $('#alloc-edit-tag').textContent='신규'; }
 async function renderAlloc() {
   try {
     const rows = await db.adminListRevenueAllocations();
+    ALLOC_ROWS = rows;
     const total = rows.reduce((a, r) => a + Number(r.pct || 0), 0);
     $('#alloc-total').textContent = '합계 ' + total + '%' + (Math.round(total) === 100 ? ' ✓' : ' ⚠ (100 아님)');
     const groups = {};
@@ -930,13 +1039,13 @@ async function renderAlloc() {
         items.map((r) => `<div class="la-row"><div class="la-who"><b>${esc(r.item_name)}</b><span>${esc(r.note||'')}</span></div><div class="la-qty"><b class="r">${r.pct}%</b></div><div class="la-acts"><button class="la-ok" data-ale="${r.id}">수정</button><button class="la-no" data-ald="${r.id}">삭제</button></div></div>`).join('') + `</div>`;
     }).join('') || '<div class="la-empty">배분 항목이 없습니다.</div>';
     $$('#alloc-groups [data-ale]').forEach((b) => b.addEventListener('click', () => { const r = rows.find((x) => x.id === b.dataset.ale); $('#al-id').value=r.id; $('#al-group').value=r.group_name; $('#al-item').value=r.item_name; $('#al-pct').value=r.pct; $('#al-kind').value=r.kind||''; $('#al-sort').value=r.sort_order; $('#al-note').value=r.note||''; $('#alloc-edit-tag').textContent='수정'; }));
-    $$('#alloc-groups [data-ald]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminDeleteRevenueAllocation(b.dataset.ald); toast('삭제됨'); renderAlloc(); } catch (e) { toast('실패: '+e.message,'err'); } }));
+    $$('#alloc-groups [data-ald]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminDeleteRevenueAllocation(b.dataset.ald); toast('삭제됨'); await renderAlloc(); renderDistribution(); } catch (e) { toast('실패: '+e.message,'err'); } }));
   } catch (e) { toast('배분 로드 실패: '+e.message,'err'); }
 }
 async function saveAlloc() {
   const g = $('#al-group').value.trim(), it = $('#al-item').value.trim();
   if (!g || !it) { toast('그룹·항목명을 입력하세요','err'); return; }
-  try { await db.adminSaveRevenueAllocation({ id:$('#al-id').value||undefined, group_name:g, item_name:it, pct:$('#al-pct').value, kind:$('#al-kind').value, sort_order:$('#al-sort').value, note:$('#al-note').value }); toast('저장됨'); allocNew(); renderAlloc(); }
+  try { await db.adminSaveRevenueAllocation({ id:$('#al-id').value||undefined, group_name:g, item_name:it, pct:$('#al-pct').value, kind:$('#al-kind').value, sort_order:$('#al-sort').value, note:$('#al-note').value }); toast('저장됨'); allocNew(); await renderAlloc(); renderDistribution(); }
   catch (e) { toast('실패: '+e.message,'err'); }
 }
 
