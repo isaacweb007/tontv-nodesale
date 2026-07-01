@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>노드 사업자 대시보드 — 내 노드 · 수익 · 지갑 실시간 | TonTV</title>
-<meta name="description" content="톤티비 플랫폼 실시간 지표, 내 노드 수익 배분, 노드별 XONT 채굴, 스테이킹과 전송까지 한 화면에서. (데모 데이터)">
+<title>노드 사업자 대시보드 — 노드 · TONX 수익 · XONT 스테이킹 | TonTV</title>
+<meta name="description" content="톤티비 노드 사업자 대시보드 — 시청자 TONX 연동 수익(20%÷N), XONT 지급·지갑, 스테이킹(연 60%). 실데이터.">
+<meta name="robots" content="noindex">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -12,16 +13,6 @@
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#101113">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="TonTV">
-<meta property="og:url" content="https://tontv.tonyai.cc/dashboard.html">
-<meta property="og:title" content="노드 사업자 대시보드 — 실시간 수익·지갑 | TonTV">
-<meta property="og:description" content="내 노드 수익 배분 · TONX→XONT 채굴 · 추천 보상 · 스테이킹/전송을 한 화면에서. (예상 노드 사업자용 시뮬레이션)">
-<meta property="og:image" content="https://tontv.tonyai.cc/assets/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tontv.tonyai.cc/assets/og-image.png">
 </head>
 <body data-page="dashboard">
 
@@ -30,243 +21,230 @@
     <div class="crumb" style="font-size:12.5px;color:#8a909b;margin-bottom:16px;display:flex;gap:9px;align-items:center">
       <a href="index.html" style="color:#8a909b">홈</a><span style="opacity:.4">/</span><span style="color:#cfd2d8">대시보드</span>
     </div>
-    <div class="sec-head reveal" style="margin-bottom:30px">
-      <span class="eyebrow">노드 사업자 대시보드 <span class="demo-pill">시뮬레이션</span></span>
-      <h2>내 노드 · 수익 · 지갑을 <span class="r">실시간</span>으로</h2>
-      <p>톤티비 플랫폼 지표와 내 노드 수익 배분, XONT 지갑 · 스테이킹 · 전송을 한 화면에서. <b style="color:#e7cf94">아래는 예시(시뮬레이션) 화면입니다.</b></p>
+    <div class="sec-head" style="margin-bottom:24px">
+      <span class="eyebrow">노드 사업자 대시보드</span>
+      <h2>내 노드 · <span class="r">수익</span> · 스테이킹</h2>
+      <p>시청자가 늘수록 노드 수익이 커집니다 — 시청자 TONX의 <b style="color:#e7cf94">20%</b>를 전체 노드가 나눠 받습니다.</p>
     </div>
 
-    <div class="sim-banner reveal">
-      <svg class="icon"><use href="#i-alert"/></svg>
-      <span><b>예상 노드 사업자에게 보여주는 시뮬레이션 화면입니다.</b> 표시된 노드 수 · 잔액 · 수익 배분 · XONT 채굴 · 추천 보상 등 <b>모든 수치는 예시 데이터</b>이며 실제 보유 · 수익이 아닙니다. 노드 구매 후 2026년 9월 정식 가동 시, 본인 지갑의 <b>온체인 실데이터</b>가 이 화면에 연동됩니다.</span>
-    </div>
-
-    <div class="dash-top reveal">
-      <div class="who">
-        <div class="av">TV</div>
-        <div><div class="nm">노드 사업자 <span style="color:var(--red-2)">#1842</span> <span class="ex-tag">예시</span></div><div class="id" id="wallet-id">예시 계정 · 지갑 연결됨 (데모)</div></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <span class="live-badge"><span class="d"></span> LIVE · 실시간 갱신</span>
-        <button class="btn btn-red" id="connect-wallet" style="padding:11px 20px;font-size:14px"><svg class="icon"><use href="#i-check"/></svg> 지갑 연결됨</button>
+    <!-- 계정 -->
+    <div class="dash-top">
+      <div class="who"><div class="av">TV</div><div><div class="nm" id="d-name">불러오는 중…</div><div class="id" id="d-email">—</div></div></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="live-badge"><span class="d"></span> LIVE</span>
+        <a class="btn btn-dark" href="account.html" style="padding:11px 18px;font-size:14px"><svg class="icon"><use href="#i-user"/></svg> 내 계정</a>
       </div>
     </div>
 
-    <div class="metrics reveal">
-      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-eye"/></svg></span> 전체 노드 접속자</div><div class="v" id="m-viewers">0</div><div class="sub"><span class="livedot"></span> 지금 시청 중</div></div>
-      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-radio"/></svg></span> 동시 스트리밍</div><div class="v r" id="m-stream">0</div><div class="sub"><span class="livedot"></span> LIVE 송출</div></div>
-      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-film"/></svg></span> 총 콘텐츠 수</div><div class="v" id="m-content">0</div><div class="sub"><span class="up">▲ +38</span> 신규 / 주</div></div>
-      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-star"/></svg></span> 누적 구독자</div><div class="v" id="m-subs">0</div><div class="sub"><span class="up">▲ +2.4%</span> 주간</div></div>
-      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-megaphone"/></svg></span> 광고주 수</div><div class="v" id="m-adv">0</div><div class="sub"><span class="up">▲ +17</span> 신규 / 주</div></div>
-      <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 누적 광고 수익</div><div class="v r" id="m-adrev">$0</div><div class="sub"><span class="livedot"></span> 실시간 누적</div></div>
+    <!-- 혜택 요약 -->
+    <div class="benefit-grid">
+      <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-server"/></svg> 보유 노드</div><div class="bv" id="b-nodes">0<span class="u">개</span></div><div class="bs" id="b-share">노드풀 0%</div></div>
+      <div class="bcard2 hi"><div class="bh"><svg class="icon"><use href="#i-coins"/></svg> 지급받은 XONT</div><div class="bv r" id="b-xont">0</div><div class="bs" id="b-xont-usd">≈ $0</div></div>
+      <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-users"/></svg> 전체 노드</div><div class="bv" id="b-total">0</div><div class="bs">÷N 균등 분배 기준</div></div>
     </div>
 
-    <!-- TONX → XONT 미러 채굴 -->
-    <div class="dash-card reveal mirror-card">
-      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> 토큰 채굴 — TONX <span class="r">→</span> XONT 미러링</h3><span class="tagx">시청자 채굴량 = 노드 풀 발행량 (1:1)</span></div>
-      <div class="mirror">
-        <div class="mside">
-          <div class="ms-tag"><svg class="icon"><use href="#i-eye"/></svg> 시청자 채굴 · <b>TONX</b></div>
-          <div class="ms-big" id="tonx-today">0</div>
-          <div class="ms-sub"><span class="livedot"></span> 오늘 시청자 전체 채굴량 · 실시간</div>
-          <div class="supply">
-            <div class="sl"><span>총 발행 한도</span><span><b id="tonx-supply-pct">0.000%</b> / 100억</span></div>
-            <div class="sbar"><i id="tonx-supply-bar" style="width:0%"></i></div>
-            <div class="sl2">누적 채굴 <b id="tonx-mined-total">0</b> TONX</div>
-          </div>
-        </div>
-        <div class="mirror-mid">
-          <div class="mm-ratio">1 : 1</div>
-          <div class="mm-arrow"><svg class="icon"><use href="#i-arrow-ur"/></svg></div>
-          <div class="mm-label">동일 수량<br>미러 발행</div>
-        </div>
-        <div class="mside nodes">
-          <div class="ms-tag"><svg class="icon"><use href="#i-server"/></svg> 노드 풀 발행 · <b>XONT</b></div>
-          <div class="ms-big r" id="xont-pool-today">0</div>
-          <div class="ms-sub">전체 노드 <b id="mirror-total-nodes">2,188</b>개에 <b>균등 분배 (÷N)</b></div>
-          <div class="pernode">
-            <div class="pn"><div class="l">노드 1개 채굴 (오늘)</div><div class="v" id="pernode-day">0.00 <span class="u">XONT</span></div></div>
-            <div class="pn"><div class="l">내 몫 (×<span id="mirror-mynodes">5</span>, 오늘)</div><div class="v r" id="my-mine-day">0.00 <span class="u">XONT</span></div></div>
-          </div>
-        </div>
+    <!-- TONX 수익 (시청자 연동) -->
+    <div class="dash-card">
+      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-trending"/></svg></span> TONX 수익 — 시청자 연동</h3><span class="tagx">시청자 채굴의 <b id="t-pct">20</b>% ÷ 전체 노드</span></div>
+      <div class="tonx-flow">
+        <div class="tstep"><div class="tl"><span class="livedot"></span> 오늘 시청자 채굴 TONX</div><div class="tv" id="t-viewer">0</div></div>
+        <div class="tar">×<b id="t-pct2">20</b>%</div>
+        <div class="tstep"><div class="tl">노드 풀 (오늘)</div><div class="tv r" id="t-pool">0</div></div>
+        <div class="tar">÷ N</div>
+        <div class="tstep"><div class="tl">노드 1개 (÷N)</div><div class="tv" id="t-pernode">0</div></div>
+        <div class="tar">× 내 노드</div>
+        <div class="tstep hi"><div class="tl">내 TONX 수익 (오늘)</div><div class="tv r" id="t-mine">0</div></div>
       </div>
-      <div class="formula-line"><svg class="icon"><use href="#i-zap"/></svg><span>노드 1개 채굴 = <b>오늘 시청자 채굴 TONX ÷ 전체 노드 수</b> · 내 채굴 = 노드 1개 채굴 <b>× 내 노드 수</b> — 시청자가 많아질수록 노드 배분도 자동 증가</span></div>
-      <div class="swap-row">
-        <div class="sw-l"><svg class="icon"><use href="#i-coins"/></svg> <b>TONX ⇄ XONT</b> 스왑</div>
-        <div class="sw-mid">스왑 비율 <b class="r">추후 공개 (TBD)</b></div>
-        <button class="sw-btn" disabled>스왑 준비 중</button>
-      </div>
+      <div class="formula-line"><svg class="icon"><use href="#i-zap"/></svg><span>내 TONX 수익 = 시청자 채굴 TONX <b>× 20%</b> ÷ 전체 노드 수 <b>× 내 노드 수</b> — 시청자가 많아질수록 자동 증가</span></div>
     </div>
 
     <div class="dash-grid">
-      <div class="dash-card reveal">
-        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-trending"/></svg></span> 내 노드 수익 (1차 3,000개 풀)</h3><span class="tagx">매출 10% · 노드 지분 분배</span></div>
-        <div class="mynode-top">
-          <div class="mn-stat"><div class="l">보유 노드</div><div class="v" id="my-nodes">5 <span class="u">개</span></div></div>
-          <div class="mn-stat"><div class="l">노드풀 점유율</div><div class="v" id="my-share">0.167<span class="u">%</span></div></div>
-          <div class="mn-stat"><div class="l">현재 총 노드</div><div class="v" id="total-nodes">2,188</div></div>
-        </div>
-        <div class="accrue">
-          <div class="l"><svg class="icon"><use href="#i-coins"/></svg> 이번 달 실시간 수익 배분 (광고+구독)</div>
-          <div class="big">$<span class="c" id="my-accrue">0.00</span></div>
-          <div class="xeq">≈ <b id="my-accrue-x">0.00</b> XONT · 익월 10일 지갑 지급</div>
-          <div class="prog">
-            <div class="pl"><span>정산 진행</span><span id="dday">다음 정산까지 D-6</span></div>
-            <div class="prbar"><i id="accrue-prog" style="width:80%"></i></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dash-card reveal">
-        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-wallet"/></svg></span> 내 XONT 지갑</h3><span class="tagx">톤체인</span></div>
+      <!-- XONT 지갑 -->
+      <div class="dash-card">
+        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-wallet"/></svg></span> XONT 지갑</h3><span class="tagx">시세 $<b id="w-price">0.1</b></span></div>
         <div class="wallet-bal">
           <div>
-            <div class="l">보유 잔액</div>
-            <div class="xt"><span id="xont-bal">0.00</span><span class="s">XONT</span></div>
-            <div class="usd" id="xont-usd">≈ $0.00</div>
+            <div class="l">사용 가능 잔액</div>
+            <div class="xt"><span id="w-bal">0</span> <span class="s">XONT</span></div>
+            <div class="usd" id="w-usd">≈ $0.00</div>
           </div>
           <div style="text-align:right">
-            <div class="l" style="justify-content:flex-end">채굴 속도</div>
-            <div style="color:#5ee08a;font-weight:800;font-size:15px">+<span id="xont-rate">0.42</span>/s</div>
+            <div class="l" style="justify-content:flex-end">스테이킹 중</div>
+            <div style="color:#f5c451;font-weight:800;font-size:16px"><span id="w-staked">0</span> XONT</div>
           </div>
         </div>
-        <div class="wallet-actions">
-          <button class="wbtn send" data-scroll="#xfer-card"><svg class="icon"><use href="#i-arrow-ur"/></svg> 전송</button>
-          <button class="wbtn stake" data-scroll="#stake-card"><svg class="icon"><use href="#i-lock"/></svg> 스테이킹</button>
+        <div class="wnote"><svg class="icon"><use href="#i-coins"/></svg> 노드 구매 시 <b>$1,000당 <span id="w-per">10,000</span> XONT</b> 지급 ($0.1 시세)</div>
+      </div>
+
+      <!-- 스테이킹 -->
+      <div class="dash-card" id="stake-card">
+        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-lock"/></svg></span> XONT 스테이킹</h3><span class="tagx">연 <b class="r" id="s-apy">60</b>% · 기본 1년</span></div>
+        <div class="stake-info">
+          <div class="si"><span class="k">월 지급</span><span class="v">원금의 <b class="r">5%</b> <em>절반 USD · 절반 XONT</em></span></div>
+          <div class="si"><span class="k">락업 기간</span><span class="v"><b id="s-term">12개월 (1년)</b></span></div>
+        </div>
+        <div class="field">
+          <label>스테이킹 수량</label>
+          <div class="inp-amt"><input type="text" inputmode="decimal" id="s-amt" placeholder="0"><span class="unit">XONT</span><button class="max" id="s-max">MAX</button></div>
+          <div class="balhint"><span>보유 <b id="s-bal">0</b> XONT</span><span id="s-est">예상 연 수익 —</span></div>
+        </div>
+        <button class="btn btn-red btn-block" id="s-btn">스테이킹하기</button>
+        <div class="active-stakes">
+          <div class="t">진행 중인 스테이킹</div>
+          <div class="stake-list" id="s-list"><div class="s-empty">아직 스테이킹이 없습니다.</div></div>
         </div>
       </div>
     </div>
 
-    <!-- 내 노드 신청 내역 (로그인 시 표시) -->
+    <!-- 내 노드 신청 내역 -->
     <div class="dash-card" id="my-apps-card" style="display:none">
       <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-inbox"/></svg></span> 내 노드 신청 내역</h3><span class="tagx">입금 · 승인 상태</span></div>
       <div class="applist" id="my-apps-list"></div>
     </div>
 
-    <div class="dash-grid-2">
-      <div class="dash-card reveal">
-        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-zap"/></svg></span> 노드별 XONT 채굴 현황</h3><span class="tagx" id="node-count-tag">5개 노드</span></div>
-        <div class="nodelist" id="node-list"></div>
-      </div>
-      <div class="dash-card reveal">
-        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-radio"/></svg></span> 현재 송출 중인 콘텐츠</h3><span class="tagx"><span class="livedot"></span> LIVE</span></div>
-        <div class="nodelist" id="stream-list"></div>
-      </div>
+    <div class="cta-band" style="margin-top:8px">
+      <h2>노드를 늘리면 <span style="color:var(--red-2)">수익도 늘어납니다</span></h2>
+      <p>시청자 TONX 20% 분배 + XONT 지급 + 연 60% 스테이킹. 노드 1개 $1,000부터.</p>
+      <div class="ph-actions"><button class="btn btn-red btn-lg" data-open-modal>노드 신청하기 →</button><a href="node.html" class="btn btn-ghost btn-lg">수익 구조 보기</a></div>
     </div>
 
-    <!-- 추천 네트워크 (2단계) -->
-    <div class="dash-card reveal" id="ref-card">
-      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 추천 네트워크 <span class="tagn">2단계</span></h3><span class="tagx">1단계 10% · 2단계 3%</span></div>
-      <div class="ref-grid">
-        <div class="ref-left">
-          <div class="ref-code">
-            <div class="rc-l">내 추천 코드</div>
-            <div class="rc-row">
-              <span class="rc-code" id="ref-code">TONTV-8K2P</span>
-              <button class="rc-copy" id="ref-copy-code"><svg class="icon"><use href="#i-share"/></svg> 복사</button>
-            </div>
-            <div class="rc-link">
-              <span id="ref-link">https://tontv.tonyai.cc/?ref=TONTV-8K2P</span>
-              <button class="rc-copy ghost" id="ref-copy-link">링크</button>
-            </div>
-          </div>
-          <div class="ref-stats">
-            <div class="rs">
-              <div class="rs-h"><span class="badge b1">1단계</span> 직접 추천 · 10%</div>
-              <div class="rs-row"><span>인원</span><b id="r1-people">0명</b></div>
-              <div class="rs-row"><span>노드 수</span><b id="r1-nodes">0개</b></div>
-              <div class="rs-row hi"><span>누적 보상</span><b id="r1-reward">0.00 XONT</b></div>
-            </div>
-            <div class="rs">
-              <div class="rs-h"><span class="badge b2">2단계</span> 간접 추천 · 3%</div>
-              <div class="rs-row"><span>인원</span><b id="r2-people">0명</b></div>
-              <div class="rs-row"><span>노드 수</span><b id="r2-nodes">0개</b></div>
-              <div class="rs-row hi"><span>누적 보상</span><b id="r2-reward">0.00 XONT</b></div>
-            </div>
-          </div>
-          <div class="ref-total">
-            <div class="l"><svg class="icon"><use href="#i-coins"/></svg> 추천 총 보상 · 실시간 적립</div>
-            <div class="v">+<span id="ref-total-x">0.00</span> <span class="u">XONT</span></div>
-            <div class="usd" id="ref-total-usd">≈ $0.00 · 익월 10일 지급</div>
-          </div>
-        </div>
-        <div class="ref-right">
-          <div class="rr-head"><span>내가 추천한 노드 사업자</span><span id="ref-people-count">0명 · 노드 0개</span></div>
-          <div class="ref-list" id="ref-list"></div>
-        </div>
-      </div>
-      <p class="ref-foot"><svg class="icon"><use href="#i-alert"/></svg><span>추천 보상은 피추천자 노드의 XONT 채굴에서 <b>1단계 10% · 2단계 3%</b>가 나에게 환원됩니다. 자기추천 · 무한 다단계는 차단됩니다.</span></p>
-    </div>
-
-    <div class="dash-grid-2">
-      <div class="dash-card reveal" id="stake-card">
-        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-lock"/></svg></span> XONT 스테이킹</h3><span class="tagx">최대 24% APY</span></div>
-        <div class="field">
-          <label>락업 기간 선택</label>
-          <div class="tiersel" id="tiersel">
-            <button class="tsel" data-mo="1" data-apy="6"><div class="m">1개월</div><div class="a">6%</div></button>
-            <button class="tsel" data-mo="3" data-apy="10"><div class="m">3개월</div><div class="a">10%</div></button>
-            <button class="tsel on" data-mo="6" data-apy="15"><div class="m">6개월</div><div class="a">15%</div></button>
-            <button class="tsel" data-mo="12" data-apy="24"><div class="m">12개월</div><div class="a">24%</div></button>
-          </div>
-        </div>
-        <div class="field">
-          <label>스테이킹 수량</label>
-          <div class="inp-amt">
-            <input type="text" inputmode="decimal" id="stake-amt" placeholder="0.00">
-            <span class="unit">XONT</span>
-            <button class="max" id="stake-max">MAX</button>
-          </div>
-          <div class="balhint"><span>보유 <b id="stake-bal">0.00</b> XONT</span><span>예상 만기 수령 <b id="stake-est" style="color:var(--red-2)">0.00</b> XONT</span></div>
-        </div>
-        <button class="btn btn-red btn-block" id="stake-btn">스테이킹하기</button>
-        <div class="active-stakes">
-          <div class="t">진행 중인 스테이킹 · 적립 보상 실시간</div>
-          <div id="stake-list"></div>
-        </div>
-      </div>
-
-      <div class="dash-card reveal" id="xfer-card">
-        <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-arrow-ur"/></svg></span> XONT 전송</h3><span class="tagx">다른 지갑으로</span></div>
-        <div class="field">
-          <label>받는 지갑 주소 (톤체인)</label>
-          <input type="text" class="inp" id="xfer-addr" placeholder="EQ... 또는 UQ... 주소 입력">
-        </div>
-        <div class="field">
-          <label>전송 수량</label>
-          <div class="inp-amt">
-            <input type="text" inputmode="decimal" id="xfer-amt" placeholder="0.00">
-            <span class="unit">XONT</span>
-            <button class="max" id="xfer-max">MAX</button>
-          </div>
-          <div class="balhint"><span>보유 <b id="xfer-bal">0.00</b> XONT</span><span>네트워크 수수료 <b>0.05 TON</b></span></div>
-        </div>
-        <div class="est"><span class="l">받는 사람 수령 금액</span><span class="v" id="xfer-receive">0.00 XONT</span></div>
-        <button class="btn btn-red btn-block" id="xfer-btn">전송하기</button>
-        <p style="font-size:11.5px;color:#7f858f;margin-top:14px;line-height:1.5"><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#i-alert"/></svg> 주소를 다시 한 번 확인하세요. 블록체인 전송은 되돌릴 수 없습니다.</p>
-      </div>
-    </div>
-
-    <div class="dash-card reveal">
-      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 톤티비 매출 실시간 분배 (이번 달 노드 풀)</h3><span class="tagx">구독 · 광고 · 토큰</span></div>
-      <div class="adrev">
-        <div class="donut">
-          <div class="cc"><div class="l">노드 풀 (10%)</div><div class="v" id="donut-total">$0</div></div>
-        </div>
-        <div class="legend">
-          <div class="lr"><span class="ll"><span class="sw" style="background:var(--red)"></span> 광고 매출</span><span class="lv" id="lg-ad">$0</span></div>
-          <div class="lr"><span class="ll"><span class="sw" style="background:#f5c451"></span> 구독 매출</span><span class="lv" id="lg-sub">$0</span></div>
-          <div class="lr"><span class="ll"><span class="sw" style="background:#3a82f6"></span> 토큰·생태계</span><span class="lv" id="lg-tok">$0</span></div>
-          <div class="lr" style="border-top:1px solid #2a2d34;padding-top:14px;margin-top:4px"><span class="ll" style="color:#fff;font-weight:800">내 노드 몫 (실시간)</span><span class="lv" style="color:var(--red-2)" id="lg-mine">$0</span></div>
-        </div>
-      </div>
-    </div>
-
-    <p class="dash-note reveal">※ 본 대시보드는 <span class="r">데모 데이터</span>로 동작합니다. 2026년 9월 정식 가동 시 온체인 실데이터(접속자 · 매출 · XONT 잔액)와 연동됩니다.</p>
+    <p class="dash-note">※ 시청자 채굴 TONX 수치는 정식 가동(2026.9) 전 시뮬레이션이며, <b>노드 수 · XONT 잔액 · 스테이킹 · 신청 내역은 실데이터</b>입니다.</p>
   </div>
 </section>
 
 <script src="layout.js"></script>
-<script src="app.js"></script>
+<script type="module">
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const fmt = (n) => Math.round(n).toLocaleString('en-US');
+  const fmt2 = (n) => Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  import('./lib/supabase.js').then(async (m) => {
+    const session = await m.getSession().catch(() => null);
+    if (!session) { location.replace('login.html'); return; }
+
+    let cfg, profile, nodeCount = 0, balance = 0, stakes = [], mining = null;
+    try {
+      [profile, cfg, balance, nodeCount, stakes, mining] = await Promise.all([
+        m.getMyProfile(), m.getTokenConfig(), m.getWalletBalance(), m.getMyNodeCount(), m.getMyStakes(), m.getMiningToday(),
+      ]);
+    } catch (e) { console.warn(e); }
+    cfg = cfg || {};
+    const price = Number(cfg.xont_price_usd || 0.1);
+    const perK = Number(cfg.xont_per_1000_usd || 10000);
+    const sharePct = Number(cfg.node_share_pct || 20);
+    const apy = Number(cfg.staking_apy || 60);
+    const totalNodes = Number(cfg.nodes_sold || 1) || 1;
+    const grantedXont = nodeCount * perK;          // 지급받은 XONT 총액
+    const stakedXont = stakes.filter(s => s.status === 'active').reduce((a, s) => a + Number(s.amount), 0);
+
+    // 계정
+    $('#d-name').textContent = (profile && profile.display_name) || '노드 사업자';
+    $('#d-email').textContent = ((profile && profile.email) || '') + ' · 로그인됨';
+
+    // 혜택 요약
+    $('#b-nodes').innerHTML = fmt(nodeCount) + '<span class="u">개</span>';
+    $('#b-share').textContent = '노드풀 ' + (nodeCount / totalNodes * 100).toFixed(3) + '%';
+    $('#b-xont').textContent = fmt(grantedXont);
+    $('#b-xont-usd').textContent = '≈ $' + fmt2(grantedXont * price);
+    $('#b-total').textContent = fmt(totalNodes);
+
+    // 지갑
+    $('#w-price').textContent = price;
+    $('#w-per').textContent = fmt(perK);
+    $('#w-bal').textContent = fmt2(balance);
+    $('#w-usd').textContent = '≈ $' + fmt2(balance * price);
+    $('#w-staked').textContent = fmt2(stakedXont);
+
+    // 스테이킹 정보
+    $('#s-apy').textContent = apy;
+    $('#t-pct').textContent = sharePct; $('#t-pct2').textContent = sharePct;
+    const months = Number(cfg.staking_months_default || 12);
+    $('#s-term').textContent = months + '개월' + (months === 12 ? ' (1년)' : '');
+    $('#s-bal').textContent = fmt2(balance);
+
+    // ---- TONX 수익 (시청자 연동, 라이브 시뮬레이션) ----
+    let viewerTonx = mining ? Number(mining.tonx_mined) : 2400000;
+    function paintTonx() {
+      const pool = viewerTonx * sharePct / 100;
+      const perNode = pool / totalNodes;
+      const mine = perNode * nodeCount;
+      $('#t-viewer').textContent = fmt(viewerTonx);
+      $('#t-pool').textContent = fmt(pool);
+      $('#t-pernode').textContent = fmt2(perNode);
+      $('#t-mine').textContent = fmt2(mine);
+    }
+    paintTonx();
+    setInterval(() => { viewerTonx += 40 + Math.random() * 120; paintTonx(); }, 1500);
+
+    // ---- 스테이킹 예상 수익 ----
+    const estEl = $('#s-est'), amtEl = $('#s-amt');
+    function calcEst() {
+      const a = parseFloat(amtEl.value) || 0;
+      if (a <= 0) { estEl.textContent = '예상 연 수익 —'; return; }
+      const yearXont = a * apy / 100;              // 연 총수익 (XONT 상당)
+      const halfUsd = yearXont / 2 * price;        // 절반 USD
+      const halfXont = yearXont / 2;               // 절반 XONT
+      estEl.innerHTML = '연 <b class="r">$' + fmt2(halfUsd) + ' + ' + fmt(halfXont) + ' XONT</b>';
+    }
+    amtEl.addEventListener('input', calcEst);
+    $('#s-max').addEventListener('click', () => { amtEl.value = Math.floor(balance); calcEst(); });
+
+    // ---- 스테이킹 목록 렌더 ----
+    function renderStakes() {
+      const box = $('#s-list');
+      const active = stakes.filter(s => s.status !== 'withdrawn');
+      if (!active.length) { box.innerHTML = '<div class="s-empty">아직 스테이킹이 없습니다.</div>'; return; }
+      box.innerHTML = active.map(s => {
+        const start = new Date(s.started_at), end = s.ends_at ? new Date(s.ends_at) : null;
+        const monthsElapsed = Math.max(0, Math.min(s.months, (Date.now() - start.getTime()) / (1000 * 60 * 60 * 24 * 30)));
+        const accXont = Number(s.amount) * (Number(s.apy) / 12 / 100) * monthsElapsed; // 적립(XONT 상당)
+        const dday = end ? Math.max(0, Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
+        return `<div class="s-row">
+          <div class="sl"><b>${fmt2(s.amount)} XONT</b><span>${s.months}개월 · 연 ${s.apy}% · 만기 D-${dday}</span></div>
+          <div class="sr"><span>적립</span><b class="r">$${fmt2(accXont / 2 * price)} + ${fmt(accXont / 2)} XONT</b></div>
+        </div>`;
+      }).join('');
+    }
+    renderStakes();
+
+    // ---- 스테이킹 실행 ----
+    $('#s-btn').addEventListener('click', async () => {
+      const a = parseFloat(amtEl.value) || 0;
+      if (a <= 0) { window.toast && window.toast('스테이킹 수량을 입력하세요', 'err'); return; }
+      if (a > balance) { window.toast && window.toast('보유 XONT가 부족합니다', 'err'); return; }
+      const btn = $('#s-btn'); const orig = btn.textContent; btn.disabled = true; btn.textContent = '처리 중…';
+      try {
+        await m.createStake({ amountXont: a, months });
+        window.toast && window.toast(`${fmt2(a)} XONT 스테이킹 완료 · 연 ${apy}%`);
+        // 새로고침 데이터
+        balance = await m.getWalletBalance();
+        stakes = await m.getMyStakes();
+        $('#w-bal').textContent = fmt2(balance); $('#w-usd').textContent = '≈ $' + fmt2(balance * price);
+        $('#s-bal').textContent = fmt2(balance);
+        $('#w-staked').textContent = fmt2(stakes.filter(s => s.status === 'active').reduce((x, s) => x + Number(s.amount), 0));
+        amtEl.value = ''; calcEst(); renderStakes();
+      } catch (e) {
+        window.toast && window.toast('스테이킹 실패: ' + (e && e.message || e), 'err');
+      } finally { btn.disabled = false; btn.textContent = orig; }
+    });
+
+    // ---- 내 노드 신청 내역 ----
+    try {
+      const deps = await m.getMyDeposits();
+      const apBox = $('#my-apps-list'), apCard = $('#my-apps-card');
+      if (apBox && apCard) {
+        const ST = { pending: ['승인 대기', 'wait'], confirmed: ['승인 완료', 'ok'], failed: ['거절됨', 'err'] };
+        apBox.innerHTML = deps.length ? deps.map(d => {
+          const s = ST[d.status] || [d.status, ''];
+          const dt = new Date(d.created_at).toLocaleDateString('ko-KR');
+          return `<div class="approw"><div class="ai"><b>${d.tier ? d.tier + ' · ' : ''}노드 ${d.quantity}개</b><span>${fmt(d.amount_usdt)} USDT · ${dt}</span></div><span class="appst ${s[1]}">${s[0]}</span></div>`;
+        }).join('') : '<div class="appempty">아직 신청 내역이 없습니다. <button class="lnk" onclick="document.querySelector(\'.float-cta [data-open-modal]\')?.click()">노드 신청하기 →</button></div>';
+        apCard.style.display = '';
+      }
+    } catch (e) {}
+  }).catch(() => { location.replace('login.html'); });
+})();
+</script>
 </body>
 </html>

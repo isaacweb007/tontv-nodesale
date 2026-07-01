@@ -374,7 +374,7 @@
   /* =========================================================
      DASHBOARD — live demo data (runs only on dashboard.html)
      ========================================================= */
-  if (document.body.dataset.page === 'dashboard') {
+  if (document.body.dataset.page === '__dashboard_legacy__') {   // v2 대시보드는 dashboard.html의 모듈 스크립트가 담당
   const state = {
     xont: 12480.55,        // available wallet balance
     myNodes: 5,
