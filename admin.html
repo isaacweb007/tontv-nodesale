@@ -51,7 +51,8 @@
         <button class="atab" data-tab="sales"><svg class="icon"><use href="#i-check"/></svg> <span>매출 승인</span><i class="tcount" id="tc-sales">0</i></button>
         <button class="atab" data-tab="withdraw"><svg class="icon"><use href="#i-dollar"/></svg> <span>출금</span><i class="tcount" id="tc-wd">0</i></button>
         <button class="atab" data-tab="wallet"><svg class="icon"><use href="#i-wallet"/></svg> <span>입금·지갑 관리</span></button>
-        <button class="atab" data-tab="settle"><svg class="icon"><use href="#i-pie"/></svg> <span>정산관리</span></button>
+        <button class="atab" data-tab="alloc"><svg class="icon"><use href="#i-pie"/></svg> <span>노드판매 배분</span></button>
+        <button class="atab" data-tab="settle"><svg class="icon"><use href="#i-sliders"/></svg> <span>정산관리</span></button>
         <button class="atab" data-tab="notice"><svg class="icon"><use href="#i-megaphone"/></svg> <span>공지</span></button>
         <div class="atab-grp">이벤트</div>
         <button class="atab" data-tab="events"><svg class="icon"><use href="#i-calendar"/></svg> <span>이벤트 관리</span></button>
@@ -149,6 +150,27 @@
           </div>
         </section>
 
+        <!-- 노드판매 배분 -->
+        <section class="apanel" data-panel="alloc" hidden>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 노드판매 매출 배분</h3><span class="tagx" id="alloc-total">합계 0%</span></div>
+            <div id="alloc-groups"></div>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-plus"/></svg></span> 배분 항목 추가/편집</h3><span class="tagx" id="alloc-edit-tag">신규</span></div>
+            <input type="hidden" id="al-id">
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>그룹</label><input class="inp" id="al-group" placeholder="영업수당"></div>
+              <div class="cfg-f"><label>항목명</label><input class="inp" id="al-item" placeholder="영업 1대"></div>
+              <div class="cfg-f"><label>비율 (%)</label><input class="inp" id="al-pct" type="number" step="0.1"></div>
+              <div class="cfg-f"><label>종류</label><input class="inp" id="al-kind" placeholder="commission / dev / staking_usdt / xont / reserve / ops"></div>
+              <div class="cfg-f"><label>정렬</label><input class="inp" id="al-sort" type="number" value="0"></div>
+              <div class="cfg-f"><label>메모</label><input class="inp" id="al-note"></div>
+            </div>
+            <div style="display:flex;gap:10px"><button class="btn btn-red" id="al-save">저장</button><button class="btn btn-ghost-dark" id="al-new">새로</button></div>
+          </div>
+        </section>
+
         <!-- 정산관리 -->
         <section class="apanel" data-panel="settle" hidden>
           <div class="dash-card" style="margin-bottom:20px">
@@ -243,7 +265,7 @@
               <div class="tk-stat"><div class="r1"><span>총 발행 상한</span><b id="t-xont-supply">0</b></div>
                 <div class="sbar"><i id="t-xont-bar" style="width:0%"></i></div>
                 <div class="r2" style="margin-top:8px"><span>누적 발행 <b id="t-xont-mined">0</b></span><span id="t-xont-pct">0%</span></div>
-                <div class="r2" style="margin-top:6px"><span>노드당 $1,000 = <b id="t-xont-per">0</b> XONT · 프로 <b class="r" id="t-xont-pro">+0%</b> · 맥스 <b class="r" id="t-xont-max">+0%</b></span></div></div>
+                <div class="r2" style="margin-top:6px"><span>노드당 $1,000 = <b id="t-xont-per">0</b> XONT · 플러스 <b class="r" id="t-xont-plus">+0%</b> · 프로 <b class="r" id="t-xont-pro">+0%</b> · 맥스 <b class="r" id="t-xont-max">+0%</b></span></div></div>
             </div>
           </div>
           <div class="dash-card">
@@ -252,6 +274,7 @@
               <div class="cfg-f"><label>XONT 시세 ($)</label><input class="inp" id="t-price" type="number" step="0.001"></div>
               <div class="cfg-f"><label>$1,000당 지급 XONT</label><input class="inp" id="t-per" type="number" step="1"></div>
               <div class="cfg-f"><label>총 발행 상한</label><input class="inp" id="t-supply" type="number" step="1000000"></div>
+              <div class="cfg-f"><label>플러스 보너스 (%)</label><input class="inp" id="t-plus" type="number" step="0.1"></div>
               <div class="cfg-f"><label>프로 보너스 (%)</label><input class="inp" id="t-pro" type="number" step="0.1"></div>
               <div class="cfg-f"><label>맥스 보너스 (%)</label><input class="inp" id="t-max" type="number" step="0.1"></div>
             </div>
@@ -409,7 +432,7 @@ let CFG = null;
 const loaded = {};
 const loaders = {
   overview: loadOverview, members: loadMembers, org: loadOrg, sales: loadSales,
-  withdraw: loadWithdraw, wallet: loadWallet, settle: loadSettle, notice: loadNotice,
+  withdraw: loadWithdraw, wallet: loadWallet, settle: loadSettle, notice: loadNotice, alloc: loadAllocations,
   rules: loadRules, token: loadToken, staking: loadStaking, sim: loadSim, rank: loadRank,
   admins: loadAdmins, audit: loadAudit, exec: loadExec, recovery: loadRecovery,
 };
@@ -658,6 +681,36 @@ async function saveRank() {
   catch (e) { toast('실패: '+e.message,'err'); }
 }
 
+/* ---------------- 노드판매 매출 배분 ---------------- */
+async function loadAllocations() {
+  $('#al-save').addEventListener('click', saveAlloc);
+  $('#al-new').addEventListener('click', allocNew);
+  renderAlloc();
+}
+function allocNew() { ['al-id','al-group','al-item','al-pct','al-kind','al-note'].forEach((i) => $('#'+i).value=''); $('#al-sort').value='0'; $('#alloc-edit-tag').textContent='신규'; }
+async function renderAlloc() {
+  try {
+    const rows = await db.adminListRevenueAllocations();
+    const total = rows.reduce((a, r) => a + Number(r.pct || 0), 0);
+    $('#alloc-total').textContent = '합계 ' + total + '%' + (Math.round(total) === 100 ? ' ✓' : ' ⚠ (100 아님)');
+    const groups = {};
+    rows.forEach((r) => { (groups[r.group_name] = groups[r.group_name] || []).push(r); });
+    $('#alloc-groups').innerHTML = Object.entries(groups).map(([g, items]) => {
+      const gsum = items.reduce((a, r) => a + Number(r.pct || 0), 0);
+      return `<div class="alloc-grp"><div class="alloc-gh"><b>${esc(g)}</b><span class="r">${gsum}%</span></div>` +
+        items.map((r) => `<div class="la-row"><div class="la-who"><b>${esc(r.item_name)}</b><span>${esc(r.note||'')}</span></div><div class="la-qty"><b class="r">${r.pct}%</b></div><div class="la-acts"><button class="la-ok" data-ale="${r.id}">수정</button><button class="la-no" data-ald="${r.id}">삭제</button></div></div>`).join('') + `</div>`;
+    }).join('') || '<div class="la-empty">배분 항목이 없습니다.</div>';
+    $$('#alloc-groups [data-ale]').forEach((b) => b.addEventListener('click', () => { const r = rows.find((x) => x.id === b.dataset.ale); $('#al-id').value=r.id; $('#al-group').value=r.group_name; $('#al-item').value=r.item_name; $('#al-pct').value=r.pct; $('#al-kind').value=r.kind||''; $('#al-sort').value=r.sort_order; $('#al-note').value=r.note||''; $('#alloc-edit-tag').textContent='수정'; }));
+    $$('#alloc-groups [data-ald]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminDeleteRevenueAllocation(b.dataset.ald); toast('삭제됨'); renderAlloc(); } catch (e) { toast('실패: '+e.message,'err'); } }));
+  } catch (e) { toast('배분 로드 실패: '+e.message,'err'); }
+}
+async function saveAlloc() {
+  const g = $('#al-group').value.trim(), it = $('#al-item').value.trim();
+  if (!g || !it) { toast('그룹·항목명을 입력하세요','err'); return; }
+  try { await db.adminSaveRevenueAllocation({ id:$('#al-id').value||undefined, group_name:g, item_name:it, pct:$('#al-pct').value, kind:$('#al-kind').value, sort_order:$('#al-sort').value, note:$('#al-note').value }); toast('저장됨'); allocNew(); renderAlloc(); }
+  catch (e) { toast('실패: '+e.message,'err'); }
+}
+
 /* ---------------- 회원 상세 ---------------- */
 async function openMember(id) {
   try {
@@ -682,7 +735,7 @@ async function openMember(id) {
 async function loadToken() {
   paintToken(await cfg());
   $('#token-save').addEventListener('click', async () => {
-    try { CFG = await db.adminUpdateConfig({ xont_price_usd:+$('#t-price').value, xont_per_1000_usd:+$('#t-per').value, xont_total_supply:+$('#t-supply').value, xont_bonus_pro_pct:+$('#t-pro').value, xont_bonus_max_pct:+$('#t-max').value }); toast('저장되었습니다'); paintToken(CFG); } catch (e) { toast('실패: '+e.message,'err'); }
+    try { CFG = await db.adminUpdateConfig({ xont_price_usd:+$('#t-price').value, xont_per_1000_usd:+$('#t-per').value, xont_total_supply:+$('#t-supply').value, xont_bonus_plus_pct:+$('#t-plus').value, xont_bonus_pro_pct:+$('#t-pro').value, xont_bonus_max_pct:+$('#t-max').value }); toast('저장되었습니다'); paintToken(CFG); } catch (e) { toast('실패: '+e.message,'err'); }
   });
 }
 function paintToken(c) {
@@ -696,10 +749,11 @@ function paintToken(c) {
   $('#t-xont-bar').style.width = Math.min(100, pct) + '%';
   $('#t-xont-price-tag').textContent = '$' + (c.xont_price_usd || 0);
   $('#t-xont-per').textContent = fmt(c.xont_per_1000_usd || 0);
+  $('#t-xont-plus').textContent = '+' + (c.xont_bonus_plus_pct || 0) + '%';
   $('#t-xont-pro').textContent = '+' + (c.xont_bonus_pro_pct || 0) + '%';
   $('#t-xont-max').textContent = '+' + (c.xont_bonus_max_pct || 0) + '%';
   $('#t-price').value = c.xont_price_usd; $('#t-per').value = c.xont_per_1000_usd;
-  $('#t-supply').value = c.xont_total_supply; $('#t-pro').value = c.xont_bonus_pro_pct; $('#t-max').value = c.xont_bonus_max_pct;
+  $('#t-supply').value = c.xont_total_supply; $('#t-plus').value = c.xont_bonus_plus_pct; $('#t-pro').value = c.xont_bonus_pro_pct; $('#t-max').value = c.xont_bonus_max_pct;
 }
 
 /* ---------------- 스테이킹 ---------------- */

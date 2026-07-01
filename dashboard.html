@@ -72,6 +72,16 @@
       <div id="ref-plan" class="ref-plan"></div>
     </div>
 
+    <!-- 노드판매 매출 배분 (투명 공개) -->
+    <div class="dash-card" style="margin-bottom:20px">
+      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 노드판매 <span class="r">매출 배분</span></h3><span class="tagx">투명 공개</span></div>
+      <div class="alloc-view">
+        <div class="alloc-bar" id="dv-bar"></div>
+        <div class="alloc-legend" id="dv-legend"></div>
+        <div class="alloc-sub" id="dv-sub"></div>
+      </div>
+    </div>
+
     <!-- 노드 수익 시뮬레이션 -->
     <div class="dash-card sim-card">
       <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-trending"/></svg></span> 노드 수익 시뮬레이션</h3><span class="tagx">아직 오픈 전 · <b class="r">예상치</b></span></div>
@@ -144,7 +154,7 @@
             <div style="color:#f5c451;font-weight:800;font-size:16px"><span id="w-staked">0</span> XONT</div>
           </div>
         </div>
-        <div class="wnote"><svg class="icon"><use href="#i-coins"/></svg> 노드 구매 시 <b>$1,000당 <span id="w-per">10,000</span> XONT</b> 지급 · 프로 <b class="r" id="w-bpro">+5%</b> · 맥스 <b class="r" id="w-bmax">+10%</b> 추가</div>
+        <div class="wnote"><svg class="icon"><use href="#i-coins"/></svg> 노드 구매 시 <b>$1,000당 <span id="w-per">10,000</span> XONT</b> · 플러스 <b class="r" id="w-bplus">+3%</b> · 프로 <b class="r" id="w-bpro">+5%</b> · 맥스 <b class="r" id="w-bmax">+10%</b> 추가</div>
       </div>
 
       <!-- 스테이킹 -->
@@ -238,9 +248,25 @@
         : '';
     } catch (e) { console.warn(e); }
 
+    // 노드판매 매출 배분 (투명 공개)
+    try {
+      const alloc = m.getRevenueAllocations ? await m.getRevenueAllocations() : [];
+      if (alloc.length) {
+        const groups = {};
+        alloc.forEach((a) => { (groups[a.group_name] = groups[a.group_name] || []).push(a); });
+        const palette = ['#e5484d', '#f0b90b', '#3a82f6', '#7ee0a8', '#a855f7'];
+        const gnames = Object.keys(groups);
+        const gsum = (n) => groups[n].reduce((s, a) => s + Number(a.pct || 0), 0);
+        $('#dv-bar').innerHTML = gnames.map((n, i) => `<i style="width:${gsum(n)}%;background:${palette[i % palette.length]}"></i>`).join('');
+        $('#dv-legend').innerHTML = gnames.map((n, i) => `<span class="lg"><span class="sw" style="background:${palette[i % palette.length]}"></span>${n} <b>${gsum(n)}%</b></span>`).join('');
+        $('#dv-sub').innerHTML = gnames.map((n) => `<div><b style="color:#cfd2d8">${n}</b> — ${groups[n].map((a) => a.item_name + ' ' + a.pct + '%').join(' · ')}</div>`).join('');
+      }
+    } catch (e) { console.warn(e); }
+
     // 지갑
     $('#w-price').textContent = price;
     $('#w-per').textContent = fmt(perK);
+    $('#w-bplus') && ($('#w-bplus').textContent = '+' + (cfg.xont_bonus_plus_pct ?? 3) + '%');
     $('#w-bpro') && ($('#w-bpro').textContent = '+' + (cfg.xont_bonus_pro_pct ?? 5) + '%');
     $('#w-bmax') && ($('#w-bmax').textContent = '+' + (cfg.xont_bonus_max_pct ?? 10) + '%');
     $('#w-bal').textContent = fmt2(balance);
