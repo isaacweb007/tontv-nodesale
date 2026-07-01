@@ -76,12 +76,23 @@
         <!-- 개요 -->
         <section class="apanel on" data-panel="overview">
           <div class="metrics am-metrics">
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-server"/></svg></span> 판매 노드</div><div class="v" id="o-nodes">0</div><div class="sub"><span id="o-cap">/ 0</span> 발행 상한</div></div>
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 누적 입금(확정)</div><div class="v r" id="o-deposit">$0</div><div class="sub">트레저리 유입</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-server"/></svg></span> 판매 노드</div><div class="v" id="o-nodes">0</div><div class="sub"><span id="o-cap">/ 0</span> 발행 상한 <span class="mdelta" id="o-nodes-delta"></span></div><svg class="spark" id="o-nodes-spark"></svg></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 누적 입금(확정)</div><div class="v r" id="o-deposit">$0</div><div class="sub">트레저리 유입 <span class="mdelta" id="o-deposit-delta"></span></div><svg class="spark" id="o-deposit-spark"></svg></div>
             <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-inbox"/></svg></span> 대기 신청</div><div class="v" id="o-pending">0</div><div class="sub">매출 승인 대기</div></div>
             <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 대기 출금</div><div class="v" id="o-wd">0</div><div class="sub">출금 승인 대기</div></div>
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-users"/></svg></span> 회원</div><div class="v" id="o-ops">0</div><div class="sub">가입 사업자</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-users"/></svg></span> 회원</div><div class="v" id="o-ops">0</div><div class="sub">가입 사업자 <span class="mdelta" id="o-ops-delta"></span></div><svg class="spark" id="o-ops-spark"></svg></div>
             <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-coins"/></svg></span> XONT 총발행</div><div class="v r" id="o-xont">0</div><div class="sub">노드 지급 누적</div></div>
+          </div>
+          <div class="dash-grid-2" style="margin-bottom:20px">
+            <div class="dash-card">
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-trending"/></svg></span> 최근 14일 판매 추이</h3><span class="tagx" id="trend-total">—</span></div>
+              <div class="trend-chart" id="trend-chart"></div>
+            </div>
+            <div class="dash-card">
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 티어별 판매 분포</h3><span class="tagx" id="tier-total">—</span></div>
+              <div class="tier-bar" id="tier-bar"></div>
+              <div class="tier-legend" id="tier-legend"></div>
+            </div>
           </div>
           <div class="dash-grid-2">
             <div class="dash-card">
@@ -368,6 +379,25 @@
 
         <!-- 관리자 관리 -->
         <section class="apanel" data-panel="admins" hidden>
+          <div class="dash-card" style="margin-bottom:16px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-user-check"/></svg></span> 새 관리자 등록</h3><span class="tagx">이메일 · 비밀번호로 신규 계정 생성</span></div>
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>표시 이름</label><input class="inp" id="na-name" placeholder="예: 운영팀 김OO" autocomplete="off"></div>
+              <div class="cfg-f"><label>이메일</label><input class="inp" id="na-email" type="email" placeholder="admin@tontv.io" autocomplete="off"></div>
+              <div class="cfg-f">
+                <label>비밀번호 (8자 이상)</label>
+                <div class="pw-field"><input class="inp" id="na-pw" type="password" placeholder="••••••••" autocomplete="new-password"><button type="button" class="pw-eye" id="na-pw-eye" aria-label="비밀번호 표시"><svg class="icon"><use href="#i-eye"/></svg></button></div>
+              </div>
+              <div class="cfg-f">
+                <label>비밀번호 확인</label>
+                <div class="pw-field"><input class="inp" id="na-pw2" type="password" placeholder="••••••••" autocomplete="new-password"><button type="button" class="pw-eye" id="na-pw2-eye" aria-label="비밀번호 표시"><svg class="icon"><use href="#i-eye"/></svg></button></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-red" id="na-save"><svg class="icon"><use href="#i-user-check"/></svg> 관리자 등록</button>
+              <span class="amini-desc" style="margin:0">등록 즉시 로그인 가능한 관리자 계정이 생성됩니다(이메일 인증 불필요).</span>
+            </div>
+          </div>
           <div class="dash-card" style="margin-bottom:16px"><div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-shield"/></svg></span> 관리자 지정</h3><span class="tagx">이메일로 검색해 관리자 권한 부여/회수</span></div>
             <div class="atoolbar"><div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="adm-q" placeholder="이름 · 이메일 검색"></div></div>
           </div>
@@ -530,7 +560,77 @@ async function loadOverview() {
     $$('#o-todo [data-go]').forEach((b) => b.addEventListener('click', () => selectTab(b.dataset.go)));
     const audit = await db.adminListAudit().catch(() => []);
     $('#o-audit').innerHTML = audit.length ? audit.slice(0, 8).map((a) => `<div class="la-row"><div class="la-who"><b>${esc(a.action)}</b><span>${esc(a.target_table || '')} ${esc(a.target_id || '')}</span></div><span style="color:#8a909b;font-size:12px">${dt(a.created_at)}</span></div>`).join('') : '<div class="la-empty">로그가 없습니다.</div>';
+
+    const [sales, ops] = await Promise.all([db.adminListConfirmedSales().catch(() => []), db.adminOperatorGrowth().catch(() => [])]);
+    renderOverviewTrends(sales, ops);
   } catch (e) { toast('개요 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 개요: 추이 · 티어 분포 ---------------- */
+const dayKey = (d) => { const x = new Date(d); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`; };
+const lastNDays = (n) => { const days = [], now = new Date(); for (let i = n - 1; i >= 0; i--) days.push(dayKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() - i))); return days; };
+function buildDailySeries(rows, dateField, valueField, days) {
+  const map = {};
+  rows.forEach((r) => { const k = dayKey(r[dateField]); map[k] = (map[k] || 0) + Number(r[valueField] || 0); });
+  return days.map((k) => map[k] || 0);
+}
+function seriesDelta(values) {
+  const half = Math.floor(values.length / 2);
+  const prev = values.slice(0, half).reduce((a, b) => a + b, 0);
+  const curr = values.slice(half).reduce((a, b) => a + b, 0);
+  if (!prev) return curr > 0 ? Infinity : 0;
+  return Math.round(((curr - prev) / prev) * 1000) / 10;
+}
+function renderSpark(id, values) {
+  const el = $('#' + id); if (!el) return;
+  const w = 100, h = 30, n = values.length, max = Math.max(...values, 1);
+  const step = w / n, bw = step * 0.62, gap = step * 0.38;
+  el.setAttribute('viewBox', `0 0 ${w} ${h}`); el.setAttribute('preserveAspectRatio', 'none');
+  el.innerHTML = values.map((v, i) => {
+    const bh = Math.max(1.5, (v / max) * (h - 2));
+    return `<rect x="${(i * step + gap / 2).toFixed(2)}" y="${(h - bh).toFixed(2)}" width="${bw.toFixed(2)}" height="${bh.toFixed(2)}" rx="1" fill="url(#sparkGrad)"/>`;
+  }).join('');
+}
+function renderMdelta(id, pct) {
+  const el = $('#' + id); if (!el) return;
+  if (!isFinite(pct)) { el.textContent = ''; return; }
+  const up = pct >= 0;
+  el.className = 'mdelta ' + (up ? 'up' : 'down');
+  el.innerHTML = (up ? '▲' : '▼') + ' ' + Math.abs(pct) + '%';
+}
+function renderTrendChart(days, values) {
+  const max = Math.max(...values, 1);
+  $('#trend-chart').innerHTML = days.map((k, i) => {
+    const v = values[i], pct = Math.max(1, Math.round((v / max) * 100));
+    const label = k.slice(5).replace('-', '/');
+    return `<div class="tbar" style="--h:${pct}%" title="${label} · ${fmt2(v)} USDT"><span class="tbar-fill"></span><span class="tbar-lbl">${label}</span></div>`;
+  }).join('');
+  $('#trend-total').textContent = fmt2(values.reduce((a, b) => a + b, 0)) + ' USDT · 14일 합계';
+}
+function renderTierBar(sales) {
+  const order = ['basic', 'plus', 'pro', 'max'];
+  const labelMap = { basic: '베이직', plus: '플러스', pro: '프로', max: '맥스' };
+  const colorMap = { basic: '#565c66', plus: '#f5c451', pro: '#ff2740', max: '#E8112D' };
+  const totals = {};
+  sales.forEach((r) => { const t = (r.tier || 'basic').toLowerCase(); totals[t] = (totals[t] || 0) + Number(r.amount_usdt || 0); });
+  const grand = Object.values(totals).reduce((a, b) => a + b, 0);
+  const present = order.filter((t) => totals[t]);
+  $('#tier-bar').innerHTML = present.length ? present.map((t) => `<span style="width:${(totals[t] / grand * 100).toFixed(2)}%;background:${colorMap[t]}" title="${labelMap[t]} ${(totals[t] / grand * 100).toFixed(1)}%"></span>`).join('') : '<span style="width:100%;background:#2a2d34"></span>';
+  $('#tier-legend').innerHTML = present.length ? present.map((t) => `<div class="tl-row"><i style="background:${colorMap[t]}"></i><b>${labelMap[t]}</b><span>${fmt2(totals[t])} USDT</span><span class="r">${(totals[t] / grand * 100).toFixed(1)}%</span></div>`).join('') : '<div class="la-empty">판매 데이터가 없습니다.</div>';
+  $('#tier-total').textContent = grand ? fmt2(grand) + ' USDT' : '—';
+}
+function renderOverviewTrends(sales, ops) {
+  const days = lastNDays(14);
+  const depositSeries = buildDailySeries(sales, 'sale_at', 'amount_usdt', days);
+  const nodeSeries = buildDailySeries(sales, 'sale_at', 'quantity', days);
+  const opDayCounts = {};
+  ops.forEach((o) => { const k = dayKey(o.created_at); opDayCounts[k] = (opDayCounts[k] || 0) + 1; });
+  const opCountSeries = days.map((k) => opDayCounts[k] || 0);
+  renderSpark('o-deposit-spark', depositSeries); renderMdelta('o-deposit-delta', seriesDelta(depositSeries));
+  renderSpark('o-nodes-spark', nodeSeries); renderMdelta('o-nodes-delta', seriesDelta(nodeSeries));
+  renderSpark('o-ops-spark', opCountSeries); renderMdelta('o-ops-delta', seriesDelta(opCountSeries));
+  renderTrendChart(days, depositSeries);
+  renderTierBar(sales);
 }
 
 /* ---------------- 회원 관리 ---------------- */
@@ -1187,6 +1287,30 @@ let ADM = [];
 async function loadAdmins() {
   try { ADM = await db.adminListOperators(); renderAdmins(); $('#adm-q').addEventListener('input', renderAdmins); }
   catch (e) { toast('로드 실패: ' + e.message, 'err'); }
+  $('#na-save').addEventListener('click', createAdmin);
+  [['na-pw', 'na-pw-eye'], ['na-pw2', 'na-pw2-eye']].forEach(([inputId, btnId]) => {
+    $('#' + btnId).addEventListener('click', () => {
+      const inp = $('#' + inputId);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+  });
+}
+async function createAdmin() {
+  const display_name = $('#na-name').value.trim();
+  const email = $('#na-email').value.trim();
+  const pw = $('#na-pw').value, pw2 = $('#na-pw2').value;
+  if (!display_name) { toast('표시 이름을 입력하세요', 'err'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('올바른 이메일 형식이 아닙니다', 'err'); return; }
+  if (pw.length < 8) { toast('비밀번호는 8자 이상이어야 합니다', 'err'); return; }
+  if (pw !== pw2) { toast('비밀번호 확인이 일치하지 않습니다', 'err'); return; }
+  $('#na-save').disabled = true;
+  try {
+    await db.adminCreateAdmin({ email, password: pw, display_name });
+    toast('관리자 계정이 생성되었습니다');
+    ['na-name', 'na-email', 'na-pw', 'na-pw2'].forEach((i) => $('#' + i).value = '');
+    ADM = await db.adminListOperators(); renderAdmins();
+  } catch (e) { toast('실패: ' + e.message, 'err'); }
+  finally { $('#na-save').disabled = false; }
 }
 function renderAdmins() {
   const q = ($('#adm-q').value || '').toLowerCase();
