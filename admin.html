@@ -73,6 +73,10 @@
         <div class="cfg-f"><label>XONT 시세 ($)</label><input class="inp" id="cfg-price" type="number" step="0.001" inputmode="decimal"></div>
         <div class="cfg-f"><label>노드 몫 (%)</label><input class="inp" id="cfg-share" type="number" step="0.1" inputmode="decimal"></div>
         <div class="cfg-f"><label>$1,000당 지급 XONT</label><input class="inp" id="cfg-per" type="number" step="1" inputmode="decimal"></div>
+        <div class="cfg-f"><label>노드 총 수</label><input class="inp" id="cfg-cap" type="number" step="1000" inputmode="numeric"></div>
+        <div class="cfg-f"><label>유저당 광고/일</label><input class="inp" id="cfg-ads" type="number" step="1" inputmode="numeric"></div>
+        <div class="cfg-f"><label>광고 1개당 TONX</label><input class="inp" id="cfg-tpa" type="number" step="0.1" inputmode="decimal"></div>
+        <div class="cfg-f"><label>TONX 1개 ≈ 원</label><input class="inp" id="cfg-krw" type="number" step="1" inputmode="numeric"></div>
       </div>
       <button class="btn btn-red" id="cfg-save" style="margin-top:6px">설정 저장</button>
     </div>
@@ -380,7 +384,11 @@
         g('#cfg-price').value = cfg.xont_price_usd;
         g('#cfg-share').value = cfg.node_share_pct;
         g('#cfg-per').value = cfg.xont_per_1000_usd;
-        g('#cfg-meta').textContent = '현재 APY ' + cfg.staking_apy + '% · 시세 $' + cfg.xont_price_usd;
+        g('#cfg-cap').value = cfg.node_cap;
+        g('#cfg-ads').value = cfg.sim_ads_per_user;
+        g('#cfg-tpa').value = cfg.sim_tonx_per_ad;
+        g('#cfg-krw').value = cfg.ad_reward_krw;
+        g('#cfg-meta').textContent = '현재 APY ' + cfg.staking_apy + '% · 시세 $' + cfg.xont_price_usd + ' · 노드 ' + cfg.node_cap;
       } catch (e) { g('#cfg-meta').textContent = '설정 로드 실패'; }
       g('#cfg-save').addEventListener('click', async () => {
         const patch = {
@@ -388,6 +396,10 @@
           xont_price_usd: parseFloat(g('#cfg-price').value) || 0,
           node_share_pct: parseFloat(g('#cfg-share').value) || 0,
           xont_per_1000_usd: parseFloat(g('#cfg-per').value) || 0,
+          node_cap: parseInt(g('#cfg-cap').value) || 0,
+          sim_ads_per_user: parseInt(g('#cfg-ads').value) || 0,
+          sim_tonx_per_ad: parseFloat(g('#cfg-tpa').value) || 0,
+          ad_reward_krw: parseFloat(g('#cfg-krw').value) || 0,
         };
         const btn = g('#cfg-save'); const o = btn.textContent; btn.disabled = true; btn.textContent = '저장 중…';
         try {
