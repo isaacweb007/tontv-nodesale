@@ -400,22 +400,35 @@
   </div>
 </section>
 
-<!-- 회원 상세 모달 -->
-<div class="adm-modal" id="mem-modal" hidden>
-  <div class="adm-modal-box">
-    <button class="modal-x" id="mem-close" aria-label="닫기"><svg class="icon"><use href="#i-x"/></svg></button>
-    <h3 id="mm-name" style="font-family:var(--font-display)">회원</h3>
-    <div class="mm-sub" id="mm-email">—</div>
-    <div class="mini-stats" id="mm-stats" style="margin:16px 0"></div>
-    <div class="mm-grid">
-      <div><div class="mm-h">총판 센터장</div><div style="display:flex;gap:8px;align-items:center"><span class="appst" id="mm-ch-status">—</span><button class="btn btn-red" id="mm-ch-toggle" style="padding:9px 16px;font-size:12.5px">지정/해제</button></div></div>
-      <div><div class="mm-h">상위 (추천인)</div><div id="mm-upline" class="mm-box">—</div></div>
+<!-- 회원 상세 드로어 (우측 슬라이드) -->
+<div class="adm-drawer" id="mem-modal" hidden>
+  <div class="adm-drawer-scrim" data-drawer-close></div>
+  <aside class="adm-drawer-panel" role="dialog" aria-label="회원 상세">
+    <header class="dw-head">
+      <div class="dw-id">
+        <div class="dw-av" id="mm-av">—</div>
+        <div style="min-width:0">
+          <div class="dw-name" id="mm-name">회원</div>
+          <div class="dw-badges" id="mm-badges"></div>
+        </div>
+      </div>
+      <button class="dw-x" id="mem-close" aria-label="닫기"><svg class="icon"><use href="#i-x"/></svg></button>
+    </header>
+    <div class="dw-actions">
+      <button class="btn btn-red" id="mm-ch-toggle">총판 센터장 지정</button>
+      <button class="btn btn-ghost-dark" id="mm-susp-toggle">정지</button>
     </div>
-    <div class="mm-h" style="margin-top:16px">하위 조직 (직속 <span id="mm-down-n">0</span>명)</div>
-    <div class="la-body" id="mm-downline"></div>
-    <div class="mm-h" style="margin-top:16px">노드 · 스테이킹</div>
-    <div id="mm-assets" class="mm-box"></div>
-  </div>
+    <div class="dw-body">
+      <div class="dw-stats" id="mm-stats"></div>
+      <section class="dw-sec"><h4><svg class="icon" style="width:15px;height:15px;color:#7f858f"><use href="#i-user"/></svg> 가입 정보</h4><div class="dw-kv" id="mm-signup"></div></section>
+      <section class="dw-sec"><h4><svg class="icon" style="width:15px;height:15px;color:#7f858f"><use href="#i-share"/></svg> 조직</h4><div class="dw-kv" id="mm-org-kv"></div><div class="dw-subh">직속 하위 <span id="mm-down-n">0</span>명</div><div class="dw-list" id="mm-downline"></div></section>
+      <section class="dw-sec"><h4><svg class="icon" style="width:15px;height:15px;color:#7f858f"><use href="#i-wallet"/></svg> 재무 현황</h4><div class="dw-fin" id="mm-finance"></div></section>
+      <section class="dw-sec"><h4><svg class="icon" style="width:15px;height:15px;color:#7f858f"><use href="#i-server"/></svg> 노드 <span class="dw-cnt" id="mm-nodes-n">0</span></h4><div class="dw-list" id="mm-nodes"></div></section>
+      <section class="dw-sec"><h4><svg class="icon" style="width:15px;height:15px;color:#7f858f"><use href="#i-lock"/></svg> 스테이킹 <span class="dw-cnt" id="mm-stk-n">0</span></h4><div class="dw-list" id="mm-stakes"></div></section>
+      <section class="dw-sec"><h4><svg class="icon" style="width:15px;height:15px;color:#7f858f"><use href="#i-dollar"/></svg> 매출(입금) 내역</h4><div class="dw-list" id="mm-deposits"></div></section>
+      <section class="dw-sec"><h4><svg class="icon" style="width:15px;height:15px;color:#7f858f"><use href="#i-clock"/></svg> 최근 거래</h4><div class="dw-list" id="mm-tx"></div></section>
+    </div>
+  </aside>
 </div>
 
 <script src="layout.js"></script>
@@ -458,8 +471,9 @@ const loaders = {
 
 function boot() {
   $$('#admin-tabs .atab').forEach((b) => b.addEventListener('click', () => selectTab(b.dataset.tab)));
-  $('#mem-close').addEventListener('click', () => $('#mem-modal').hidden = true);
-  $('#mem-modal').addEventListener('click', (e) => { if (e.target.id === 'mem-modal') $('#mem-modal').hidden = true; });
+  $('#mem-close').addEventListener('click', closeMember);
+  $$('#mem-modal [data-drawer-close]').forEach((el) => el.addEventListener('click', closeMember));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#mem-modal').hidden) closeMember(); });
   loadOverview(); loaded.overview = true;
 }
 function selectTab(tab) {
@@ -890,28 +904,89 @@ async function saveAlloc() {
   catch (e) { toast('실패: '+e.message,'err'); }
 }
 
-/* ---------------- 회원 상세 ---------------- */
+/* ---------------- 회원 상세 (우측 드로어) ---------------- */
+function closeMember() { const dw = $('#mem-modal'); dw.classList.remove('open'); setTimeout(() => { dw.hidden = true; }, 240); }
+const dwKV = (k, v) => `<div class="dw-kvrow"><span class="dw-k">${k}</span><span class="dw-v">${v}</span></div>`;
+const dwStat = (icon, label, val) => `<div class="dw-stat"><div class="dws-h"><svg class="icon"><use href="#${icon}"/></svg> ${label}</div><div class="dws-v">${val}</div></div>`;
+const dwFin = (label, val, hi) => `<div class="dw-fincard${hi ? ' hi' : ''}"><div class="dw-fl">${label}</div><div class="dw-fv">${val}</div></div>`;
+const dwRow = (a, b, c, cls) => `<div class="dw-row"><div class="dw-r-main"><b>${a}</b><span>${b}</span></div><div class="dw-r-tag ${cls || ''}">${c || ''}</div></div>`;
+const dwEmpty = (m) => `<div class="dw-empty">${m}</div>`;
+const depSt = (s) => ({ pending: '<span style="color:#f5c451">대기</span>', confirmed: '<span style="color:#5ee08a">승인</span>', failed: '<span style="color:#ff8a96">거절</span>' }[s] || s);
+
 async function openMember(id) {
+  const dw = $('#mem-modal');
   try {
     const d = await db.adminOperatorDetail(id);
-    if (!d.op) { toast('회원 정보 없음','err'); return; }
-    $('#mm-name').textContent = d.op.display_name || '회원';
-    $('#mm-email').textContent = (d.op.email || '') + ' · ' + (d.op.phone || '');
-    const active = d.stakes.filter((s) => s.status === 'active').reduce((a, s) => a + Number(s.amount), 0);
-    $('#mm-stats').innerHTML = statCards([['노드', d.nodes.length], ['XONT 잔액', fmt2(d.balance)], ['스테이킹', fmt2(active)], ['직속 하위', d.downline.length]]);
-    $('#mm-ch-status').textContent = d.op.is_center_head ? '총판 센터장' : '일반 회원';
-    $('#mm-ch-status').className = 'appst' + (d.op.is_center_head ? ' ok' : '');
-    $('#mm-ch-toggle').textContent = d.op.is_center_head ? '해제' : '지정';
-    $('#mm-ch-toggle').onclick = async () => {
-      try { await db.adminUpdateOperator(id, { is_center_head: !d.op.is_center_head }); toast('처리되었습니다'); openMember(id); }
-      catch (e) { toast('실패: ' + e.message, 'err'); }
-    };
-    $('#mm-upline').innerHTML = d.upline ? `<b>${esc(d.upline.display_name)||'—'}</b> · ${esc(d.upline.email||'')} <span class="muted sm">(${esc(d.upline.referral_code||'')})</span>` : '없음 (최상위)';
+    if (!d.op) { toast('회원 정보 없음', 'err'); return; }
+    const o = d.op, f = d.finance;
+
+    $('#mm-av').textContent = (o.display_name || o.email || '?').slice(0, 2);
+    $('#mm-name').textContent = o.display_name || '회원';
+    const badges = [o.status === 'suspended' ? '<span class="dwb red">정지</span>' : '<span class="dwb green">활성</span>'];
+    if (o.is_admin) badges.push('<span class="dwb gold">관리자</span>');
+    if (o.is_center_head) badges.push('<span class="dwb gold">총판 센터장</span>');
+    if (o.email) badges.push(`<span class="dwb gray">${esc(o.email)}</span>`);
+    $('#mm-badges').innerHTML = badges.join('');
+
+    $('#mm-ch-toggle').textContent = o.is_center_head ? '총판 센터장 해제' : '총판 센터장 지정';
+    $('#mm-ch-toggle').onclick = async () => { try { await db.adminUpdateOperator(id, { is_center_head: !o.is_center_head }); toast('처리되었습니다'); openMember(id); } catch (e) { toast('실패: ' + e.message, 'err'); } };
+    $('#mm-susp-toggle').textContent = o.status === 'suspended' ? '정지 해제' : '정지';
+    $('#mm-susp-toggle').className = 'btn ' + (o.status === 'suspended' ? 'btn-red' : 'btn-ghost-dark');
+    $('#mm-susp-toggle').onclick = async () => { try { await db.adminUpdateOperator(id, { status: o.status === 'suspended' ? 'active' : 'suspended' }); toast('처리되었습니다'); openMember(id); loaded.members && loadMembers(); } catch (e) { toast('실패: ' + e.message, 'err'); } };
+
+    $('#mm-stats').innerHTML = [
+      dwStat('i-server', '노드', d.nodes.length + '개'),
+      dwStat('i-wallet', 'XONT 잔액', fmt2(f.balance)),
+      dwStat('i-lock', '스테이킹', fmt2(f.stakedActive)),
+      dwStat('i-users', '직속 하위', d.downline.length + '명'),
+    ].join('');
+
+    const KYC = { none: '미인증', pending: '대기', verified: '인증완료', rejected: '거절' };
+    $('#mm-signup').innerHTML = [
+      dwKV('이름', esc(o.display_name || '—')),
+      dwKV('이메일', esc(o.email || '—')),
+      dwKV('연락처', esc(o.phone || '—')),
+      dwKV('추가 연락처', esc(o.contact || '—')),
+      dwKV('내 추천코드', `<b>${esc(o.referral_code || '—')}</b>`),
+      dwKV('추천인 코드', esc(o.referred_by_code || '—')),
+      dwKV('지갑 주소', o.wallet_address ? esc(o.wallet_address) : '<span class="dw-dim">미등록</span>'),
+      dwKV('KYC', KYC[o.kyc_status] || o.kyc_status || '—'),
+      dwKV('상태', o.status === 'suspended' ? '<span style="color:#ff8a96">정지</span>' : '<span style="color:#5ee08a">활성</span>'),
+      dwKV('권한', (o.is_admin ? '관리자' : '') + (o.is_center_head ? (o.is_admin ? ' · 총판센터장' : '총판센터장') : '') || '일반 회원'),
+      dwKV('가입일', dt(o.created_at)),
+    ].join('');
+
+    $('#mm-org-kv').innerHTML = [
+      dwKV('상위 추천인', d.upline ? `<b>${esc(d.upline.display_name) || '—'}</b> · ${esc(d.upline.email || '')}` : '없음 (최상위)'),
+      dwKV('상위 연락처', d.upline ? esc(d.upline.phone || '—') : '—'),
+    ].join('');
     $('#mm-down-n').textContent = d.downline.length;
-    $('#mm-downline').innerHTML = d.downline.length ? d.downline.map((x) => `<div class="la-row"><div class="la-who"><b>${esc(x.display_name)||'—'}</b><span>${esc(x.email||'')} · ${day(x.created_at)}</span></div><span class="muted sm">${esc(x.referral_code||'')}</span></div>`).join('') : '<div class="la-empty">하위 조직이 없습니다.</div>';
-    $('#mm-assets').innerHTML = `노드 <b>${d.nodes.length}</b>개 · 스테이킹 <b>${d.stakes.length}</b>건 · 추천코드 <b>${esc(d.op.referral_code||'')}</b>`;
-    $('#mem-modal').hidden = false;
-  } catch (e) { toast('상세 로드 실패: '+e.message,'err'); }
+    $('#mm-downline').innerHTML = d.downline.length ? d.downline.map((x) => dwRow(esc(x.display_name) || '—', esc(x.email || '') + ' · ' + day(x.created_at), esc(x.referral_code || ''))).join('') : dwEmpty('하위 조직이 없습니다.');
+
+    $('#mm-finance').innerHTML = [
+      dwFin('XONT 잔액', fmt2(f.balance), true),
+      dwFin('노드 지급 누적', fmt2(f.grantedXont)),
+      dwFin('추천수당 누적', fmt2(f.referralXont)),
+      dwFin('보상 누적', fmt2(f.rewardXont)),
+      dwFin('스테이킹 락업', fmt2(f.stakedActive)),
+      dwFin('누적 입금(확정)', '$' + fmt(f.depositUsdt)),
+    ].join('');
+
+    $('#mm-nodes-n').textContent = d.nodes.length;
+    $('#mm-nodes').innerHTML = d.nodes.length ? d.nodes.slice(0, 60).map((n) => dwRow('노드', (n.status === 'active' ? '가동중' : '대기') + ' · $' + fmt(n.price_usdt), day(n.purchased_at))).join('') : dwEmpty('노드가 없습니다.');
+
+    $('#mm-stk-n').textContent = d.stakes.length;
+    $('#mm-stakes').innerHTML = d.stakes.length ? d.stakes.map((s) => dwRow(fmt2(s.amount) + ' XONT', s.months + '개월 · 연 ' + s.apy + '%', (s.status === 'active' ? '만기 ' + day(s.ends_at) : s.status), s.status === 'active' ? 'pos' : '')).join('') : dwEmpty('스테이킹이 없습니다.');
+
+    $('#mm-deposits').innerHTML = d.deposits.length ? d.deposits.map((x) => dwRow((x.tier ? esc(x.tier) + ' · ' : '') + '노드 ' + x.quantity + '개', fmt(x.amount_usdt) + ' USDT · ' + esc(x.network || ''), depSt(x.status))).join('') : dwEmpty('입금 내역이 없습니다.');
+
+    const KIND = { referral: '추천수당', reward: '보상', settlement: '노드지급', staking: '스테이킹', withdrawal: '출금', mining: '채굴', transfer: '전송', swap: '스왑' };
+    $('#mm-tx').innerHTML = d.tx.length ? d.tx.map((t) => dwRow(KIND[t.kind] || esc(t.kind), esc(t.counterparty || '') + ' · ' + dt(t.created_at), (t.direction === 'in' ? '+' : '−') + fmt2(t.amount), t.direction === 'in' ? 'pos' : 'neg')).join('') : dwEmpty('거래 내역이 없습니다.');
+
+    dw.hidden = false;
+    requestAnimationFrame(() => dw.classList.add('open'));
+    $('.adm-drawer-panel', dw).scrollTop = 0;
+  } catch (e) { toast('상세 로드 실패: ' + e.message, 'err'); }
 }
 
 /* ---------------- 토큰 관리 ---------------- */
