@@ -62,9 +62,9 @@
       <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-users"/></svg> 전체 노드</div><div class="bv" id="b-total">0</div><div class="bs">÷N 균등 분배 기준</div></div>
     </div>
 
-    <!-- 내 조직 · 직급 -->
+    <!-- 내 조직 -->
     <div class="dash-card" style="margin-bottom:20px">
-      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 내 조직 · <span class="r">직급</span></h3><span class="tagx" id="ref-rank">미지정</span></div>
+      <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 내 <span class="r">조직</span></h3><span class="tagx" id="ref-rank" hidden>총판 센터장</span></div>
       <div class="benefit-grid">
         <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-user-check"/></svg> 직속 하위</div><div class="bv" id="ref-down">0<span class="u">명</span></div><div class="bs">내 추천으로 가입</div></div>
         <div class="bcard2 hi"><div class="bh"><svg class="icon"><use href="#i-coins"/></svg> 추천수당 누적</div><div class="bv r" id="ref-earn">0</div><div class="bs">XONT</div></div>
@@ -231,7 +231,7 @@
     $('#b-xont-usd').textContent = '≈ $' + fmt2(grantedXont * price);
     $('#b-total').textContent = (cap / 10000) + '만';
 
-    // 내 조직 · 직급 · 추천수당 (보상플랜 테이블 연동)
+    // 내 조직 · 추천수당 (보상플랜 테이블 연동) — 직급 사다리는 없음, 총판 센터장은 지정 역할
     try {
       const [ref, cls] = await Promise.all([
         m.getMyReferralSummary ? m.getMyReferralSummary() : null,
@@ -241,7 +241,7 @@
         $('#ref-down').innerHTML = fmt(ref.downline_count) + '<span class="u">명</span>';
         $('#ref-earn').textContent = fmt2(ref.referral_earned);
         $('#ref-code').textContent = ref.referral_code || '—';
-        if (ref.rank_name) { const el = $('#ref-rank'); el.textContent = ref.rank_name; if (ref.rank_color) el.style.color = ref.rank_color; }
+        if (ref.is_center_head) { $('#ref-rank').hidden = false; }
       }
       const act = (cls || []).filter((c) => c.active !== false);
       $('#ref-plan').innerHTML = act.length

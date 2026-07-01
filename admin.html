@@ -59,7 +59,7 @@
         <div class="atab-grp">보상</div>
         <button class="atab" data-tab="rules"><svg class="icon"><use href="#i-sliders"/></svg> <span>보상 규칙</span></button>
         <button class="atab" data-tab="token"><svg class="icon"><use href="#i-coins"/></svg> <span>토큰 관리</span></button>
-        <button class="atab" data-tab="rank"><svg class="icon"><use href="#i-crown"/></svg> <span>직급 관리</span></button>
+        <button class="atab" data-tab="rank"><svg class="icon"><use href="#i-crown"/></svg> <span>총판 센터장</span></button>
         <button class="atab" data-tab="staking"><svg class="icon"><use href="#i-lock"/></svg> <span>스테이킹 관리</span></button>
         <button class="atab" data-tab="sim"><svg class="icon"><use href="#i-trending"/></svg> <span>보상 시뮬레이터</span></button>
         <div class="atab-grp">운영</div>
@@ -273,7 +273,7 @@
               <thead><tr><th>이름</th><th>종류</th><th>비율(%)</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
               <tbody id="br-body"></tbody></table></div>
             <div class="cfg-grid" style="margin-top:14px">
-              <div class="cfg-f"><label>이름</label><input class="inp" id="br-name" placeholder="예: 직급 달성 보너스"></div>
+              <div class="cfg-f"><label>이름</label><input class="inp" id="br-name" placeholder="예: 총판 센터장 보너스"></div>
               <div class="cfg-f"><label>종류</label><input class="inp" id="br-kind" placeholder="rank_bonus / matching / custom"></div>
               <div class="cfg-f"><label>비율 (%)</label><input class="inp" id="br-rate" type="number" step="0.1" placeholder="0"></div>
             </div>
@@ -312,28 +312,17 @@
           </div>
         </section>
 
-        <!-- 직급 관리 -->
+        <!-- 총판 센터장 지정 -->
         <section class="apanel" data-panel="rank" hidden>
           <div class="dash-card" style="margin-bottom:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-crown"/></svg></span> 직급 추가/편집</h3><span class="tagx" id="rank-edit-tag">신규</span></div>
-            <input type="hidden" id="rk-id">
-            <div class="cfg-grid">
-              <div class="cfg-f"><label>직급명</label><input class="inp" id="rk-name" placeholder="예: 브론즈"></div>
-              <div class="cfg-f"><label>코드</label><input class="inp" id="rk-code" placeholder="bronze"></div>
-              <div class="cfg-f"><label>정렬 순서</label><input class="inp" id="rk-sort" type="number" value="0"></div>
-              <div class="cfg-f"><label>필요 노드 수</label><input class="inp" id="rk-nodes" type="number" value="0"></div>
-              <div class="cfg-f"><label>필요 직접추천</label><input class="inp" id="rk-refs" type="number" value="0"></div>
-              <div class="cfg-f"><label>필요 그룹 노드</label><input class="inp" id="rk-group" type="number" value="0"></div>
-              <div class="cfg-f"><label>보너스 (%)</label><input class="inp" id="rk-bonus" type="number" step="0.1" value="0"></div>
-              <div class="cfg-f"><label>색상</label><input class="inp" id="rk-color" type="color" value="#e8112d" style="height:44px;padding:4px"></div>
-            </div>
-            <div class="field"><label>혜택 설명</label><input class="inp" id="rk-benefits" placeholder="직급 혜택"></div>
-            <div style="display:flex;gap:10px"><button class="btn btn-red" id="rk-save">저장</button><button class="btn btn-ghost-dark" id="rk-new">새로 작성</button></div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-crown"/></svg></span> 총판 센터장 지정</h3><span class="tagx">매출 배분 10% 수령 역할 · 승급 사다리 아님</span></div>
+            <p class="amini-desc">직급 체계는 없습니다. <b>총판 센터장</b>은 노드판매 배분(영업수당 10%)을 받는 지정 역할이며, 회원을 검색해 지정/해제합니다. 실제 지급은 <b>보상 실행</b> 탭에서 처리하세요.</p>
+            <div class="atoolbar" style="margin-top:14px"><div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="rk-q" placeholder="이름 · 이메일 검색"></div></div>
           </div>
           <div class="dash-card">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 직급 목록</h3><span class="tagx" id="rank-count">0개</span></div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-users"/></svg></span> 회원 목록</h3><span class="tagx" id="rank-count">0명 지정됨</span></div>
             <div class="atable-wrap"><table class="atable">
-              <thead><tr><th>직급</th><th>필요 노드</th><th>필요 추천</th><th>보너스</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
+              <thead><tr><th>회원</th><th>이메일</th><th>가입일</th><th>역할</th><th class="ta-r">관리</th></tr></thead>
               <tbody id="rank-body"></tbody></table></div>
           </div>
         </section>
@@ -419,7 +408,7 @@
     <div class="mm-sub" id="mm-email">—</div>
     <div class="mini-stats" id="mm-stats" style="margin:16px 0"></div>
     <div class="mm-grid">
-      <div><div class="mm-h">직급 배정</div><div style="display:flex;gap:8px"><select class="inp" id="mm-rank"></select><button class="btn btn-red" id="mm-rank-save">배정</button></div></div>
+      <div><div class="mm-h">총판 센터장</div><div style="display:flex;gap:8px;align-items:center"><span class="appst" id="mm-ch-status">—</span><button class="btn btn-red" id="mm-ch-toggle" style="padding:9px 16px;font-size:12.5px">지정/해제</button></div></div>
       <div><div class="mm-h">상위 (추천인)</div><div id="mm-upline" class="mm-box">—</div></div>
     </div>
     <div class="mm-h" style="margin-top:16px">하위 조직 (직속 <span id="mm-down-n">0</span>명)</div>
@@ -540,7 +529,6 @@ let ORG_NODES = [], ORG_CHILDREN = {}, ORG_ROOTS = [], orgView = 'tree', orgGrap
 
 async function loadOrg() {
   try {
-    if (!RANKS.length) RANKS = await db.adminListRanks().catch(() => []);
     const [nodes, rewards] = await Promise.all([db.adminOrgTree(), db.adminListReferrals()]);
     buildOrgTree(nodes);
     renderOrgStats();
@@ -582,8 +570,6 @@ function orgDepth(node, seen) {
   const kids = ORG_CHILDREN[node.id] || [];
   return kids.length ? 1 + Math.max(...kids.map((k) => orgDepth(k, seen))) : 1;
 }
-function orgRankMap() { const m = {}; (RANKS || []).forEach((r) => { m[r.id] = r; }); return m; }
-
 function renderOrgStats() {
   const sponsors = ORG_NODES.filter((n) => (ORG_CHILDREN[n.id] || []).length > 0).length;
   const maxDepth = ORG_ROOTS.length ? Math.max(...ORG_ROOTS.map((r) => orgDepth(r))) : 0;
@@ -600,7 +586,6 @@ function renderOrgTree() {
     if (matches(n)) return true;
     return (ORG_CHILDREN[n.id] || []).some((k) => subtreeHasMatch(k, seen));
   };
-  const rankMap = orgRankMap();
   let shown = 0;
   const rowFor = (n, depth, seen) => {
     seen = seen || new Set(); if (seen.has(n.id)) return '';
@@ -609,13 +594,12 @@ function renderOrgTree() {
     shown++;
     const kids = (ORG_CHILDREN[n.id] || []).filter((k) => !q || subtreeHasMatch(k, new Set()));
     const hasKids = kids.length > 0;
-    const rank = n.rank_id ? rankMap[n.rank_id] : null;
     const hit = q && matches(n) ? ' tn-hit' : '';
-    const lvlStyle = rank ? ` style="background:${esc(rank.color)}22;color:${esc(rank.color)}"` : '';
+    const lvlStyle = n.is_center_head ? ' style="background:#f5c45122;color:#f5c451"' : '';
     return `<div class="tree-node">
       <div class="tn-row clickable${hit}" data-op="${n.id}">
         ${hasKids ? '<button class="tn-toggle" data-toggle type="button">▾</button>' : '<span class="tn-toggle tn-leaf"></span>'}
-        <span class="tn-lvl"${lvlStyle}>${rank ? esc(rank.name) : depth + '대'}</span>
+        <span class="tn-lvl"${lvlStyle}>${n.is_center_head ? '총판 센터장' : depth + '대'}</span>
         <b>${esc(n.display_name) || '—'}</b>
         <span class="tn-meta">${esc(n.email || '')} · 노드 ${n.node_count} · 하위 ${(ORG_CHILDREN[n.id] || []).length}명 · ${day(n.created_at)}</span>
       </div>
@@ -668,19 +652,18 @@ function renderOrgGraph() {
   const byId = {}; pos.forEach((p) => { byId[p.node.id] = p; });
   const W = Math.max(...pos.map((p) => p.x + OG_W)) + 16;
   const H = Math.max(...pos.map((p) => p.y + OG_H)) + 16;
-  const rankMap = orgRankMap();
   const edges = pos.filter((p) => p.node.referred_by && byId[p.node.referred_by]).map((p) => {
     const par = byId[p.node.referred_by];
     const px = par.x + OG_W / 2, py = par.y + OG_H, cx = p.x + OG_W / 2, cy = p.y, midY = py + OG_VGAP / 2;
     return `<path class="og-edge" d="M${px},${py} L${px},${midY} L${cx},${midY} L${cx},${cy}"/>`;
   }).join('');
   const nodes = pos.map((p) => {
-    const n = p.node, rank = n.rank_id ? rankMap[n.rank_id] : null;
-    const stroke = rank ? rank.color : (p.depth === 0 ? '#e5484d' : '#2a2d34');
+    const n = p.node;
+    const stroke = n.is_center_head ? '#f5c451' : (p.depth === 0 ? '#e5484d' : '#2a2d34');
     return `<g class="og-node" data-op="${n.id}">
-      <rect x="${p.x}" y="${p.y}" width="${OG_W}" height="${OG_H}" rx="10" fill="#1b1e23" stroke="${stroke}" stroke-width="${p.depth === 0 ? 2 : 1.3}"/>
+      <rect x="${p.x}" y="${p.y}" width="${OG_W}" height="${OG_H}" rx="10" fill="#1b1e23" stroke="${stroke}" stroke-width="${n.is_center_head || p.depth === 0 ? 2 : 1.3}"/>
       <text x="${p.x + 12}" y="${p.y + 24}" class="og-name">${esc(trunc(n.display_name || n.email || '—', 16))}</text>
-      <text x="${p.x + 12}" y="${p.y + 42}" class="og-meta">노드 ${n.node_count} · 하위 ${(ORG_CHILDREN[n.id] || []).length}</text>
+      <text x="${p.x + 12}" y="${p.y + 42}" class="og-meta">${n.is_center_head ? '총판센터장 · ' : ''}노드 ${n.node_count} · 하위 ${(ORG_CHILDREN[n.id] || []).length}</text>
     </g>`;
   }).join('');
   const svg = $('#org-graph-svg');
@@ -855,23 +838,26 @@ async function saveBR() {
   catch (e) { toast('실패: '+e.message,'err'); }
 }
 
-/* ---------------- 직급 관리 ---------------- */
-let RANKS = [];
-function rankNew() { ['rk-id','rk-name','rk-code','rk-benefits'].forEach((i) => $('#'+i).value=''); ['rk-sort','rk-nodes','rk-refs','rk-group','rk-bonus'].forEach((i) => $('#'+i).value='0'); $('#rk-color').value='#e8112d'; $('#rank-edit-tag').textContent='신규'; }
-async function loadRank() { $('#rk-save').addEventListener('click', saveRank); $('#rk-new').addEventListener('click', rankNew); renderRanks(); }
-async function renderRanks() {
-  try {
-    RANKS = await db.adminListRanks();
-    $('#rank-count').textContent = RANKS.length + '개';
-    $('#rank-body').innerHTML = RANKS.length ? RANKS.map((r) => `<tr><td><b style="color:${esc(r.color)}">${esc(r.name)}</b></td><td>${r.min_nodes}</td><td>${r.min_referrals}</td><td>${r.bonus_pct}%</td><td>${r.active?'<span class="appst ok">활성</span>':'<span class="muted sm">off</span>'}</td><td class="ta-r"><button class="la-ok" data-red="${r.id}">수정</button><button class="la-no" data-rdel="${r.id}">삭제</button></td></tr>`).join('') : '<tr><td colspan="6" class="la-empty">직급이 없습니다. 오후에 입력할 직급을 여기서 추가하세요.</td></tr>';
-    $$('#rank-body [data-red]').forEach((b) => b.addEventListener('click', () => { const r = RANKS.find((x) => x.id === b.dataset.red); $('#rk-id').value=r.id; $('#rk-name').value=r.name; $('#rk-code').value=r.code||''; $('#rk-sort').value=r.sort_order; $('#rk-nodes').value=r.min_nodes; $('#rk-refs').value=r.min_referrals; $('#rk-group').value=r.min_group_nodes; $('#rk-bonus').value=r.bonus_pct; $('#rk-color').value=r.color||'#e8112d'; $('#rk-benefits').value=r.benefits||''; $('#rank-edit-tag').textContent='수정'; }));
-    $$('#rank-body [data-rdel]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminDeleteRank(b.dataset.rdel); toast('삭제됨'); renderRanks(); } catch (e) { toast('실패: '+e.message,'err'); } }));
-  } catch (e) { toast('직급 로드 실패: '+e.message,'err'); }
+/* ---------------- 총판 센터장 지정 (직급 사다리 없음 · 지정 역할) ---------------- */
+let CENTERHEADS = [];
+async function loadRank() {
+  CENTERHEADS = await db.adminListOperators().catch(() => []);
+  renderCenterHeads();
+  $('#rk-q').addEventListener('input', renderCenterHeads);
 }
-async function saveRank() {
-  const name = $('#rk-name').value.trim(); if (!name) { toast('직급명을 입력하세요','err'); return; }
-  try { await db.adminSaveRank({ id:$('#rk-id').value||undefined, name, code:$('#rk-code').value, sort_order:$('#rk-sort').value, min_nodes:$('#rk-nodes').value, min_referrals:$('#rk-refs').value, min_group_nodes:$('#rk-group').value, bonus_pct:$('#rk-bonus').value, color:$('#rk-color').value, benefits:$('#rk-benefits').value }); toast('저장됨'); rankNew(); renderRanks(); }
-  catch (e) { toast('실패: '+e.message,'err'); }
+function renderCenterHeads() {
+  const q = ($('#rk-q').value || '').trim().toLowerCase();
+  const rows = CENTERHEADS.filter((m) => !q || (m.display_name || '').toLowerCase().includes(q) || (m.email || '').toLowerCase().includes(q));
+  $('#rank-count').textContent = CENTERHEADS.filter((m) => m.is_center_head).length + '명 지정됨';
+  $('#rank-body').innerHTML = rows.length ? rows.map((m) => `<tr><td><b>${esc(m.display_name) || '—'}</b></td><td>${esc(m.email)}</td><td>${day(m.created_at)}</td><td>${m.is_center_head ? '<span class="appst ok">총판 센터장</span>' : '<span class="muted sm">일반</span>'}</td><td class="ta-r"><button class="la-${m.is_center_head ? 'no' : 'ok'}" data-ch="${m.id}" data-set="${m.is_center_head ? '0' : '1'}">${m.is_center_head ? '해제' : '지정'}</button></td></tr>`).join('') : '<tr><td colspan="5" class="la-empty">회원이 없습니다.</td></tr>';
+  $$('#rank-body [data-ch]').forEach((b) => b.addEventListener('click', async () => {
+    try {
+      await db.adminUpdateOperator(b.dataset.ch, { is_center_head: b.dataset.set === '1' });
+      toast('처리되었습니다');
+      const m = CENTERHEADS.find((x) => x.id === b.dataset.ch); if (m) m.is_center_head = b.dataset.set === '1';
+      renderCenterHeads();
+    } catch (e) { toast('실패: ' + e.message, 'err'); }
+  }));
 }
 
 /* ---------------- 노드판매 매출 배분 ---------------- */
@@ -913,9 +899,13 @@ async function openMember(id) {
     $('#mm-email').textContent = (d.op.email || '') + ' · ' + (d.op.phone || '');
     const active = d.stakes.filter((s) => s.status === 'active').reduce((a, s) => a + Number(s.amount), 0);
     $('#mm-stats').innerHTML = statCards([['노드', d.nodes.length], ['XONT 잔액', fmt2(d.balance)], ['스테이킹', fmt2(active)], ['직속 하위', d.downline.length]]);
-    if (!RANKS.length) RANKS = await db.adminListRanks().catch(() => []);
-    $('#mm-rank').innerHTML = '<option value="">직급 없음</option>' + RANKS.map((r) => `<option value="${r.id}" ${r.id === d.op.rank_id ? 'selected' : ''}>${esc(r.name)}</option>`).join('');
-    $('#mm-rank-save').onclick = async () => { try { await db.adminAssignRank(id, $('#mm-rank').value || null); toast('직급 배정됨'); } catch (e) { toast('실패: '+e.message,'err'); } };
+    $('#mm-ch-status').textContent = d.op.is_center_head ? '총판 센터장' : '일반 회원';
+    $('#mm-ch-status').className = 'appst' + (d.op.is_center_head ? ' ok' : '');
+    $('#mm-ch-toggle').textContent = d.op.is_center_head ? '해제' : '지정';
+    $('#mm-ch-toggle').onclick = async () => {
+      try { await db.adminUpdateOperator(id, { is_center_head: !d.op.is_center_head }); toast('처리되었습니다'); openMember(id); }
+      catch (e) { toast('실패: ' + e.message, 'err'); }
+    };
     $('#mm-upline').innerHTML = d.upline ? `<b>${esc(d.upline.display_name)||'—'}</b> · ${esc(d.upline.email||'')} <span class="muted sm">(${esc(d.upline.referral_code||'')})</span>` : '없음 (최상위)';
     $('#mm-down-n').textContent = d.downline.length;
     $('#mm-downline').innerHTML = d.downline.length ? d.downline.map((x) => `<div class="la-row"><div class="la-who"><b>${esc(x.display_name)||'—'}</b><span>${esc(x.email||'')} · ${day(x.created_at)}</span></div><span class="muted sm">${esc(x.referral_code||'')}</span></div>`).join('') : '<div class="la-empty">하위 조직이 없습니다.</div>';

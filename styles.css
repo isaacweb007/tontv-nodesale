@@ -1675,9 +1675,6 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .tn-row b{color:#eef0f3;font-size:14px}
 .tn-lvl{background:#22252b;color:#f0b90b;font-size:11px;font-weight:800;padding:3px 8px;border-radius:7px}
 .tn-meta{color:#8a909b;font-size:12px}
-.promo{display:flex;flex-direction:column;gap:14px}
-.promo-row .pr-h{display:flex;justify-content:space-between;font-size:13px;color:#cfd2d8;margin-bottom:6px}
-.promo-row .pr-h b{color:#eef0f3}
 /* 조직도 트리 (어드민) */
 .tn-toggle{width:20px;height:20px;border-radius:6px;background:#22252b;color:#aeb4bf;font-size:11px;line-height:1;border:none;cursor:pointer;flex:0 0 auto;display:flex;align-items:center;justify-content:center;transition:.15s}
 .tn-toggle:hover{background:#2c2f36;color:#fff}
