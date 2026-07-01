@@ -1661,6 +1661,22 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .alloc-legend .lg .sw{width:10px;height:10px;border-radius:3px}
 .alloc-legend .lg b{color:#eef0f3}
 .alloc-sub{margin-top:8px;font-size:12px;color:#8a909b;line-height:1.7}
+/* 마이오피스 */
+.mo-rank{border:1.5px solid #3a3f48;color:#cfd2d8;font-size:12.5px;font-weight:800;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.mo-tabs{display:flex;gap:8px;margin:20px 0 14px;flex-wrap:wrap}
+.mo-tabs button{background:#16181c;border:1px solid #23262c;color:#aeb4bf;font-size:13.5px;font-weight:700;padding:10px 16px;border-radius:11px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s}
+.mo-tabs button .icon{width:15px;height:15px}
+.mo-tabs button:hover{color:#eef0f3}
+.mo-tabs button.on{background:linear-gradient(180deg,#2a1418,#1a1013);border-color:var(--red-2,#e5484d);color:#fff}
+.mo-tree{display:flex;flex-direction:column;gap:2px}
+.tree-node{position:relative}
+.tn-row{display:flex;align-items:center;gap:9px;padding:9px 12px;background:#16181c;border:1px solid #23262c;border-left:3px solid var(--red-2,#e5484d);border-radius:10px;margin-bottom:4px;flex-wrap:wrap}
+.tn-row b{color:#eef0f3;font-size:14px}
+.tn-lvl{background:#22252b;color:#f0b90b;font-size:11px;font-weight:800;padding:3px 8px;border-radius:7px}
+.tn-meta{color:#8a909b;font-size:12px}
+.promo{display:flex;flex-direction:column;gap:14px}
+.promo-row .pr-h{display:flex;justify-content:space-between;font-size:13px;color:#cfd2d8;margin-bottom:6px}
+.promo-row .pr-h b{color:#eef0f3}
 
 /* 내 계정 (account.html) */
 .acct-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
