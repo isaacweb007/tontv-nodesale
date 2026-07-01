@@ -603,6 +603,21 @@ section[id]{scroll-margin-top:84px}
 .tier.best .lock{background:var(--ink-2);box-shadow:inset -4px -4px 10px #26282e,inset 5px 5px 12px #050608;color:var(--red-2)}
 .tier.best .apy{color:var(--red-2)}
 .tier.best .badge{position:absolute;top:0;right:0;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:5px 12px;border-radius:0 0 0 12px}
+/* 단일 1년 스테이킹 카드 (대시보드와 동일 상품) */
+.stake-solo{display:grid;grid-template-columns:minmax(240px,.85fr) 1.15fr;gap:0;background:linear-gradient(160deg,var(--ink),#000);border-radius:var(--radius);box-shadow:var(--shadow-up);overflow:hidden;position:relative}
+.stake-solo .ss-apy{padding:38px 30px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;border-right:1px solid rgba(255,255,255,.06)}
+.stake-solo .ss-badge{background:var(--red);color:#fff;font-size:11px;font-weight:800;letter-spacing:.03em;padding:6px 13px;border-radius:999px}
+.stake-solo .ss-num{font-family:var(--font-display);font-size:clamp(46px,6vw,68px);font-weight:900;color:var(--red-2);line-height:1;margin-top:16px}
+.stake-solo .ss-num small{font-size:24px;margin-left:2px}
+.stake-solo .ss-lock{display:flex;align-items:center;gap:7px;margin-top:14px;color:#cfd2d8;font-size:14px;font-weight:700}
+.stake-solo .ss-lock .icon{color:var(--red-2)}
+.stake-solo .ss-facts{padding:26px 30px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.stake-solo .ssf{display:flex;flex-direction:column;gap:3px;padding-bottom:15px;border-bottom:1px solid rgba(255,255,255,.06)}
+.stake-solo .ssf:last-child{border-bottom:none;padding-bottom:0}
+.stake-solo .ssf .k{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#8a909b}
+.stake-solo .ssf b{font-size:18px;font-weight:800;color:#f2f4f7;margin-top:2px}
+.stake-solo .ssf .e{font-size:12.5px;color:#aeb4bf}
+@media(max-width:640px){.stake-solo{grid-template-columns:1fr}.stake-solo .ss-apy{border-right:none;border-bottom:1px solid rgba(255,255,255,.06);align-items:center;text-align:center;padding:30px 24px}}
 .tier-note{margin-top:22px;background:rgba(232,17,45,.05);border:1px solid rgba(232,17,45,.16);border-radius:var(--radius-sm);
   padding:14px 20px;font-size:12.5px;color:var(--text-soft);line-height:1.55}
 
