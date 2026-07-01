@@ -13,6 +13,24 @@
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#101113">
+<style>
+  .sim-my3{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+  .sim-my3 .myrow,.sim-my3 .scenrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:#16181c;border:1px solid #23262c;flex-wrap:wrap}
+  .sim-my3 .myrow.anchor{background:linear-gradient(180deg,#1c1f24,#141619);border-color:#2c3038}
+  .sim-my3 .myl{font-size:13.5px;color:#aeb4bf;display:flex;align-items:center;gap:6px}
+  .sim-my3 .myl em{font-style:normal;color:#7d838e;font-size:11.5px}
+  .sim-my3 .myv{font-size:15px;color:#eef0f3;font-weight:700}
+  .sim-my3 .myrow.anchor .myv{font-size:17px}
+  .sim-my3 .myrow.anchor .myv b{color:#7ee0a8}
+  .sim-my3 .scenrow{background:#1a1517;border-color:#3a2530}
+  .sim-my3 .scens{display:flex;gap:8px;flex-wrap:wrap}
+  .sim-my3 .scens>span{font-size:12.5px;color:#9aa0ab;background:#221a1d;padding:6px 11px;border-radius:9px;border:1px solid #33242b}
+  .sim-my3 .scens>span b{color:#f0d29a;font-weight:800;margin-left:4px}
+  .sim-my3 .scens>span.hot{background:linear-gradient(180deg,#3a1520,#241016);border-color:var(--red-2,#e5484d)}
+  .sim-my3 .scens>span.hot b{color:#ff8a95}
+  .tonx-sub{font-size:11.5px;color:#7d838e;font-weight:500}
+  @media(max-width:560px){.sim-my3 .myrow,.sim-my3 .scenrow{flex-direction:column;align-items:flex-start;gap:7px}}
+</style>
 </head>
 <body data-page="dashboard">
 
@@ -48,9 +66,9 @@
       <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-trending"/></svg></span> 노드 수익 시뮬레이션</h3><span class="tagx">아직 오픈 전 · <b class="r">예상치</b></span></div>
 
       <div class="sim-mech">
-        <div class="sm-step"><span class="sn">1</span><div><b>시청자가 광고 시청</b><p>유저 1명이 하루 평균 <b>광고 10개</b> 시청 · 광고 1개당 <b>TONX 1개</b>(≈20원) 적립</p></div></div>
+        <div class="sm-step"><span class="sn">1</span><div><b>시청자가 광고 시청</b><p>유저 1명이 하루 평균 <b>광고 10개</b> 시청 · 광고 1개당 <b>≈20원</b> 리워드 재원 발생</p></div></div>
         <div class="sm-ar"><svg class="icon"><use href="#i-chevron-r"/></svg></div>
-        <div class="sm-step"><span class="sn">2</span><div><b>TONX 발생·지급</b><p>플랫폼이 광고 수익으로 TONX를 사서 시청자에게 지급 (TONX-P 포인트 → 스왑 출금)</p></div></div>
+        <div class="sm-step"><span class="sn">2</span><div><b>TONX로 지급</b><p>플랫폼이 <b>광고매출(재원)</b>로 TONX를 매입해 지급 · <b>기준가 100원</b> 환산 (상장 후 시세 적용)</p></div></div>
         <div class="sm-ar"><svg class="icon"><use href="#i-chevron-r"/></svg></div>
         <div class="sm-step"><span class="sn">3</span><div><b>노드 <span class="r">20%</span> 배당</b><p>그날 발생한 TONX의 <b>20%</b>를 노드 사업자 몫으로</p></div></div>
         <div class="sm-ar"><svg class="icon"><use href="#i-chevron-r"/></svg></div>
@@ -66,20 +84,38 @@
       </div>
 
       <div class="sim-out">
-        <div class="so"><div class="l">하루 발생 TONX</div><div class="v" id="so-total">—</div></div>
+        <div class="so"><div class="l">하루 리워드 재원</div><div class="v" id="so-total">—</div></div>
         <div class="so"><div class="l">노드 풀 (20%)</div><div class="v r" id="so-pool">—</div></div>
         <div class="so"><div class="l">노드 1개 / 일</div><div class="v" id="so-pernode">—</div></div>
         <div class="so hi"><div class="l">내 노드 (×<span id="so-nx">0</span>) / 일</div><div class="v r" id="so-my">—</div></div>
       </div>
-      <div class="sim-my2">내 노드 예상 수익 — <b id="so-mymonth">—</b> / 월 · <b id="so-myyear">—</b> / 년</div>
+
+      <div class="sim-my3">
+        <div class="myrow anchor">
+          <span class="myl"><svg class="icon"><use href="#i-coins"/></svg> 내 노드 배당 <em>재원 기반 · 확정성↑</em></span>
+          <span class="myv"><b id="so-fiatmonth">—</b> / 월 · <b id="so-fiatyear">—</b> / 년</span>
+        </div>
+        <div class="myrow">
+          <span class="myl">🪙 적립 TONX <em>기준가 <span id="so-refp">100</span>원</em></span>
+          <span class="myv"><b id="so-tonxyear">—</b> TONX / 년</span>
+        </div>
+        <div class="scenrow">
+          <span class="myl">🚀 상장가 시나리오 <em>연 누적 평가액</em></span>
+          <span class="scens">
+            <span>100원<b id="ls-100">—</b></span>
+            <span>500원<b id="ls-500">—</b></span>
+            <span class="hot">1,000원<b id="ls-1000">—</b></span>
+          </span>
+        </div>
+      </div>
 
       <div class="sim-tblwrap">
         <table class="sim-table">
-          <thead><tr><th>시청자</th><th>하루 TONX</th><th>노드풀 20%</th><th>노드 1개/일</th><th>노드 1개/월</th></tr></thead>
+          <thead><tr><th>시청자</th><th>노드 배당/월</th><th>배당/년</th><th>적립 TONX/년</th><th>상장가 1,000원</th></tr></thead>
           <tbody id="sim-tbody"></tbody>
         </table>
       </div>
-      <p class="sim-note"><svg class="icon"><use href="#i-alert"/></svg> <span>가정: 유저당 광고 10개/일 · 광고 1개 = TONX 1개(≈20원) · 노드 몫 20% · 전체 5만 노드 완판 기준 ÷N. <b>정식 오픈(2026.9) 전 예상 시뮬레이션</b>이며 실제 수치가 아닙니다.</span></p>
+      <p class="sim-note"><svg class="icon"><use href="#i-alert"/></svg> <span>가정: 유저당 광고 10개/일 · 광고 1개당 ≈20원 리워드 재원 · 노드 몫 20% · 5만 노드 완판 ÷N · TONX 기준가 100원. <b>배당은 광고매출(재원) 기준 원화로 고정</b>이라 토큰 가격과 무관하게 안정적이며, <b>상장가 시나리오는 보유 TONX의 평가액(시장 변동)</b>입니다. 정식 오픈 전 예상 시뮬레이션.</span></p>
     </div>
 
     <div class="dash-grid">
@@ -186,11 +222,12 @@
     $('#s-term').textContent = months + '개월' + (months === 12 ? ' (1년)' : '');
     $('#s-bal').textContent = fmt2(balance);
 
-    // ---- 노드 수익 시뮬레이션 (오픈 전 예상치) ----
-    const ads = Number(cfg.sim_ads_per_user || 10);      // 유저당 광고/일
-    const tpa = Number(cfg.sim_tonx_per_ad || 1);        // 광고 1개당 TONX
-    const krw = Number(cfg.ad_reward_krw || 20);         // TONX 1개 ≈ 원
-    const shareF = sharePct / 100;                       // 노드 몫 (0.2)
+    // ---- 노드 수익 시뮬레이션 (오픈 전 예상치 · 원 기준 배당) ----
+    const ads = Number(cfg.sim_ads_per_user || 10);        // 유저당 광고/일
+    const krw = Number(cfg.ad_reward_krw || 20);           // 광고 1개당 리워드 재원(원)
+    const refKrw = Number(cfg.reference_price_krw || 100); // 상장 전 TONX 기준가(원)
+    const shareF = sharePct / 100;                         // 노드 몫 (0.2)
+    const LISTING = [100, 500, 1000];                      // 상장가 시나리오(원)
     const SCEN = [10000, 100000, 1000000, 10000000, 100000000];
     const fmtT = (n) => {
       if (n < 1000) return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
@@ -199,18 +236,30 @@
       return Math.round(n).toLocaleString('en-US');
     };
     const fmtKrw = (n) => n >= 1e8 ? (n / 1e8).toFixed(1) + '억원' : n >= 1e4 ? Math.round(n / 1e4).toLocaleString('en-US') + '만원' : Math.round(n).toLocaleString('en-US') + '원';
-    const scen = (V) => { const daily = V * ads * tpa, pool = daily * shareF, perNode = pool / cap; return { daily, pool, perNode, my: perNode * nodeCount }; };
+    // 원(fiat) 기준 배당: 광고 재원 → 노드 20% → ÷N. TONX 수량 = 배당원 ÷ 기준가.
+    const scen = (V) => {
+      const dailyFiat = V * ads * krw, poolFiat = dailyFiat * shareF, perNodeFiat = poolFiat / cap;
+      const myFiat = perNodeFiat * nodeCount;
+      return { dailyFiat, poolFiat, perNodeFiat, myFiat,
+        dailyT: dailyFiat / refKrw, poolT: poolFiat / refKrw, perNodeT: perNodeFiat / refKrw, myT: myFiat / refKrw };
+    };
     const vLabel = (V) => V >= 1e8 ? (V / 1e8) + '억명' : (V / 1e4).toLocaleString('en-US') + '만명';
+    const cell = (fiat, tonx) => fmtKrw(fiat) + ' <span class="tonx-sub">(' + fmtT(tonx) + ' TONX)</span>';
 
     function paintScen(V) {
       const s = scen(V);
-      $('#so-total').textContent = fmtT(s.daily) + ' TONX';
-      $('#so-pool').textContent = fmtT(s.pool) + ' TONX';
-      $('#so-pernode').textContent = fmtT(s.perNode) + ' TONX';
+      $('#so-total').innerHTML = cell(s.dailyFiat, s.dailyT);
+      $('#so-pool').innerHTML = cell(s.poolFiat, s.poolT);
+      $('#so-pernode').innerHTML = cell(s.perNodeFiat, s.perNodeT);
       $('#so-nx').textContent = nodeCount;
-      $('#so-my').textContent = fmtT(s.my) + ' TONX';
-      $('#so-mymonth').innerHTML = fmtT(s.my * 30) + ' TONX <span class="krw">(≈ ' + fmtKrw(s.my * 30 * krw) + ')</span>';
-      $('#so-myyear').innerHTML = fmtT(s.my * 365) + ' TONX <span class="krw">(≈ ' + fmtKrw(s.my * 365 * krw) + ')</span>';
+      $('#so-my').innerHTML = cell(s.myFiat, s.myT);
+      // 요약: 배당(원) 앵커 + 적립 TONX + 상장가 시나리오
+      $('#so-fiatmonth').textContent = fmtKrw(s.myFiat * 30);
+      $('#so-fiatyear').textContent = fmtKrw(s.myFiat * 365);
+      $('#so-refp').textContent = fmt(refKrw);
+      $('#so-tonxyear').textContent = fmtT(s.myT * 365);
+      const yearT = s.myT * 365;
+      LISTING.forEach(p => { const el = $('#ls-' + p); if (el) el.textContent = fmtKrw(yearT * p); });
     }
     document.querySelectorAll('#sim-scen button').forEach(b => b.addEventListener('click', () => {
       document.querySelectorAll('#sim-scen button').forEach(x => x.classList.remove('on'));
@@ -219,7 +268,7 @@
     paintScen(10000);
     $('#sim-tbody').innerHTML = SCEN.map(V => {
       const s = scen(V);
-      return `<tr><td>${vLabel(V)}</td><td>${fmtT(s.daily)}</td><td>${fmtT(s.pool)}</td><td class="r">${fmtT(s.perNode)}</td><td class="r">${fmtT(s.perNode * 30)}</td></tr>`;
+      return `<tr><td>${vLabel(V)}</td><td>${fmtKrw(s.perNodeFiat * 30)}</td><td class="r">${fmtKrw(s.perNodeFiat * 365)}</td><td>${fmtT(s.perNodeT * 365)}</td><td class="r">${fmtKrw(s.perNodeT * 365 * 1000)}</td></tr>`;
     }).join('');
 
     // ---- 스테이킹 예상 수익 ----
