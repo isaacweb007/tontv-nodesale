@@ -283,11 +283,22 @@
     selectedTier = c.dataset.tier; updateTotal();
   }));
 
+  /* 주소로 QR을 동적 생성(어드민이 주소 변경 시 즉시 반영) · 실패 시 정적 SVG 유지 */
+  let _qrlib = null;
+  const updateQR = async (c) => {
+    const img = $('#dep-qr'); if (!img) return;
+    img.src = c.qr;
+    try {
+      if (!_qrlib) _qrlib = (await import('https://esm.sh/qrcode@1.5.4')).default;
+      const url = await _qrlib.toDataURL(c.addr, { margin: 1, width: 240, color: { dark: '#000000', light: '#ffffff' } });
+      if (CHAINS[selectedChain] && CHAINS[selectedChain].addr === c.addr) img.src = url;
+    } catch (e) { /* 정적 SVG 폴백 유지 */ }
+  };
   /* 입금 네트워크(체인) 선택 — 주소·QR·경고문 전환 */
   const applyChain = () => {
     const c = CHAINS[selectedChain]; if (!c) return;
     $('#dep-addr') && ($('#dep-addr').textContent = c.addr);
-    $('#dep-qr') && ($('#dep-qr').src = c.qr);
+    updateQR(c);
     $('#net-name') && ($('#net-name').textContent = c.net);
     $('#net-sub') && ($('#net-sub').textContent = c.sub);
     $('#net-short') && ($('#net-short').textContent = c.short);
@@ -299,6 +310,10 @@
     $$('#chain-grid .chainchip').forEach(x => x.classList.remove('on')); c.classList.add('on');
     selectedChain = c.dataset.chain; applyChain();
   }));
+  /* 입금 주소를 DB(token_config)에서 로드해 최신화 */
+  import('./lib/supabase.js').then(m => m.getDepositAddresses ? m.getDepositAddresses() : null).then(a => {
+    if (a) { if (a.deposit_addr_tron) CHAINS.tron.addr = a.deposit_addr_tron; if (a.deposit_addr_evm) CHAINS.evm.addr = a.deposit_addr_evm; applyChain(); }
+  }).catch(() => {});
 
   $('#copy-addr').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(CHAINS[selectedChain].addr); }

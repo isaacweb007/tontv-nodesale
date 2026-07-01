@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>운영자 어드민 콘솔 — 신청 · 입금 · 사업자 · 토큰 · 분배 관리 | TonTV</title>
-<meta name="description" content="톤티비 노드세일 운영자 콘솔(데모). 노드 신청 승인, USDT 입금 확인, 사업자 관리, TONX→XONT 토큰 분배, 광고수익 정산, 토큰·지갑 관리를 한 곳에서.">
+<title>운영자 어드민 콘솔 — 회원 · 매출 · 토큰 · 정산 · 보상 관리 | TonTV</title>
+<meta name="description" content="톤티비 노드세일 운영자 콘솔. 회원·조직도·매출승인·출금·입금/지갑·정산·공지·토큰·스테이킹·보상실행·계정복구·감사로그를 실데이터로 관리.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
@@ -16,16 +16,6 @@
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#101113">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="TonTV">
-<meta property="og:url" content="https://tontv.tonyai.cc/admin.html">
-<meta property="og:title" content="운영자 어드민 콘솔 | TonTV">
-<meta property="og:description" content="톤티비 노드세일 운영자 콘솔(데모) — 신청·입금·사업자·TONX→XONT 분배·정산 관리.">
-<meta property="og:image" content="https://tontv.tonyai.cc/assets/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tontv.tonyai.cc/assets/og-image.png">
 </head>
 <body data-page="admin">
 
@@ -37,411 +27,615 @@
 
     <div class="admin-head">
       <div>
-        <span class="eyebrow" style="color:var(--red-2)"><svg class="icon" style="vertical-align:-.15em"><use href="#i-shield"/></svg> 운영자 콘솔 <span class="demo-pill">DEMO</span></span>
-        <h2>플랫폼 <span class="r">전체 관리</span>를 한 화면에서</h2>
-        <p>노드 신청 · 입금 · 사업자 · 토큰 분배 · 광고수익 정산 · 토큰/지갑까지 운영자가 직접 관리합니다.</p>
+        <span class="eyebrow" style="color:var(--red-2)"><svg class="icon" style="vertical-align:-.15em"><use href="#i-shield"/></svg> 운영자 콘솔 <span class="demo-pill">실데이터</span></span>
+        <h2>노드세일 <span class="r">전체 관리</span>를 한 화면에서</h2>
+        <p>회원 · 매출 승인 · 출금 · 정산 · 토큰 · 스테이킹 · 보상 실행 · 계정 복구를 운영자가 직접 관리합니다.</p>
       </div>
       <div class="admin-who">
         <span class="live-badge"><span class="d"></span> LIVE</span>
         <div class="op"><div class="av"><svg class="icon"><use href="#i-shield"/></svg></div>
-          <div><div class="nm">운영자 <span style="color:var(--red-2)">@admin</span></div><div class="id">TonGram Ventures · 슈퍼관리자</div></div></div>
+          <div><div class="nm" id="adm-name">운영자</div><div class="id" id="adm-id">—</div></div></div>
       </div>
     </div>
 
-    <div class="admin-secnote">
-      <svg class="icon"><use href="#i-alert"/></svg>
-      <span><b>데모 운영자 콘솔입니다.</b> 표시된 모든 신청·입금·잔액·트랜잭션은 예시 데이터이며, 모든 동작은 화면 내 데모로만 반영됩니다. 정식 운영 시에는 <b>관리자 인증(2FA)·권한 분리·서버 검증</b>이 적용됩니다.</span>
-    </div>
+    <!-- 접근 게이트 -->
+    <div class="adm-gate" id="adm-gate">불러오는 중…</div>
 
-    <!-- ===== 실시간 노드 신청 승인 (실데이터 · 관리자 전용) ===== -->
-    <div class="live-apps" id="live-apps" hidden>
-      <div class="la-head">
-        <h3><svg class="icon"><use href="#i-inbox"/></svg> 실시간 노드 신청 <span class="la-real">실데이터</span></h3>
-        <span class="la-meta" id="la-meta">불러오는 중…</span>
-      </div>
-      <div class="la-body" id="la-body"></div>
-    </div>
-
-    <!-- ===== 토큰 · 스테이킹 설정 (실데이터 · 관리자 전용) ===== -->
-    <div class="live-apps" id="live-cfg" hidden>
-      <div class="la-head">
-        <h3><svg class="icon"><use href="#i-sliders"/></svg> 토큰 · 스테이킹 설정 <span class="la-real">실데이터</span></h3>
-        <span class="la-meta" id="cfg-meta"></span>
-      </div>
-      <div class="cfg-grid">
-        <div class="cfg-f"><label>스테이킹 APY (연 %)</label><input class="inp" id="cfg-apy" type="number" step="0.1" inputmode="decimal"></div>
-        <div class="cfg-f"><label>XONT 시세 ($)</label><input class="inp" id="cfg-price" type="number" step="0.001" inputmode="decimal"></div>
-        <div class="cfg-f"><label>노드 몫 (%)</label><input class="inp" id="cfg-share" type="number" step="0.1" inputmode="decimal"></div>
-        <div class="cfg-f"><label>$1,000당 지급 XONT</label><input class="inp" id="cfg-per" type="number" step="1" inputmode="decimal"></div>
-        <div class="cfg-f"><label>노드 총 수</label><input class="inp" id="cfg-cap" type="number" step="1000" inputmode="numeric"></div>
-        <div class="cfg-f"><label>유저당 광고/일</label><input class="inp" id="cfg-ads" type="number" step="1" inputmode="numeric"></div>
-        <div class="cfg-f"><label>광고 1개당 TONX</label><input class="inp" id="cfg-tpa" type="number" step="0.1" inputmode="decimal"></div>
-        <div class="cfg-f"><label>TONX 1개 ≈ 원</label><input class="inp" id="cfg-krw" type="number" step="1" inputmode="numeric"></div>
-      </div>
-      <button class="btn btn-red" id="cfg-save" style="margin-top:6px">설정 저장</button>
-    </div>
-
-    <div class="admin-shell">
-      <!-- ===== sidebar tabs ===== -->
+    <!-- 콘솔 본체 -->
+    <div class="admin-shell" id="adm-shell" hidden>
       <aside class="admin-side" id="admin-tabs">
+        <div class="atab-grp">메인</div>
         <button class="atab on" data-tab="overview"><svg class="icon"><use href="#i-bars"/></svg> <span>개요</span></button>
-        <button class="atab" data-tab="apps"><svg class="icon"><use href="#i-inbox"/></svg> <span>노드 신청</span><i class="tcount" id="tc-apps">0</i></button>
-        <button class="atab" data-tab="deposits"><svg class="icon"><use href="#i-dollar"/></svg> <span>입금 관리</span><i class="tcount" id="tc-deps">0</i></button>
-        <button class="atab" data-tab="operators"><svg class="icon"><use href="#i-users"/></svg> <span>노드 사업자</span></button>
-        <button class="atab" data-tab="distribute"><svg class="icon"><use href="#i-coins"/></svg> <span>토큰 분배</span></button>
-        <button class="atab" data-tab="adrev"><svg class="icon"><use href="#i-megaphone"/></svg> <span>광고수익 분배</span></button>
-        <button class="atab" data-tab="token"><svg class="icon"><use href="#i-key"/></svg> <span>토큰 관리</span></button>
-        <button class="atab" data-tab="wallet"><svg class="icon"><use href="#i-wallet"/></svg> <span>지갑 관리</span></button>
-        <button class="atab" data-tab="settings"><svg class="icon"><use href="#i-settings"/></svg> <span>설정</span></button>
+        <button class="atab" data-tab="members"><svg class="icon"><use href="#i-users"/></svg> <span>회원 관리</span></button>
+        <button class="atab" data-tab="org"><svg class="icon"><use href="#i-share"/></svg> <span>조직도</span></button>
+        <button class="atab" data-tab="sales"><svg class="icon"><use href="#i-check"/></svg> <span>매출 승인</span><i class="tcount" id="tc-sales">0</i></button>
+        <button class="atab" data-tab="withdraw"><svg class="icon"><use href="#i-dollar"/></svg> <span>출금</span><i class="tcount" id="tc-wd">0</i></button>
+        <button class="atab" data-tab="wallet"><svg class="icon"><use href="#i-wallet"/></svg> <span>입금·지갑 관리</span></button>
+        <button class="atab" data-tab="settle"><svg class="icon"><use href="#i-pie"/></svg> <span>정산관리</span></button>
+        <button class="atab" data-tab="notice"><svg class="icon"><use href="#i-megaphone"/></svg> <span>공지</span></button>
+        <div class="atab-grp">이벤트</div>
+        <button class="atab" data-tab="events"><svg class="icon"><use href="#i-calendar"/></svg> <span>이벤트 관리</span></button>
+        <div class="atab-grp">보상</div>
+        <button class="atab" data-tab="rules"><svg class="icon"><use href="#i-sliders"/></svg> <span>보상 규칙</span></button>
+        <button class="atab" data-tab="token"><svg class="icon"><use href="#i-coins"/></svg> <span>토큰 관리</span></button>
+        <button class="atab" data-tab="rank"><svg class="icon"><use href="#i-crown"/></svg> <span>직급 관리</span></button>
+        <button class="atab" data-tab="staking"><svg class="icon"><use href="#i-lock"/></svg> <span>스테이킹 관리</span></button>
+        <button class="atab" data-tab="sim"><svg class="icon"><use href="#i-trending"/></svg> <span>보상 시뮬레이터</span></button>
+        <div class="atab-grp">운영</div>
+        <button class="atab" data-tab="admins"><svg class="icon"><use href="#i-shield"/></svg> <span>관리자 관리</span></button>
+        <button class="atab" data-tab="audit"><svg class="icon"><use href="#i-clock"/></svg> <span>감사 로그</span></button>
+        <button class="atab" data-tab="exec"><svg class="icon"><use href="#i-refresh"/></svg> <span>보상 실행</span></button>
+        <button class="atab" data-tab="bridge"><svg class="icon"><use href="#i-radio"/></svg> <span>브릿지 헬스</span></button>
+        <button class="atab" data-tab="recovery"><svg class="icon"><use href="#i-key"/></svg> <span>계정 복구</span><i class="tcount" id="tc-rec">0</i></button>
+        <button class="atab" data-tab="logout"><svg class="icon"><use href="#i-x"/></svg> <span>로그아웃</span></button>
       </aside>
 
-      <!-- ===== panels ===== -->
       <div class="admin-main">
 
-        <!-- 1. 개요 -->
+        <!-- 개요 -->
         <section class="apanel on" data-panel="overview">
           <div class="metrics am-metrics">
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-server"/></svg></span> 판매 노드</div><div class="v" id="o-nodes">0</div><div class="sub"><span class="up" id="o-nodes-cap">/ 3,000</span> 1차 풀</div></div>
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 누적 입금</div><div class="v r" id="o-deposit">$0</div><div class="sub"><span class="livedot"></span> 트레저리 유입</div></div>
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-inbox"/></svg></span> 대기 신청</div><div class="v" id="o-pending">0</div><div class="sub">승인 대기 건</div></div>
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-clock"/></svg></span> 미확인 입금</div><div class="v" id="o-unconf">0</div><div class="sub">확인 필요</div></div>
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-users"/></svg></span> 활성 사업자</div><div class="v" id="o-ops">0</div><div class="sub">노드 보유</div></div>
-            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-pie"/></svg></span> 이번 달 노드풀</div><div class="v r" id="o-pool">$0</div><div class="sub">매출 10%</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-server"/></svg></span> 판매 노드</div><div class="v" id="o-nodes">0</div><div class="sub"><span id="o-cap">/ 0</span> 발행 상한</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 누적 입금(확정)</div><div class="v r" id="o-deposit">$0</div><div class="sub">트레저리 유입</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-inbox"/></svg></span> 대기 신청</div><div class="v" id="o-pending">0</div><div class="sub">매출 승인 대기</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-dollar"/></svg></span> 대기 출금</div><div class="v" id="o-wd">0</div><div class="sub">출금 승인 대기</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-users"/></svg></span> 회원</div><div class="v" id="o-ops">0</div><div class="sub">가입 사업자</div></div>
+            <div class="metric"><div class="mh"><span class="e"><svg class="icon"><use href="#i-coins"/></svg></span> XONT 총발행</div><div class="v r" id="o-xont">0</div><div class="sub">노드 지급 누적</div></div>
           </div>
-
           <div class="dash-grid-2">
             <div class="dash-card">
-              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-alert"/></svg></span> 처리 대기 (액션 필요)</h3><span class="tagx" id="todo-count">0건</span></div>
-              <div class="nodelist" id="todo-list"></div>
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-alert"/></svg></span> 처리 대기 (액션 필요)</h3><span class="tagx" id="o-todo-n">0건</span></div>
+              <div class="nodelist" id="o-todo"></div>
             </div>
             <div class="dash-card">
-              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 최근 활동 로그</h3><span class="tagx"><span class="livedot"></span> 실시간</span></div>
-              <div class="nodelist" id="log-list"></div>
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 최근 감사 로그</h3><span class="tagx"><span class="livedot"></span> 실시간</span></div>
+              <div class="nodelist" id="o-audit"></div>
             </div>
           </div>
         </section>
 
-        <!-- 2. 노드 신청 -->
-        <section class="apanel" data-panel="apps" hidden>
+        <!-- 회원 관리 -->
+        <section class="apanel" data-panel="members" hidden>
+          <div class="mini-stats" id="mem-stats"></div>
+          <div class="atoolbar"><div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="mem-q" placeholder="이름 · 이메일 검색"></div><span class="acount" id="mem-count">0명</span></div>
+          <div class="atable-wrap"><table class="atable">
+            <thead><tr><th>회원</th><th>노드</th><th>XONT 잔액</th><th>KYC</th><th>가입일</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
+            <tbody id="mem-body"></tbody></table></div>
+        </section>
+
+        <!-- 조직도 -->
+        <section class="apanel" data-panel="org" hidden>
+          <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 2단계 추천 조직도</h3><span class="tagx" id="org-meta">—</span></div>
+          <div class="atable-wrap"><table class="atable">
+            <thead><tr><th>추천인</th><th>단계</th><th>피추천인</th><th>보상 XONT</th><th>일자</th></tr></thead>
+            <tbody id="org-body"></tbody></table></div>
+        </section>
+
+        <!-- 매출 승인 -->
+        <section class="apanel" data-panel="sales" hidden>
           <div class="atoolbar">
-            <div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="apps-q" placeholder="신청자 · 지갑 검색"></div>
-            <div class="aseg" id="apps-filter">
-              <button class="on" data-f="all">전체</button>
-              <button data-f="pending">대기</button>
-              <button data-f="approved">승인</button>
-              <button data-f="rejected">거절</button>
-            </div>
-            <span class="acount" id="apps-count">0건</span>
+            <div class="aseg" id="sales-filter"><button class="on" data-f="all">전체</button><button data-f="pending">대기</button><button data-f="confirmed">승인</button><button data-f="failed">거절</button></div>
+            <span class="acount" id="sales-count">0건</span>
           </div>
-          <div class="atable-wrap">
-            <table class="atable">
-              <thead><tr><th>신청자</th><th>지갑</th><th>수량</th><th>금액 (USDT)</th><th>신청일</th><th>상태</th><th class="ta-r">처리</th></tr></thead>
-              <tbody id="apps-body"></tbody>
-            </table>
-          </div>
+          <div class="la-body" id="sales-body"></div>
         </section>
 
-        <!-- 3. 입금 관리 -->
-        <section class="apanel" data-panel="deposits" hidden>
-          <div class="mini-stats">
-            <div class="ms"><div class="l">트레저리 누적 유입</div><div class="v r" id="d-total">$0</div></div>
-            <div class="ms"><div class="l">오늘 유입</div><div class="v" id="d-today">$0</div></div>
-            <div class="ms"><div class="l">미확인</div><div class="v" id="d-unconf">0</div></div>
-            <div class="ms"><div class="l">확인 완료</div><div class="v" id="d-conf">0</div></div>
-          </div>
+        <!-- 출금 -->
+        <section class="apanel" data-panel="withdraw" hidden>
           <div class="atoolbar">
-            <div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="deps-q" placeholder="주문 · TX 해시 검색"></div>
-            <div class="aseg" id="deps-filter">
-              <button class="on" data-f="all">전체</button>
-              <button data-f="unconfirmed">미확인</button>
-              <button data-f="confirmed">확인</button>
-              <button data-f="failed">실패</button>
-            </div>
-            <span class="acount" id="deps-count">0건</span>
+            <div class="aseg" id="wd-filter"><button class="on" data-f="all">전체</button><button data-f="pending">대기</button><button data-f="paid">지급완료</button><button data-f="rejected">거절</button></div>
+            <span class="acount" id="wd-count">0건</span>
           </div>
-          <div class="atable-wrap">
-            <table class="atable">
-              <thead><tr><th>주문</th><th>금액</th><th>네트워크</th><th>TX 해시</th><th>시각</th><th>상태</th><th class="ta-r">처리</th></tr></thead>
-              <tbody id="deps-body"></tbody>
-            </table>
-          </div>
+          <div class="la-body" id="wd-body"></div>
+          <p class="amini-desc" style="margin-top:12px"><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#i-alert"/></svg> 온체인 지급은 없습니다. 운영자가 앱 밖에서 전송 후 <b>지급완료</b>로 마킹하면 XONT 잔액이 차감·기록됩니다.</p>
         </section>
 
-        <!-- 4. 노드 사업자 -->
-        <section class="apanel" data-panel="operators" hidden>
-          <div class="mini-stats">
-            <div class="ms"><div class="l">총 사업자</div><div class="v" id="op-total">0</div></div>
-            <div class="ms"><div class="l">활성</div><div class="v" style="color:#5ee08a" id="op-active">0</div></div>
-            <div class="ms"><div class="l">정지</div><div class="v" style="color:var(--red-2)" id="op-susp">0</div></div>
-            <div class="ms"><div class="l">총 노드</div><div class="v" id="op-nodes">0</div></div>
-          </div>
-          <div class="atoolbar">
-            <div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="ops-q" placeholder="사업자 · 지갑 검색"></div>
-            <div class="aseg" id="ops-filter">
-              <button class="on" data-f="all">전체</button>
-              <button data-f="active">활성</button>
-              <button data-f="suspended">정지</button>
-            </div>
-            <span class="acount" id="ops-count">0건</span>
-          </div>
-          <div class="atable-wrap">
-            <table class="atable">
-              <thead><tr><th>사업자</th><th>지갑</th><th>노드</th><th>KYC</th><th>가입일</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
-              <tbody id="ops-body"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- 5. 토큰 분배 -->
-        <section class="apanel" data-panel="distribute" hidden>
-          <div class="dash-card mirror-card" style="margin-bottom:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> TONX <span class="r">→</span> XONT 미러 분배</h3><span class="tagx">시청자 채굴량 = 노드 풀 발행 (1:1)</span></div>
-            <div class="mirror">
-              <div class="mside"><div class="ms-tag"><svg class="icon"><use href="#i-eye"/></svg> 오늘 시청자 채굴 · <b>TONX</b></div><div class="ms-big" id="ad-tonx">0</div><div class="ms-sub"><span class="livedot"></span> 전체 시청자 합산 · 실시간</div></div>
-              <div class="mirror-mid"><div class="mm-ratio">1 : 1</div><div class="mm-arrow"><svg class="icon"><use href="#i-arrow-ur"/></svg></div><div class="mm-label">동일 수량<br>미러 발행</div></div>
-              <div class="mside nodes"><div class="ms-tag"><svg class="icon"><use href="#i-server"/></svg> 노드 풀 발행 · <b>XONT</b></div><div class="ms-big r" id="ad-xont">0</div><div class="ms-sub">전체 노드 <b id="ad-nodes">0</b>개 균등 분배 (÷N)</div>
-                <div class="pernode"><div class="pn"><div class="l">노드 1개 (오늘)</div><div class="v" id="ad-per">0</div></div><div class="pn"><div class="l">분배 상태</div><div class="v r" id="ad-state" style="font-size:14px">대기</div></div></div></div>
-            </div>
-            <div class="run-row">
-              <label class="atoggle"><input type="checkbox" id="ad-auto" checked><span class="tk"></span> 자동 분배 (매일 00:00 KST)</label>
-              <button class="btn btn-red" id="ad-run"><svg class="icon"><use href="#i-refresh"/></svg> 오늘 분배 실행</button>
-            </div>
-          </div>
-          <div class="dash-card">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 분배 이력</h3><span class="tagx">최근 분배 라운드</span></div>
-            <div class="atable-wrap">
-              <table class="atable">
-                <thead><tr><th>일자</th><th>시청자 TONX</th><th>발행 XONT</th><th>노드수</th><th>노드당</th><th>상태</th></tr></thead>
-                <tbody id="dist-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- 6. 광고수익 분배 -->
-        <section class="apanel" data-panel="adrev" hidden>
+        <!-- 입금·지갑 관리 -->
+        <section class="apanel" data-panel="wallet" hidden>
           <div class="dash-card" style="margin-bottom:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 이번 달 매출 분배 (노드 풀)</h3><span class="tagx">매출 10% · 노드 지분</span></div>
-            <div class="adrev">
-              <div class="donut"><div class="cc"><div class="l">노드 풀 (10%)</div><div class="v" id="ar-pool">$0</div></div></div>
-              <div class="legend">
-                <div class="lr"><span class="ll"><span class="sw" style="background:var(--red)"></span> 광고 매출</span><span class="lv" id="ar-ad">$0</span></div>
-                <div class="lr"><span class="ll"><span class="sw" style="background:#f5c451"></span> 구독 매출</span><span class="lv" id="ar-sub">$0</span></div>
-                <div class="lr"><span class="ll"><span class="sw" style="background:#3a82f6"></span> 토큰·생태계</span><span class="lv" id="ar-tok">$0</span></div>
-                <div class="lr" style="border-top:1px solid #2a2d34;padding-top:14px;margin-top:4px"><span class="ll" style="color:#fff;font-weight:800">노드당 배분 (3,000개)</span><span class="lv" style="color:var(--red-2)" id="ar-per">$0</span></div>
-              </div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-key"/></svg></span> 입금 주소 (신청 모달 노출)</h3><span class="tagx">TRON · EVM 2체인</span></div>
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>TRON (TRC20) 주소</label><input class="inp" id="addr-tron"></div>
+              <div class="cfg-f"><label>EVM (ERC20/BEP20) 주소</label><input class="inp" id="addr-evm"></div>
             </div>
-            <div class="run-row">
-              <div class="dlabel"><svg class="icon"><use href="#i-calendar"/></svg> 다음 월 정산 <b id="ar-dday">D-6</b> · 익월 10일 자동 지급</div>
-              <button class="btn btn-red" id="ar-run"><svg class="icon"><use href="#i-refresh"/></svg> 월 정산 실행</button>
-            </div>
+            <button class="btn btn-red" id="addr-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 주소 저장</button>
+            <p class="amini-desc" style="margin-top:10px">저장 시 신청 모달·대시보드의 입금 주소와 QR이 즉시 변경됩니다.</p>
           </div>
           <div class="dash-card">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 정산 이력</h3><span class="tagx">월별 노드 풀 지급</span></div>
-            <div class="atable-wrap">
-              <table class="atable">
-                <thead><tr><th>정산 월</th><th>총 매출</th><th>노드 풀(10%)</th><th>노드수</th><th>노드당</th><th>지급일</th><th>상태</th></tr></thead>
-                <tbody id="settle-body"></tbody>
-              </table>
-            </div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> XONT 원장 (최근)</h3><span class="tagx">유입 · 지급 · 발행</span></div>
+            <div class="atable-wrap"><table class="atable">
+              <thead><tr><th>유형</th><th>회원</th><th>방향</th><th>수량</th><th>상대</th><th>시각</th></tr></thead>
+              <tbody id="tx-body"></tbody></table></div>
           </div>
         </section>
 
-        <!-- 7. 토큰 관리 -->
+        <!-- 정산관리 -->
+        <section class="apanel" data-panel="settle" hidden>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 이번 배당 풀 (원 기준 · 시뮬 파라미터)</h3><span class="tagx">시청자 리워드 20% ÷ N</span></div>
+            <div class="mini-stats" id="settle-stats"></div>
+            <p class="amini-desc" style="margin-top:8px">배당은 <b>원(fiat) 기준</b>으로 산정합니다. 실제 XONT 적립은 <b>보상 실행</b> 탭에서 회원별로 처리합니다(온체인 없음).</p>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 일자별 매출·노드풀</h3><span class="tagx">revenue_daily</span></div>
+            <div class="atable-wrap"><table class="atable">
+              <thead><tr><th>일자</th><th>광고 매출</th><th>구독 매출</th><th>노드풀</th></tr></thead>
+              <tbody id="settle-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <!-- 공지 -->
+        <section class="apanel" data-panel="notice" hidden>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-megaphone"/></svg></span> 공지 작성</h3><span class="tagx" id="ann-edit-tag">신규</span></div>
+            <input type="hidden" id="ann-id">
+            <div class="field"><label>제목</label><input class="inp" id="ann-title" placeholder="공지 제목"></div>
+            <div class="field"><label>내용</label><textarea class="inp" id="ann-body" rows="4" placeholder="공지 내용"></textarea></div>
+            <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:4px 0 12px">
+              <label class="atoggle"><input type="checkbox" id="ann-pin"><span class="tk"></span> 상단 고정</label>
+              <label class="atoggle"><input type="checkbox" id="ann-pub" checked><span class="tk"></span> 게시</label>
+            </div>
+            <div style="display:flex;gap:10px"><button class="btn btn-red" id="ann-save">저장</button><button class="btn btn-ghost-dark" id="ann-new">새로 작성</button></div>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 공지 목록</h3><span class="tagx" id="ann-count">0건</span></div>
+            <div class="la-body" id="ann-body-list"></div>
+          </div>
+        </section>
+
+        <!-- 이벤트 (준비중) -->
+        <section class="apanel" data-panel="events" hidden><div class="ph-soon"><svg class="icon"><use href="#i-calendar"/></svg><h3>이벤트 관리</h3><p>프로모션·이벤트 스키마는 다음 단계(P2)에서 추가됩니다.</p></div></section>
+
+        <!-- 보상 규칙 -->
+        <section class="apanel" data-panel="rules" hidden>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-sliders"/></svg></span> 보상 규칙 (배당·추천·스테이킹)</h3><span class="tagx" id="rules-meta"></span></div>
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>노드 몫 (%)</label><input class="inp" id="r-share" type="number" step="0.1"></div>
+              <div class="cfg-f"><label>광고 1개당 리워드 재원 (원)</label><input class="inp" id="r-krw" type="number" step="1"></div>
+              <div class="cfg-f"><label>TONX 기준가 (원)</label><input class="inp" id="r-ref" type="number" step="1"></div>
+              <div class="cfg-f"><label>유저당 광고/일</label><input class="inp" id="r-ads" type="number" step="1"></div>
+              <div class="cfg-f"><label>노드 총 수 (÷N)</label><input class="inp" id="r-cap" type="number" step="1000"></div>
+              <div class="cfg-f"><label>1단계 추천 (%)</label><input class="inp" id="r-l1" type="number" step="0.1"></div>
+              <div class="cfg-f"><label>2단계 추천 (%)</label><input class="inp" id="r-l2" type="number" step="0.1"></div>
+              <div class="cfg-f"><label>스테이킹 APY (연 %)</label><input class="inp" id="r-apy" type="number" step="0.1"></div>
+              <div class="cfg-f"><label>스테이킹 기본 개월</label><input class="inp" id="r-months" type="number" step="1"></div>
+            </div>
+            <button class="btn btn-red" id="rules-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 규칙 저장</button>
+          </div>
+        </section>
+
+        <!-- 토큰 관리 -->
         <section class="apanel" data-panel="token" hidden>
           <div class="dash-grid-2" style="margin-bottom:20px">
             <div class="dash-card">
-              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-eye"/></svg></span> TONX (시청자 토큰)</h3><span class="tagx">총발행 100억</span></div>
-              <div class="tk-stat"><div class="r1"><span>총 발행 한도</span><b>10,000,000,000</b></div>
-                <div class="sbar"><i id="tk-tonx-bar" style="width:0%"></i></div>
-                <div class="r2"><span>누적 채굴 <b id="tk-tonx-mined">0</b></span><span id="tk-tonx-pct">0%</span></div>
-                <div class="r3"><div><div class="l">유통량</div><div class="v" id="tk-tonx-circ">0</div></div><div><div class="l">홀더</div><div class="v" id="tk-tonx-holders">0</div></div></div>
-              </div>
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-eye"/></svg></span> TONX (시청자 토큰)</h3><span class="tagx">Watch-to-Earn</span></div>
+              <div class="tk-stat"><div class="r1"><span>총 발행 한도</span><b id="t-tonx-supply">0</b></div>
+                <div class="r2" style="margin-top:8px"><span>누적 채굴 <b id="t-tonx-mined">0</b></span></div></div>
             </div>
             <div class="dash-card">
-              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-server"/></svg></span> XONT (노드 토큰)</h3><span class="tagx">노드 채굴·정산</span></div>
-              <div class="tk-stat"><div class="r1"><span>총 발행량</span><b id="tk-xont-supply">0</b></div>
-                <div class="r3" style="margin-top:14px"><div><div class="l">유통량</div><div class="v" id="tk-xont-circ">0</div></div><div><div class="l">스테이킹 락업</div><div class="v" id="tk-xont-stake">0</div></div></div>
-                <div class="r3"><div><div class="l">데모 시세</div><div class="v" id="tk-xont-price">$0.85</div></div><div><div class="l">홀더</div><div class="v" id="tk-xont-holders">0</div></div></div>
-              </div>
-            </div>
-          </div>
-          <div class="dash-card" style="margin-bottom:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-arrow-ur"/></svg></span> TONX ⇄ XONT 스왑 비율 설정</h3><span class="tagx" id="swap-state-tag">미설정 (TBD)</span></div>
-            <p class="amini-desc">현재 스왑은 <b>비활성</b> 상태입니다. 비율을 설정·활성화하면 사용자 대시보드에 노출됩니다.</p>
-            <div class="swap-set">
-              <div class="field"><label>1 XONT 당 TONX</label><div class="inp-amt"><input type="text" inputmode="decimal" id="swap-ratio" placeholder="예: 12.5"><span class="unit">TONX</span></div></div>
-              <label class="atoggle"><input type="checkbox" id="swap-active"><span class="tk"></span> 스왑 활성화</label>
-              <button class="btn btn-red" id="swap-save">비율 저장</button>
+              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-server"/></svg></span> XONT (노드 토큰)</h3><span class="tagx" id="t-xont-price-tag">$0</span></div>
+              <div class="tk-stat"><div class="r1"><span>총 발행량</span><b id="t-xont-supply">0</b></div>
+                <div class="r2" style="margin-top:8px"><span>노드당 지급 $1,000 = <b id="t-xont-per">0</b> XONT</span></div></div>
             </div>
           </div>
           <div class="dash-card">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-sliders"/></svg></span> 발행 · 소각 (운영)</h3><span class="tagx">데모</span></div>
-            <div class="mintburn">
-              <div class="field"><label>토큰</label><div class="aseg sm" id="mb-token"><button class="on" data-t="XONT">XONT</button><button data-t="TONX">TONX</button></div></div>
-              <div class="field"><label>수량</label><div class="inp-amt"><input type="text" inputmode="decimal" id="mb-amt" placeholder="0"><span class="unit" id="mb-unit">XONT</span></div></div>
-              <div class="mb-actions"><button class="btn btn-red" id="mb-mint"><svg class="icon"><use href="#i-plus"/></svg> 발행</button><button class="btn btn-ghost-dark" id="mb-burn"><svg class="icon"><use href="#i-flame"/></svg> 소각</button></div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-sliders"/></svg></span> 토큰 파라미터</h3></div>
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>XONT 시세 ($)</label><input class="inp" id="t-price" type="number" step="0.001"></div>
+              <div class="cfg-f"><label>$1,000당 지급 XONT</label><input class="inp" id="t-per" type="number" step="1"></div>
             </div>
+            <button class="btn btn-red" id="token-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 저장</button>
           </div>
         </section>
 
-        <!-- 8. 지갑 관리 -->
-        <section class="apanel" data-panel="wallet" hidden>
-          <div class="dash-card" style="margin-bottom:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-wallet"/></svg></span> 트레저리 지갑</h3><span class="tagx">운영 지갑 잔액</span></div>
-            <div class="walletlist" id="wallet-list"></div>
+        <!-- 직급 (준비중) -->
+        <section class="apanel" data-panel="rank" hidden><div class="ph-soon"><svg class="icon"><use href="#i-crown"/></svg><h3>직급 관리</h3><p>회원 직급/등급 체계는 다음 단계(P2)에서 설계·추가됩니다.</p></div></section>
+
+        <!-- 스테이킹 관리 -->
+        <section class="apanel" data-panel="staking" hidden>
+          <div class="mini-stats" id="stk-stats"></div>
+          <div class="atable-wrap"><table class="atable">
+            <thead><tr><th>회원</th><th>원금 XONT</th><th>기간</th><th>APY</th><th>시작</th><th>만기</th><th>상태</th></tr></thead>
+            <tbody id="stk-body"></tbody></table></div>
+        </section>
+
+        <!-- 보상 시뮬레이터 -->
+        <section class="apanel" data-panel="sim" hidden>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-trending"/></svg></span> 노드 배당 시뮬레이터 (원 기준 · 20%÷N)</h3><span class="tagx">대시보드와 동일 모델</span></div>
+            <div class="sim-scen" id="sim-scen"><button data-v="10000" class="on">1만</button><button data-v="100000">10만</button><button data-v="1000000">100만</button><button data-v="10000000">1천만</button><button data-v="100000000">1억</button></div>
+            <div class="mini-stats" id="sim-out"></div>
           </div>
+        </section>
+
+        <!-- 관리자 관리 -->
+        <section class="apanel" data-panel="admins" hidden>
+          <div class="dash-card" style="margin-bottom:16px"><div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-shield"/></svg></span> 관리자 지정</h3><span class="tagx">이메일로 검색해 관리자 권한 부여/회수</span></div>
+            <div class="atoolbar"><div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="adm-q" placeholder="이름 · 이메일 검색"></div></div>
+          </div>
+          <div class="atable-wrap"><table class="atable">
+            <thead><tr><th>회원</th><th>이메일</th><th>가입일</th><th>관리자</th><th class="ta-r">전환</th></tr></thead>
+            <tbody id="adm-body"></tbody></table></div>
+        </section>
+
+        <!-- 감사 로그 -->
+        <section class="apanel" data-panel="audit" hidden>
+          <div class="atable-wrap"><table class="atable">
+            <thead><tr><th>시각</th><th>액션</th><th>대상</th><th>상세</th></tr></thead>
+            <tbody id="audit-body"></tbody></table></div>
+        </section>
+
+        <!-- 보상 실행 -->
+        <section class="apanel" data-panel="exec" hidden>
           <div class="dash-card" style="margin-bottom:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-key"/></svg></span> 입금 주소 관리 (USDT-TRC20)</h3><span class="tagx">신청 모달 노출 주소</span></div>
-            <div class="addr-manage">
-              <div class="cur"><div class="l">현재 입금 주소</div><div class="copy-field"><span class="val" id="cur-addr">—</span><button class="cp" id="adm-copy-addr">복사</button></div></div>
-              <div class="field"><label>새 입금 주소로 교체</label><input class="inp" id="new-addr" placeholder="T... TRC20 주소 입력"></div>
-              <button class="btn btn-red" id="addr-save"><svg class="icon"><use href="#i-check"/></svg> 주소 교체</button>
-              <p class="amini-desc" style="margin-top:10px"><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#i-alert"/></svg> 교체 시 신청 모달의 입금 주소가 즉시 변경됩니다. 정식 운영에서는 멀티시그·화이트리스트 검증이 필요합니다.</p>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-refresh"/></svg></span> 보상/배당 XONT 적립 (오프체인)</h3><span class="tagx">wallet_balances 적립 + 원장</span></div>
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>회원 선택</label><select class="inp" id="exec-op"></select></div>
+              <div class="cfg-f"><label>적립 XONT</label><input class="inp" id="exec-amt" type="number" step="1" placeholder="0"></div>
+              <div class="cfg-f"><label>메모</label><input class="inp" id="exec-memo" placeholder="예: 6월 배당"></div>
             </div>
+            <button class="btn btn-red" id="exec-run" style="margin-top:6px"><svg class="icon"><use href="#i-plus"/></svg> 적립 실행</button>
           </div>
           <div class="dash-card">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 최근 트랜잭션</h3><span class="tagx">유입 · 지급 · 발행</span></div>
-            <div class="atable-wrap">
-              <table class="atable">
-                <thead><tr><th>유형</th><th>지갑</th><th>금액</th><th>상대 / TX</th><th>시각</th><th>상태</th></tr></thead>
-                <tbody id="tx-body"></tbody>
-              </table>
-            </div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 최근 보상 지급</h3></div>
+            <div class="la-body" id="exec-log"></div>
           </div>
         </section>
 
-        <!-- 9. 설정 -->
-        <section class="apanel" data-panel="settings" hidden>
-          <div class="dash-grid-2">
-            <div class="dash-card">
-              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-server"/></svg></span> 노드 세일</h3></div>
-              <div class="field"><label>노드 1개 가격 (USD)</label><div class="inp-amt"><input type="text" inputmode="numeric" id="set-price" value="1000"><span class="unit">USD</span></div></div>
-              <div class="field"><label>1차 판매 한도 (개)</label><div class="inp-amt"><input type="text" inputmode="numeric" id="set-cap1" value="3000"><span class="unit">개</span></div></div>
-              <div class="field"><label>총 발행 상한 (개)</label><div class="inp-amt"><input type="text" inputmode="numeric" id="set-cap-total" value="50000"><span class="unit">개</span></div></div>
-              <div class="field"><label>가동 시점</label><input class="inp" id="set-launch" value="2026. 9"></div>
+        <!-- 브릿지 헬스 (해당없음) -->
+        <section class="apanel" data-panel="bridge" hidden><div class="ph-soon"><svg class="icon"><use href="#i-radio"/></svg><h3>브릿지 헬스</h3><p>현재 <b>온체인 지급이 없어</b> TONX↔XONT 브릿지가 존재하지 않습니다. 온체인 연동 시 활성화됩니다.</p></div></section>
+
+        <!-- 계정 복구 -->
+        <section class="apanel" data-panel="recovery" hidden>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-key"/></svg></span> 비밀번호 복구 신청</h3><span class="tagx" id="rec-count">0건</span></div>
+            <div class="la-body" id="rec-body"></div>
+            <div id="rec-link-box" hidden style="margin-top:14px">
+              <label class="amini-label">복구 링크 (유저에게 전달)</label>
+              <div class="copy-field"><span class="val" id="rec-link"></span><button class="cp" id="rec-copy">복사</button></div>
             </div>
-            <div class="dash-card">
-              <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 추천 · 스테이킹</h3></div>
-              <div class="set2col">
-                <div class="field"><label>1단계 추천 (%)</label><div class="inp-amt"><input type="text" inputmode="decimal" id="set-ref1" value="10"><span class="unit">%</span></div></div>
-                <div class="field"><label>2단계 추천 (%)</label><div class="inp-amt"><input type="text" inputmode="decimal" id="set-ref2" value="3"><span class="unit">%</span></div></div>
-              </div>
-              <label class="amini-label">스테이킹 APY (%)</label>
-              <div class="apy-grid">
-                <div class="apf"><span>1개월</span><input id="set-apy1" value="6"></div>
-                <div class="apf"><span>3개월</span><input id="set-apy3" value="10"></div>
-                <div class="apf"><span>6개월</span><input id="set-apy6" value="15"></div>
-                <div class="apf"><span>12개월</span><input id="set-apy12" value="24"></div>
-              </div>
-              <label class="atoggle" style="margin-top:16px"><input type="checkbox" id="set-maint"><span class="tk"></span> 점검 모드 (사용자 구매 일시 중지)</label>
-            </div>
-          </div>
-          <div class="set-save-row">
-            <button class="btn btn-red btn-lg" id="set-save"><svg class="icon"><use href="#i-check"/></svg> 설정 저장</button>
-            <span class="amini-desc">변경은 데모로만 반영됩니다.</span>
           </div>
         </section>
 
       </div>
     </div>
 
-    <p class="dash-note">※ 본 어드민은 <span class="r">데모 데이터</span>로 동작하는 운영자 콘솔 프로토타입입니다. 정식 가동 시 관리자 인증·권한·온체인 데이터와 연동됩니다.</p>
+    <p class="dash-note">※ 모든 데이터는 Supabase 실데이터이며, 관리자 동작은 <b>감사 로그</b>에 기록됩니다. 토큰 전송은 온체인이 아닌 <b>오프체인 원장</b>으로 관리됩니다.</p>
   </div>
 </section>
 
 <script src="layout.js"></script>
-<script src="app.js"></script>
-<script src="admin.js"></script>
 <script type="module">
-/* 실시간 노드 신청 승인 (실데이터 · 관리자 전용) */
-(() => {
-  const $ = (s) => document.querySelector(s);
-  const panel = $('#live-apps'), body = $('#la-body'), meta = $('#la-meta');
-  if (!panel) return;
-  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const ST = { pending: ['승인 대기', 'wait'], confirmed: ['승인 완료', 'ok'], failed: ['거절됨', 'err'] };
+import * as db from './lib/supabase.js';
 
-  import('./lib/supabase.js').then(async (m) => {
-    const session = await m.getSession().catch(() => null);
-    panel.hidden = false;
-    if (!session) { meta.textContent = '관리자 로그인 필요'; body.innerHTML = '<div class="la-empty">관리자 계정으로 <a href="login.html">로그인</a> 후 신청을 승인할 수 있습니다.</div>'; return; }
-    let admin = false;
-    try {
-      const { data: me } = await m.supabase.from('node_operators').select('is_admin').eq('auth_user_id', session.user.id).maybeSingle();
-      admin = !!(me && me.is_admin);
-    } catch (e) {}
-    if (!admin) { meta.textContent = '권한 없음'; body.innerHTML = '<div class="la-empty">이 계정은 관리자 권한이 없습니다.</div>'; return; }
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const fmt = (n) => Math.round(Number(n) || 0).toLocaleString('en-US');
+const fmt2 = (n) => (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const usd = (n) => '$' + fmt(n);
+const won = (n) => n >= 1e12 ? (n/1e12).toFixed(2)+'조원' : n >= 1e8 ? (n/1e8).toFixed(1)+'억원' : n >= 1e4 ? Math.round(n/1e4).toLocaleString('en-US')+'만원' : Math.round(n).toLocaleString('en-US')+'원';
+const dt = (s) => s ? new Date(s).toLocaleString('ko-KR', { dateStyle:'short', timeStyle:'short' }) : '—';
+const day = (s) => s ? new Date(s).toLocaleDateString('ko-KR') : '—';
+const toast = (m, t) => window.toast && window.toast(m, t);
 
-    // ---- 토큰·스테이킹 설정 패널 ----
-    const cfgPanel = document.querySelector('#live-cfg');
-    if (cfgPanel) {
-      cfgPanel.hidden = false;
-      const g = (id) => document.querySelector(id);
-      try {
-        const cfg = await m.getTokenConfig();
-        g('#cfg-apy').value = cfg.staking_apy;
-        g('#cfg-price').value = cfg.xont_price_usd;
-        g('#cfg-share').value = cfg.node_share_pct;
-        g('#cfg-per').value = cfg.xont_per_1000_usd;
-        g('#cfg-cap').value = cfg.node_cap;
-        g('#cfg-ads').value = cfg.sim_ads_per_user;
-        g('#cfg-tpa').value = cfg.sim_tonx_per_ad;
-        g('#cfg-krw').value = cfg.ad_reward_krw;
-        g('#cfg-meta').textContent = '현재 APY ' + cfg.staking_apy + '% · 시세 $' + cfg.xont_price_usd + ' · 노드 ' + cfg.node_cap;
-      } catch (e) { g('#cfg-meta').textContent = '설정 로드 실패'; }
-      g('#cfg-save').addEventListener('click', async () => {
-        const patch = {
-          staking_apy: parseFloat(g('#cfg-apy').value) || 0,
-          xont_price_usd: parseFloat(g('#cfg-price').value) || 0,
-          node_share_pct: parseFloat(g('#cfg-share').value) || 0,
-          xont_per_1000_usd: parseFloat(g('#cfg-per').value) || 0,
-          node_cap: parseInt(g('#cfg-cap').value) || 0,
-          sim_ads_per_user: parseInt(g('#cfg-ads').value) || 0,
-          sim_tonx_per_ad: parseFloat(g('#cfg-tpa').value) || 0,
-          ad_reward_krw: parseFloat(g('#cfg-krw').value) || 0,
-        };
-        const btn = g('#cfg-save'); const o = btn.textContent; btn.disabled = true; btn.textContent = '저장 중…';
-        try {
-          await m.adminUpdateConfig(patch);
-          window.toast && window.toast('설정이 저장되었습니다');
-          g('#cfg-meta').textContent = '현재 APY ' + patch.staking_apy + '% · 시세 $' + patch.xont_price_usd;
-        } catch (e) { window.toast && window.toast('저장 실패: ' + (e && e.message || e), 'err'); }
-        finally { btn.disabled = false; btn.textContent = o; }
-      });
-    }
+const gate = $('#adm-gate'), shell = $('#adm-shell');
 
-    async function load() {
-      const { data: deps, error } = await m.supabase
-        .from('deposits')
-        .select('id, quantity, amount_usdt, status, created_at, tier, network, node_operators(display_name, email, phone)')
-        .order('created_at', { ascending: false }).limit(50);
-      if (error) { meta.textContent = '오류: ' + error.message; return; }
-      const pending = deps.filter((d) => d.status === 'pending').length;
-      meta.textContent = `대기 ${pending}건 · 전체 ${deps.length}건`;
-      body.innerHTML = deps.length ? deps.map((d) => {
-        const op = d.node_operators || {};
-        const s = ST[d.status] || [d.status, ''];
-        const acts = d.status === 'pending'
-          ? `<div class="la-acts"><button class="la-ok" data-approve="${d.id}">승인</button><button class="la-no" data-reject="${d.id}">거절</button></div>`
-          : `<span class="appst ${s[1]}">${s[0]}</span>`;
-        return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone)}</span></div><div class="la-qty">${d.tier ? esc(d.tier) + ' · ' : ''}노드 <b>${d.quantity}</b>개 · ${Number(d.amount_usdt).toLocaleString()} USDT${d.network ? ' · <b>' + esc(d.network) + '</b>' : ''}</div>${acts}</div>`;
-      }).join('') : '<div class="la-empty">아직 신청이 없습니다.</div>';
-    }
-    async function setStatus(id, status) {
-      const { error } = await m.supabase.from('deposits').update({ status }).eq('id', id);
-      if (error) { window.toast && window.toast('실패: ' + error.message, 'err'); return; }
-      window.toast && window.toast(status === 'confirmed' ? '승인 완료 · 노드 생성됨' : '거절 처리됨');
-      load();
-    }
-    body.addEventListener('click', (e) => {
-      const a = e.target.closest('[data-approve]'), r = e.target.closest('[data-reject]');
-      if (a) setStatus(a.dataset.approve, 'confirmed');
-      else if (r) setStatus(r.dataset.reject, 'failed');
-    });
-    load();
-  }).catch(() => { panel.hidden = false; meta.textContent = '연결 실패'; });
+(async () => {
+  const session = await db.getSession().catch(() => null);
+  if (!session) { gate.innerHTML = '관리자 계정으로 <a href="login.html" style="color:var(--red-2)">로그인</a> 후 이용할 수 있습니다.'; return; }
+  const admin = await db.isAdmin().catch(() => false);
+  if (!admin) { gate.innerHTML = '이 계정은 <b>관리자 권한</b>이 없습니다.'; return; }
+  const prof = await db.getMyProfile().catch(() => null);
+  $('#adm-name').textContent = (prof && prof.display_name) || '운영자';
+  $('#adm-id').textContent = ((prof && prof.email) || '') + ' · 슈퍼관리자';
+  gate.hidden = true; shell.hidden = false;
+  boot();
 })();
+
+let CFG = null;
+const loaded = {};
+const loaders = {
+  overview: loadOverview, members: loadMembers, org: loadOrg, sales: loadSales,
+  withdraw: loadWithdraw, wallet: loadWallet, settle: loadSettle, notice: loadNotice,
+  rules: loadRules, token: loadToken, staking: loadStaking, sim: loadSim,
+  admins: loadAdmins, audit: loadAudit, exec: loadExec, recovery: loadRecovery,
+};
+
+function boot() {
+  $$('#admin-tabs .atab').forEach((b) => b.addEventListener('click', () => selectTab(b.dataset.tab)));
+  loadOverview(); loaded.overview = true;
+}
+function selectTab(tab) {
+  if (tab === 'logout') { db.signOut().then(() => location.href = 'index.html'); return; }
+  $$('#admin-tabs .atab').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+  $$('.apanel').forEach((p) => { p.hidden = p.dataset.panel !== tab; p.classList.toggle('on', p.dataset.panel === tab); });
+  if (loaders[tab] && !loaded[tab]) { loaded[tab] = true; loaders[tab](); }
+}
+async function cfg() { if (!CFG) CFG = await db.getTokenConfig(); return CFG; }
+
+/* ---------------- 개요 ---------------- */
+async function loadOverview() {
+  try {
+    const s = await db.adminStats(); CFG = s.cfg;
+    $('#o-nodes').textContent = fmt(s.cfg.nodes_sold || 0);
+    $('#o-cap').textContent = '/ ' + fmt(s.cfg.node_cap || 0);
+    $('#o-deposit').textContent = usd(s.depositTotal);
+    $('#o-pending').textContent = fmt(s.pendingApps);
+    $('#o-wd').textContent = fmt(s.pendingWithdrawals);
+    $('#o-ops').textContent = fmt(s.opCount);
+    $('#o-xont').textContent = fmt(s.cfg.xont_minted || 0);
+    $('#tc-sales').textContent = s.pendingApps; $('#tc-wd').textContent = s.pendingWithdrawals;
+    const todo = [];
+    if (s.pendingApps) todo.push({ ic:'i-inbox', t:`노드 신청 승인 대기 ${s.pendingApps}건`, go:'sales' });
+    if (s.pendingWithdrawals) todo.push({ ic:'i-dollar', t:`출금 승인 대기 ${s.pendingWithdrawals}건`, go:'withdraw' });
+    const recReq = await db.adminListResetRequests().catch(() => []);
+    const recPending = recReq.filter((r) => r.status === 'pending').length;
+    $('#tc-rec').textContent = recPending;
+    if (recPending) todo.push({ ic:'i-key', t:`비밀번호 복구 신청 ${recPending}건`, go:'recovery' });
+    $('#o-todo-n').textContent = todo.length + '건';
+    $('#o-todo').innerHTML = todo.length ? todo.map((x) => `<div class="la-row"><div class="la-who"><b><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#${x.ic}"/></svg> ${esc(x.t)}</b></div><button class="la-ok" data-go="${x.go}">이동</button></div>`).join('') : '<div class="la-empty">처리할 항목이 없습니다.</div>';
+    $$('#o-todo [data-go]').forEach((b) => b.addEventListener('click', () => selectTab(b.dataset.go)));
+    const audit = await db.adminListAudit().catch(() => []);
+    $('#o-audit').innerHTML = audit.length ? audit.slice(0, 8).map((a) => `<div class="la-row"><div class="la-who"><b>${esc(a.action)}</b><span>${esc(a.target_table || '')} ${esc(a.target_id || '')}</span></div><span style="color:#8a909b;font-size:12px">${dt(a.created_at)}</span></div>`).join('') : '<div class="la-empty">로그가 없습니다.</div>';
+  } catch (e) { toast('개요 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 회원 관리 ---------------- */
+let MEMBERS = [];
+async function loadMembers() {
+  try {
+    MEMBERS = await db.adminListOperators();
+    const active = MEMBERS.filter((m) => m.status !== 'suspended').length;
+    const nodes = MEMBERS.reduce((a, m) => a + (m.node_count || 0), 0);
+    $('#mem-stats').innerHTML = statCards([['총 회원', MEMBERS.length], ['활성', active], ['정지', MEMBERS.length - active], ['총 노드', nodes]]);
+    renderMembers();
+    $('#mem-q').addEventListener('input', renderMembers);
+  } catch (e) { toast('회원 로드 실패: ' + e.message, 'err'); }
+}
+function renderMembers() {
+  const q = ($('#mem-q').value || '').toLowerCase();
+  const rows = MEMBERS.filter((m) => !q || (m.display_name || '').toLowerCase().includes(q) || (m.email || '').toLowerCase().includes(q));
+  $('#mem-count').textContent = rows.length + '명';
+  $('#mem-body').innerHTML = rows.length ? rows.map((m) => {
+    const st = m.status === 'suspended' ? '<span class="appst err">정지</span>' : '<span class="appst ok">활성</span>';
+    return `<tr><td><b>${esc(m.display_name) || '—'}</b><div class="muted sm">${esc(m.email)}</div></td><td>${m.node_count}</td><td>${fmt2(m.xont_balance)}</td><td>${esc(m.kyc_status || '—')}</td><td>${day(m.created_at)}</td><td>${st}${m.is_admin ? ' <span class="appst" style="background:#3a2c14;color:#f0c04a">관리자</span>' : ''}</td><td class="ta-r"><button class="la-${m.status==='suspended'?'ok':'no'}" data-op="${m.id}" data-act="${m.status==='suspended'?'active':'suspended'}">${m.status==='suspended'?'해제':'정지'}</button></td></tr>`;
+  }).join('') : '<tr><td colspan="7" class="la-empty">회원이 없습니다.</td></tr>';
+  $$('#mem-body [data-op]').forEach((b) => b.addEventListener('click', async () => {
+    try { await db.adminUpdateOperator(b.dataset.op, { status: b.dataset.act }); toast('처리되었습니다'); const m = MEMBERS.find((x) => x.id === b.dataset.op); if (m) m.status = b.dataset.act; renderMembers(); }
+    catch (e) { toast('실패: ' + e.message, 'err'); }
+  }));
+}
+
+/* ---------------- 조직도 ---------------- */
+async function loadOrg() {
+  try {
+    const r = await db.adminListReferrals();
+    $('#org-meta').textContent = r.length + '건';
+    $('#org-body').innerHTML = r.length ? r.map((x) => `<tr><td><b>${esc(x.referrer?.display_name) || '—'}</b><div class="muted sm">${esc(x.referrer?.email||'')}</div></td><td>${x.level}단계</td><td>${esc(x.referee?.display_name) || '—'}<div class="muted sm">${esc(x.referee?.email||'')}</div></td><td>${fmt2(x.reward_xont)}</td><td>${day(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="5" class="la-empty">추천 내역이 없습니다.</td></tr>';
+  } catch (e) { toast('조직도 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 매출 승인 ---------------- */
+let DEPOSITS = [], salesFilter = 'all';
+async function loadSales() {
+  try { DEPOSITS = await db.adminListDeposits(); renderSales();
+    $$('#sales-filter button').forEach((b) => b.addEventListener('click', () => { $$('#sales-filter button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); salesFilter = b.dataset.f; renderSales(); }));
+  } catch (e) { toast('신청 로드 실패: ' + e.message, 'err'); }
+}
+function renderSales() {
+  const ST = { pending:['승인 대기','wait'], confirmed:['승인 완료','ok'], failed:['거절됨','err'] };
+  const rows = DEPOSITS.filter((d) => salesFilter === 'all' || d.status === salesFilter);
+  $('#sales-count').textContent = rows.length + '건';
+  $('#sales-body').innerHTML = rows.length ? rows.map((d) => {
+    const op = d.node_operators || {}; const s = ST[d.status] || [d.status, ''];
+    const acts = d.status === 'pending'
+      ? `<div class="la-acts"><button class="la-ok" data-approve="${d.id}">승인</button><button class="la-no" data-reject="${d.id}">거절</button></div>`
+      : `<span class="appst ${s[1]}">${s[0]}</span>`;
+    return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone||'')}</span></div><div class="la-qty">${d.tier ? esc(d.tier)+' · ' : ''}노드 <b>${d.quantity}</b>개 · ${fmt(d.amount_usdt)} USDT${d.network ? ' · <b>'+esc(d.network)+'</b>' : ''}</div>${acts}</div>`;
+  }).join('') : '<div class="la-empty">신청이 없습니다.</div>';
+  $$('#sales-body [data-approve]').forEach((b) => b.addEventListener('click', () => setDep(b.dataset.approve, 'confirmed')));
+  $$('#sales-body [data-reject]').forEach((b) => b.addEventListener('click', () => setDep(b.dataset.reject, 'failed')));
+}
+async function setDep(id, status) {
+  try { await db.adminSetDepositStatus(id, status); toast(status === 'confirmed' ? '승인 완료 · 노드 생성됨' : '거절 처리됨'); DEPOSITS = await db.adminListDeposits(); renderSales(); loaded.overview && loadOverview(); }
+  catch (e) { toast('실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 출금 ---------------- */
+let WD = [], wdFilter = 'all';
+async function loadWithdraw() {
+  try { WD = await db.adminListWithdrawals(); renderWd();
+    $$('#wd-filter button').forEach((b) => b.addEventListener('click', () => { $$('#wd-filter button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); wdFilter = b.dataset.f; renderWd(); }));
+  } catch (e) { toast('출금 로드 실패: ' + e.message, 'err'); }
+}
+function renderWd() {
+  const ST = { pending:['대기','wait'], approved:['승인','ok'], paid:['지급완료','ok'], rejected:['거절','err'] };
+  const rows = WD.filter((w) => wdFilter === 'all' || w.status === wdFilter);
+  $('#wd-count').textContent = rows.length + '건';
+  $('#wd-body').innerHTML = rows.length ? rows.map((w) => {
+    const op = w.node_operators || {}; const s = ST[w.status] || [w.status, ''];
+    const acts = w.status === 'pending' || w.status === 'approved'
+      ? `<div class="la-acts"><button class="la-ok" data-paid="${w.id}">지급완료</button><button class="la-no" data-rej="${w.id}">거절</button></div>`
+      : `<span class="appst ${s[1]}">${s[0]}</span>`;
+    return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(w.address||'주소 미기재')} ${w.network?'· '+esc(w.network):''}</span></div><div class="la-qty"><b>${fmt2(w.amount_xont)}</b> XONT${w.usd_equiv?' · $'+fmt2(w.usd_equiv):''}</div>${acts}</div>`;
+  }).join('') : '<div class="la-empty">출금 신청이 없습니다.</div>';
+  $$('#wd-body [data-paid]').forEach((b) => b.addEventListener('click', () => procWd(b.dataset.paid, 'paid')));
+  $$('#wd-body [data-rej]').forEach((b) => b.addEventListener('click', () => procWd(b.dataset.rej, 'rejected')));
+}
+async function procWd(id, status) {
+  try { await db.adminProcessWithdrawal(id, status); toast(status === 'paid' ? '지급완료 처리 · 잔액 차감됨' : '거절 처리됨'); WD = await db.adminListWithdrawals(); renderWd(); }
+  catch (e) { toast('실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 입금·지갑 ---------------- */
+async function loadWallet() {
+  try {
+    const a = await db.getDepositAddresses();
+    if (a) { $('#addr-tron').value = a.deposit_addr_tron || ''; $('#addr-evm').value = a.deposit_addr_evm || ''; }
+    $('#addr-save').addEventListener('click', async () => {
+      try { await db.adminUpdateConfig({ deposit_addr_tron: $('#addr-tron').value.trim(), deposit_addr_evm: $('#addr-evm').value.trim() }); toast('입금 주소가 저장되었습니다'); }
+      catch (e) { toast('실패: ' + e.message, 'err'); }
+    });
+    const tx = await db.adminListTransactions();
+    $('#tx-body').innerHTML = tx.length ? tx.map((t) => `<tr><td>${esc(t.kind)}</td><td>${esc(t.node_operators?.display_name || '—')}</td><td>${t.direction==='in'?'<span style="color:#5ee08a">입금</span>':'<span style="color:var(--red-2)">출금</span>'}</td><td>${fmt2(t.amount)}</td><td>${esc(t.counterparty||'—')}</td><td>${dt(t.created_at)}</td></tr>`).join('') : '<tr><td colspan="6" class="la-empty">원장이 비어 있습니다.</td></tr>';
+  } catch (e) { toast('지갑 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 정산관리 ---------------- */
+async function loadSettle() {
+  try {
+    const c = await cfg();
+    const cap = Number(c.node_cap || 50000), ads = Number(c.sim_ads_per_user || 10), krw = Number(c.ad_reward_krw || 20), share = Number(c.node_share_pct || 20) / 100;
+    // 예시 시청자 = platform_stats.viewers (있으면), 없으면 100만
+    const ps = await db.pingSupabase().catch(() => null);
+    const V = ps && ps.viewers ? Number(ps.viewers) : 1000000;
+    const dailyFiat = V * ads * krw, poolFiat = dailyFiat * share;
+    $('#settle-stats').innerHTML = statCards([['기준 시청자', fmt(V)], ['일 리워드 재원', won(dailyFiat)], ['노드풀(20%)/일', won(poolFiat)], ['노드풀/월', won(poolFiat * 30)]]);
+    const { data: rev } = await db.supabase.from('revenue_daily').select('*').order('day', { ascending: false }).limit(30);
+    $('#settle-body').innerHTML = (rev && rev.length) ? rev.map((r) => `<tr><td>${r.day}</td><td>${usd(r.ad_revenue||0)}</td><td>${usd(r.subscription_revenue||0)}</td><td class="r">${usd(r.node_pool_amount||0)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">일자별 매출 데이터가 없습니다.</td></tr>';
+  } catch (e) { toast('정산 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 공지 ---------------- */
+async function loadNotice() {
+  $('#ann-save').addEventListener('click', saveAnn);
+  $('#ann-new').addEventListener('click', () => { $('#ann-id').value=''; $('#ann-title').value=''; $('#ann-body').value=''; $('#ann-pin').checked=false; $('#ann-pub').checked=true; $('#ann-edit-tag').textContent='신규'; });
+  renderAnn();
+}
+async function renderAnn() {
+  try {
+    const list = await db.adminListAnnouncements();
+    $('#ann-count').textContent = list.length + '건';
+    $('#ann-body-list').innerHTML = list.length ? list.map((a) => `<div class="la-row"><div class="la-who"><b>${a.pinned?'📌 ':''}${esc(a.title)}</b><span>${a.published?'게시':'비공개'} · ${day(a.created_at)}</span></div><div class="la-acts"><button class="la-ok" data-edit="${a.id}">수정</button><button class="la-no" data-del="${a.id}">삭제</button></div></div>`).join('') : '<div class="la-empty">공지가 없습니다.</div>';
+    $$('#ann-body-list [data-edit]').forEach((b) => b.addEventListener('click', () => { const a = list.find((x) => x.id === b.dataset.edit); $('#ann-id').value=a.id; $('#ann-title').value=a.title; $('#ann-body').value=a.body||''; $('#ann-pin').checked=a.pinned; $('#ann-pub').checked=a.published; $('#ann-edit-tag').textContent='수정'; }));
+    $$('#ann-body-list [data-del]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminDeleteAnnouncement(b.dataset.del); toast('삭제됨'); renderAnn(); } catch (e) { toast('실패: '+e.message,'err'); } }));
+  } catch (e) { toast('공지 로드 실패: ' + e.message, 'err'); }
+}
+async function saveAnn() {
+  const title = $('#ann-title').value.trim(); if (!title) { toast('제목을 입력하세요','err'); return; }
+  try { await db.adminSaveAnnouncement({ id: $('#ann-id').value || undefined, title, body: $('#ann-body').value, pinned: $('#ann-pin').checked, published: $('#ann-pub').checked }); toast('저장되었습니다'); $('#ann-new').click(); renderAnn(); }
+  catch (e) { toast('실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 보상 규칙 ---------------- */
+async function loadRules() {
+  const c = await cfg();
+  $('#r-share').value=c.node_share_pct; $('#r-krw').value=c.ad_reward_krw; $('#r-ref').value=c.reference_price_krw;
+  $('#r-ads').value=c.sim_ads_per_user; $('#r-cap').value=c.node_cap; $('#r-l1').value=c.ref_l1_pct; $('#r-l2').value=c.ref_l2_pct;
+  $('#r-apy').value=c.staking_apy; $('#r-months').value=c.staking_months_default;
+  $('#rules-meta').textContent = `노드몫 ${c.node_share_pct}% · 기준가 ${c.reference_price_krw}원 · APY ${c.staking_apy}%`;
+  $('#rules-save').addEventListener('click', async () => {
+    const patch = { node_share_pct:+$('#r-share').value, ad_reward_krw:+$('#r-krw').value, reference_price_krw:+$('#r-ref').value, sim_ads_per_user:+$('#r-ads').value, node_cap:+$('#r-cap').value, ref_l1_pct:+$('#r-l1').value, ref_l2_pct:+$('#r-l2').value, staking_apy:+$('#r-apy').value, staking_months_default:+$('#r-months').value };
+    try { CFG = await db.adminUpdateConfig(patch); toast('규칙이 저장되었습니다'); } catch (e) { toast('실패: '+e.message,'err'); }
+  });
+}
+
+/* ---------------- 토큰 관리 ---------------- */
+async function loadToken() {
+  const c = await cfg();
+  $('#t-tonx-supply').textContent = fmt(c.tonx_total_supply || 0);
+  $('#t-tonx-mined').textContent = fmt(c.tonx_minted || 0);
+  $('#t-xont-supply').textContent = fmt(c.xont_minted || 0);
+  $('#t-xont-price-tag').textContent = '$' + (c.xont_price_usd || 0);
+  $('#t-xont-per').textContent = fmt(c.xont_per_1000_usd || 0);
+  $('#t-price').value = c.xont_price_usd; $('#t-per').value = c.xont_per_1000_usd;
+  $('#token-save').addEventListener('click', async () => {
+    try { CFG = await db.adminUpdateConfig({ xont_price_usd:+$('#t-price').value, xont_per_1000_usd:+$('#t-per').value }); toast('저장되었습니다'); loadToken(); } catch (e) { toast('실패: '+e.message,'err'); }
+  });
+}
+
+/* ---------------- 스테이킹 ---------------- */
+async function loadStaking() {
+  try {
+    const st = await db.adminListStakes();
+    const active = st.filter((s) => s.status === 'active');
+    const total = active.reduce((a, s) => a + Number(s.amount), 0);
+    $('#stk-stats').innerHTML = statCards([['총 스테이킹', st.length], ['활성', active.length], ['락업 XONT', fmt2(total)]]);
+    $('#stk-body').innerHTML = st.length ? st.map((s) => `<tr><td>${esc(s.node_operators?.display_name)||'—'}<div class="muted sm">${esc(s.node_operators?.email||'')}</div></td><td>${fmt2(s.amount)}</td><td>${s.months}개월</td><td>${s.apy}%</td><td>${day(s.started_at)}</td><td>${day(s.ends_at)}</td><td><span class="appst ${s.status==='active'?'ok':''}">${esc(s.status)}</span></td></tr>`).join('') : '<tr><td colspan="7" class="la-empty">스테이킹이 없습니다.</td></tr>';
+  } catch (e) { toast('스테이킹 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 보상 시뮬레이터 ---------------- */
+async function loadSim() {
+  const c = await cfg();
+  const paint = (V) => {
+    const cap = Number(c.node_cap||50000), ads=Number(c.sim_ads_per_user||10), krw=Number(c.ad_reward_krw||20), share=Number(c.node_share_pct||20)/100, ref=Number(c.reference_price_krw||100);
+    const perNodeFiat = V*ads*krw*share/cap;
+    $('#sim-out').innerHTML = statCards([['노드당 배당/월', won(perNodeFiat*30)], ['노드당 배당/년', won(perNodeFiat*365)], ['적립 TONX/년', fmt(perNodeFiat*365/ref)], ['상장 1,000원 시', won(perNodeFiat*365/ref*1000)]]);
+  };
+  $$('#sim-scen button').forEach((b) => b.addEventListener('click', () => { $$('#sim-scen button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); paint(+b.dataset.v); }));
+  paint(10000);
+}
+
+/* ---------------- 관리자 관리 ---------------- */
+let ADM = [];
+async function loadAdmins() {
+  try { ADM = await db.adminListOperators(); renderAdmins(); $('#adm-q').addEventListener('input', renderAdmins); }
+  catch (e) { toast('로드 실패: ' + e.message, 'err'); }
+}
+function renderAdmins() {
+  const q = ($('#adm-q').value || '').toLowerCase();
+  const rows = ADM.filter((m) => !q || (m.display_name||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q));
+  $('#adm-body').innerHTML = rows.map((m) => `<tr><td><b>${esc(m.display_name)||'—'}</b></td><td>${esc(m.email)}</td><td>${day(m.created_at)}</td><td>${m.is_admin?'<span class="appst ok">관리자</span>':'<span class="muted sm">일반</span>'}</td><td class="ta-r"><button class="la-${m.is_admin?'no':'ok'}" data-op="${m.id}" data-adm="${m.is_admin?'0':'1'}">${m.is_admin?'회수':'지정'}</button></td></tr>`).join('');
+  $$('#adm-body [data-op]').forEach((b) => b.addEventListener('click', async () => {
+    try { await db.adminUpdateOperator(b.dataset.op, { is_admin: b.dataset.adm === '1' }); toast('처리됨'); const m = ADM.find((x) => x.id === b.dataset.op); if (m) m.is_admin = b.dataset.adm === '1'; renderAdmins(); }
+    catch (e) { toast('실패: ' + e.message, 'err'); }
+  }));
+}
+
+/* ---------------- 감사 로그 ---------------- */
+async function loadAudit() {
+  try {
+    const a = await db.adminListAudit();
+    $('#audit-body').innerHTML = a.length ? a.map((x) => `<tr><td>${dt(x.created_at)}</td><td><b>${esc(x.action)}</b></td><td>${esc(x.target_table||'')} ${esc((x.target_id||'').slice(0,12))}</td><td class="muted sm">${esc(JSON.stringify(x.detail||{}))}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">로그가 없습니다.</td></tr>';
+  } catch (e) { toast('감사로그 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- 보상 실행 ---------------- */
+async function loadExec() {
+  try {
+    const ops = await db.adminListOperators();
+    $('#exec-op').innerHTML = ops.map((o) => `<option value="${o.id}">${esc(o.display_name||o.email)} (${fmt2(o.xont_balance)} XONT)</option>`).join('');
+    $('#exec-run').addEventListener('click', async () => {
+      const opId = $('#exec-op').value, amt = parseFloat($('#exec-amt').value) || 0;
+      if (amt <= 0) { toast('적립 XONT를 입력하세요','err'); return; }
+      try { await db.adminCreditReward(opId, amt, $('#exec-memo').value); toast(`${fmt2(amt)} XONT 적립 완료`); $('#exec-amt').value=''; renderExecLog(); }
+      catch (e) { toast('실패: ' + e.message, 'err'); }
+    });
+    renderExecLog();
+  } catch (e) { toast('로드 실패: ' + e.message, 'err'); }
+}
+async function renderExecLog() {
+  const tx = await db.adminListTransactions().catch(() => []);
+  const rw = tx.filter((t) => t.kind === 'reward').slice(0, 10);
+  $('#exec-log').innerHTML = rw.length ? rw.map((t) => `<div class="la-row"><div class="la-who"><b>${esc(t.node_operators?.display_name||'—')}</b><span>${dt(t.created_at)}</span></div><div class="la-qty">+${fmt2(t.amount)} XONT</div></div>`).join('') : '<div class="la-empty">보상 지급 내역이 없습니다.</div>';
+}
+
+/* ---------------- 계정 복구 ---------------- */
+async function loadRecovery() { renderRecovery(); $('#rec-copy').addEventListener('click', () => { navigator.clipboard.writeText($('#rec-link').textContent); toast('복사됨'); }); }
+async function renderRecovery() {
+  try {
+    const r = await db.adminListResetRequests();
+    const pending = r.filter((x) => x.status === 'pending').length;
+    $('#rec-count').textContent = pending + '건 대기'; $('#tc-rec').textContent = pending;
+    $('#rec-body').innerHTML = r.length ? r.map((x) => {
+      const st = { pending:['대기','wait'], done:['처리완료','ok'], rejected:['거절','err'] }[x.status] || [x.status,''];
+      const acts = x.status === 'pending' ? `<div class="la-acts"><button class="la-ok" data-rec="${x.id}" data-email="${esc(x.email||'')}">복구링크 생성</button><button class="la-no" data-rrej="${x.id}">거절</button></div>` : `<span class="appst ${st[1]}">${st[0]}</span>`;
+      return `<div class="la-row"><div class="la-who"><b>${esc(x.email||'—')}</b><span>${esc(x.node_operators?.display_name||'')} · ${dt(x.requested_at)}</span></div>${acts}</div>`;
+    }).join('') : '<div class="la-empty">복구 신청이 없습니다.</div>';
+    $$('#rec-body [data-rec]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true; b.textContent = '생성 중…';
+      try { const res = await db.adminRecoverPassword(b.dataset.email, b.dataset.rec); if (res && res.action_link) { $('#rec-link').textContent = res.action_link; $('#rec-link-box').hidden = false; } toast('복구 링크 생성됨 · 유저에게 전달'); renderRecovery(); }
+      catch (e) { toast('실패: ' + e.message, 'err'); b.disabled = false; b.textContent = '복구링크 생성'; }
+    }));
+    $$('#rec-body [data-rrej]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminSetResetStatus(b.dataset.rrej, 'rejected'); toast('거절됨'); renderRecovery(); } catch (e) { toast('실패: '+e.message,'err'); } }));
+  } catch (e) { toast('복구 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---------------- helper ---------------- */
+function statCards(pairs) { return pairs.map(([l, v]) => `<div class="ms"><div class="l">${esc(l)}</div><div class="v">${typeof v === 'number' ? fmt(v) : v}</div></div>`).join(''); }
 </script>
 </body>
 </html>
