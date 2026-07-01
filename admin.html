@@ -414,7 +414,7 @@
     async function load() {
       const { data: deps, error } = await m.supabase
         .from('deposits')
-        .select('id, quantity, amount_usdt, status, created_at, tier, node_operators(display_name, email, phone)')
+        .select('id, quantity, amount_usdt, status, created_at, tier, network, node_operators(display_name, email, phone)')
         .order('created_at', { ascending: false }).limit(50);
       if (error) { meta.textContent = '오류: ' + error.message; return; }
       const pending = deps.filter((d) => d.status === 'pending').length;
@@ -425,7 +425,7 @@
         const acts = d.status === 'pending'
           ? `<div class="la-acts"><button class="la-ok" data-approve="${d.id}">승인</button><button class="la-no" data-reject="${d.id}">거절</button></div>`
           : `<span class="appst ${s[1]}">${s[0]}</span>`;
-        return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone)}</span></div><div class="la-qty">${d.tier ? esc(d.tier) + ' · ' : ''}노드 <b>${d.quantity}</b>개 · ${Number(d.amount_usdt).toLocaleString()} USDT</div>${acts}</div>`;
+        return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone)}</span></div><div class="la-qty">${d.tier ? esc(d.tier) + ' · ' : ''}노드 <b>${d.quantity}</b>개 · ${Number(d.amount_usdt).toLocaleString()} USDT${d.network ? ' · <b>' + esc(d.network) + '</b>' : ''}</div>${acts}</div>`;
       }).join('') : '<div class="la-empty">아직 신청이 없습니다.</div>';
     }
     async function setStatus(id, status) {

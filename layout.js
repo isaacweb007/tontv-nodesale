@@ -9,7 +9,23 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-  const DEPOSIT_ADDRESS = 'TUgTV1NodeSa1eTreasuryDem0xXyZ12345'; // DEMO placeholder — replace in production
+  // USDT 수령 공개 주소 — 유저가 둘 중 하나의 네트워크를 선택해 입금
+  const CHAINS = {
+    tron: {
+      addr: 'TCEkL45cDG4MjGvmSab3zDfdnz8xeLYeVe',
+      net: 'USDT · TRC20 (TRON)', sub: '반드시 트론(TRC20) 네트워크로만 전송하세요', short: 'TRON', code: 'TRC20',
+      qr: 'assets/usdt-trc20-qr.svg', label: '입금 주소 (USDT · TRC20)',
+      hint: '트론 지갑(예: TronLink · OKX · Binance)에서 QR을 스캔하고 <b>정확히 위 금액</b>의 USDT를 전송하세요.',
+      warn: '<b>TRC20(트론) 네트워크의 USDT만</b> 보내세요. 다른 네트워크(ERC20·BEP20 등)로 전송 시 자산이 영구 소실될 수 있습니다.',
+    },
+    evm: {
+      addr: '0xB5FCc21c74DA0850a6248aBbC23455A3Af4D7E2e',
+      net: 'USDT · ERC20 / BEP20 (EVM)', sub: '이더리움(ERC20) 또는 BSC(BEP20) 네트워크로만 전송하세요', short: 'ETH · BSC', code: 'ERC20/BEP20',
+      qr: 'assets/usdt-evm-qr.svg', label: '입금 주소 (USDT · ERC20 / BEP20)',
+      hint: 'EVM 지갑(예: MetaMask · OKX · Binance)에서 QR을 스캔하고 <b>정확히 위 금액</b>의 USDT를 전송하세요.',
+      warn: '<b>ERC20(이더리움) 또는 BEP20(BSC) 네트워크의 USDT만</b> 보내세요. 트론(TRC20) 등 다른 네트워크로 전송 시 자산이 영구 소실될 수 있습니다.',
+    },
+  };
   const NODE_PRICE = 1000;
 
   /* ---------------- shared markup ---------------- */
@@ -123,7 +139,7 @@
     <div id="modal-step1">
       <div class="modal-head"><div class="topbar"></div>
         <button class="modal-x" data-close-modal aria-label="닫기"><svg class="icon"><use href="#i-x"/></svg></button>
-        <h3>톤티비 노드 신청</h3><p>USDT(TRC20)로 입금하면 노드 배정 후 XONT가 지급됩니다.</p></div>
+        <h3>톤티비 노드 신청</h3><p>USDT(TRC20 또는 ERC20/BEP20)로 입금하면 노드 배정 후 XONT가 지급됩니다.</p></div>
       <div class="modal-body">
         <div class="mlabel">신청 플랜 선택</div>
         <div class="tier-grid" id="tier-grid">
@@ -132,15 +148,20 @@
           <button class="tierchip" data-tier="max" data-price="3000" data-nodes="3"><div class="tt">맥스</div><div class="te">Max</div><div class="tp">$3,000</div><div class="tnd">노드 3개</div></button>
         </div>
         <div class="total-box"><div class="l">결제 금액<b id="total-tier">베이직 · 노드 1개</b></div><div class="amt"><span id="total-amt">1,000</span><span class="u">USDT</span></div></div>
-        <div class="net-badge"><div class="ic">₮</div><div class="nt"><b>USDT · TRC20 (TRON)</b><span>반드시 트론(TRC20) 네트워크로만 전송하세요</span></div><span class="tron">TRON</span></div>
-        <div class="qr-zone"><div class="qr"><img src="assets/usdt-trc20-qr.svg" alt="USDT TRC20 입금 주소 QR"></div>
-          <div class="qi"><div class="l">QR 스캔으로 간편 입금</div><div class="scan">트론 지갑(예: TronLink · OKX · Binance)에서 QR을 스캔하고 <b>정확히 위 금액</b>의 USDT를 전송하세요.</div></div></div>
-        <div class="addr-row"><div class="l">입금 주소 (USDT-TRC20)</div>
-          <div class="copy-field"><span class="val" id="dep-addr">${DEPOSIT_ADDRESS}</span><button class="cp" id="copy-addr">복사</button></div></div>
+        <div class="mlabel" style="margin-top:2px">입금 네트워크 선택</div>
+        <div class="chain-grid" id="chain-grid">
+          <button class="chainchip on" data-chain="tron"><div class="cn">TRON</div><div class="ce">USDT · TRC20</div></button>
+          <button class="chainchip" data-chain="evm"><div class="cn">Ethereum / BSC</div><div class="ce">USDT · ERC20 / BEP20</div></button>
+        </div>
+        <div class="net-badge"><div class="ic">₮</div><div class="nt"><b id="net-name">USDT · TRC20 (TRON)</b><span id="net-sub">반드시 트론(TRC20) 네트워크로만 전송하세요</span></div><span class="tron" id="net-short">TRON</span></div>
+        <div class="qr-zone"><div class="qr"><img id="dep-qr" src="assets/usdt-trc20-qr.svg" alt="USDT 입금 주소 QR"></div>
+          <div class="qi"><div class="l">QR 스캔으로 간편 입금</div><div class="scan" id="qr-hint">트론 지갑(예: TronLink · OKX · Binance)에서 QR을 스캔하고 <b>정확히 위 금액</b>의 USDT를 전송하세요.</div></div></div>
+        <div class="addr-row"><div class="l" id="addr-label">입금 주소 (USDT · TRC20)</div>
+          <div class="copy-field"><span class="val" id="dep-addr">${CHAINS.tron.addr}</span><button class="cp" id="copy-addr">복사</button></div></div>
         <div class="warn"><span class="i"><svg class="icon"><use href="#i-alert"/></svg></span>
-          <div><b>TRC20 네트워크의 USDT만</b> 보내세요. 다른 토큰/네트워크(ERC20·BEP20 등)로 전송 시 자산이 영구 소실될 수 있습니다.</div></div>
+          <div id="warn-text"><b>TRC20 네트워크의 USDT만</b> 보내세요. 다른 토큰/네트워크(ERC20·BEP20 등)로 전송 시 자산이 영구 소실될 수 있습니다.</div></div>
         <button class="btn btn-red btn-block btn-lg" id="confirm-deposit">입금을 완료했습니다 →</button>
-        <p class="demo-note">※ 데모용 안내입니다. 위 주소는 <b>예시(플레이스홀더)</b>이며 실제 송금하지 마세요. 정식 가동 시 검증된 운영 주소로 교체됩니다.</p>
+        <p class="demo-note">※ 선택한 <b>네트워크와 주소</b>를 반드시 확인하세요. 잘못된 네트워크로 전송된 자산은 복구할 수 없습니다. 입금은 취소·환불이 불가합니다.</p>
       </div>
     </div>
     <div id="modal-step2" style="display:none">
@@ -238,7 +259,7 @@
 
   /* ---------------- deposit modal ---------------- */
   const modal = $('#modal');
-  let qty = 1, selectedTier = 'basic';
+  let qty = 1, selectedTier = 'basic', selectedChain = 'tron';
   const fmt = n => Math.round(n).toLocaleString('en-US');
   const TIER_NAMES = { basic: '베이직', pro: '프로', max: '맥스' };
   const updateTotal = () => {
@@ -261,8 +282,26 @@
     $$('#tier-grid .tierchip').forEach(x => x.classList.remove('on')); c.classList.add('on');
     selectedTier = c.dataset.tier; updateTotal();
   }));
+
+  /* 입금 네트워크(체인) 선택 — 주소·QR·경고문 전환 */
+  const applyChain = () => {
+    const c = CHAINS[selectedChain]; if (!c) return;
+    $('#dep-addr') && ($('#dep-addr').textContent = c.addr);
+    $('#dep-qr') && ($('#dep-qr').src = c.qr);
+    $('#net-name') && ($('#net-name').textContent = c.net);
+    $('#net-sub') && ($('#net-sub').textContent = c.sub);
+    $('#net-short') && ($('#net-short').textContent = c.short);
+    $('#addr-label') && ($('#addr-label').textContent = c.label);
+    $('#qr-hint') && ($('#qr-hint').innerHTML = c.hint);
+    $('#warn-text') && ($('#warn-text').innerHTML = c.warn);
+  };
+  $$('#chain-grid .chainchip').forEach(c => c.addEventListener('click', () => {
+    $$('#chain-grid .chainchip').forEach(x => x.classList.remove('on')); c.classList.add('on');
+    selectedChain = c.dataset.chain; applyChain();
+  }));
+
   $('#copy-addr').addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(DEPOSIT_ADDRESS); }
+    try { await navigator.clipboard.writeText(CHAINS[selectedChain].addr); }
     catch { const r = document.createRange(); r.selectNode($('#dep-addr')); getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); getSelection().removeAllRanges(); }
     const b = $('#copy-addr'); b.innerHTML = '복사됨 <svg class="icon" style="width:12px;height:12px;vertical-align:-.1em"><use href="#i-check"/></svg>'; b.classList.add('done');
     window.toast('입금 주소가 복사되었습니다');
@@ -282,7 +321,7 @@
     const orig = btn.textContent; btn.disabled = true; btn.textContent = '신청 처리 중…';
     try {
       const m = await import('/lib/supabase.js');
-      await m.createNodeApplication({ tier: selectedTier });   // deposits에 pending 기록
+      await m.createNodeApplication({ tier: selectedTier, network: CHAINS[selectedChain].code });   // deposits에 pending 기록
       showDepositDone();
       window.toast && window.toast('노드 신청이 접수되었습니다 · 승인 대기');
     } catch (e) {
@@ -292,6 +331,7 @@
     }
   });
   updateTotal();
+  applyChain();
 
   /* ---------------- Unicorn Studio animated background (vanilla embed) ----------------
      Loads the official UMD script only when a [data-us-project] scene is on the page
