@@ -203,6 +203,31 @@
             </div>
             <button class="btn btn-red" id="rules-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 규칙 저장</button>
           </div>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 추천수당 (다단계 %)</h3><span class="tagx">단계별 추천 보상률</span></div>
+            <div class="atable-wrap"><table class="atable">
+              <thead><tr><th>단계</th><th>보상률(%)</th><th>라벨</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
+              <tbody id="cl-body"></tbody></table></div>
+            <div class="cfg-grid" style="margin-top:14px">
+              <div class="cfg-f"><label>단계</label><input class="inp" id="cl-level" type="number" placeholder="3"></div>
+              <div class="cfg-f"><label>보상률 (%)</label><input class="inp" id="cl-rate" type="number" step="0.1" placeholder="0"></div>
+              <div class="cfg-f"><label>라벨</label><input class="inp" id="cl-label" placeholder="예: 3단계"></div>
+            </div>
+            <button class="btn btn-red" id="cl-save" style="margin-top:6px">단계 추가/수정</button>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> 보너스 규칙</h3><span class="tagx" id="br-count">0개</span></div>
+            <div class="atable-wrap"><table class="atable">
+              <thead><tr><th>이름</th><th>종류</th><th>비율(%)</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
+              <tbody id="br-body"></tbody></table></div>
+            <div class="cfg-grid" style="margin-top:14px">
+              <div class="cfg-f"><label>이름</label><input class="inp" id="br-name" placeholder="예: 직급 달성 보너스"></div>
+              <div class="cfg-f"><label>종류</label><input class="inp" id="br-kind" placeholder="rank_bonus / matching / custom"></div>
+              <div class="cfg-f"><label>비율 (%)</label><input class="inp" id="br-rate" type="number" step="0.1" placeholder="0"></div>
+            </div>
+            <input type="hidden" id="br-id">
+            <div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-red" id="br-save">보너스 추가/수정</button><button class="btn btn-ghost-dark" id="br-new">새로</button></div>
+          </div>
         </section>
 
         <!-- 토큰 관리 -->
@@ -229,8 +254,31 @@
           </div>
         </section>
 
-        <!-- 직급 (준비중) -->
-        <section class="apanel" data-panel="rank" hidden><div class="ph-soon"><svg class="icon"><use href="#i-crown"/></svg><h3>직급 관리</h3><p>회원 직급/등급 체계는 다음 단계(P2)에서 설계·추가됩니다.</p></div></section>
+        <!-- 직급 관리 -->
+        <section class="apanel" data-panel="rank" hidden>
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-crown"/></svg></span> 직급 추가/편집</h3><span class="tagx" id="rank-edit-tag">신규</span></div>
+            <input type="hidden" id="rk-id">
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>직급명</label><input class="inp" id="rk-name" placeholder="예: 브론즈"></div>
+              <div class="cfg-f"><label>코드</label><input class="inp" id="rk-code" placeholder="bronze"></div>
+              <div class="cfg-f"><label>정렬 순서</label><input class="inp" id="rk-sort" type="number" value="0"></div>
+              <div class="cfg-f"><label>필요 노드 수</label><input class="inp" id="rk-nodes" type="number" value="0"></div>
+              <div class="cfg-f"><label>필요 직접추천</label><input class="inp" id="rk-refs" type="number" value="0"></div>
+              <div class="cfg-f"><label>필요 그룹 노드</label><input class="inp" id="rk-group" type="number" value="0"></div>
+              <div class="cfg-f"><label>보너스 (%)</label><input class="inp" id="rk-bonus" type="number" step="0.1" value="0"></div>
+              <div class="cfg-f"><label>색상</label><input class="inp" id="rk-color" type="color" value="#e8112d" style="height:44px;padding:4px"></div>
+            </div>
+            <div class="field"><label>혜택 설명</label><input class="inp" id="rk-benefits" placeholder="직급 혜택"></div>
+            <div style="display:flex;gap:10px"><button class="btn btn-red" id="rk-save">저장</button><button class="btn btn-ghost-dark" id="rk-new">새로 작성</button></div>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 직급 목록</h3><span class="tagx" id="rank-count">0개</span></div>
+            <div class="atable-wrap"><table class="atable">
+              <thead><tr><th>직급</th><th>필요 노드</th><th>필요 추천</th><th>보너스</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
+              <tbody id="rank-body"></tbody></table></div>
+          </div>
+        </section>
 
         <!-- 스테이킹 관리 -->
         <section class="apanel" data-panel="staking" hidden>
@@ -305,6 +353,24 @@
   </div>
 </section>
 
+<!-- 회원 상세 모달 -->
+<div class="adm-modal" id="mem-modal" hidden>
+  <div class="adm-modal-box">
+    <button class="modal-x" id="mem-close" aria-label="닫기"><svg class="icon"><use href="#i-x"/></svg></button>
+    <h3 id="mm-name" style="font-family:var(--font-display)">회원</h3>
+    <div class="mm-sub" id="mm-email">—</div>
+    <div class="mini-stats" id="mm-stats" style="margin:16px 0"></div>
+    <div class="mm-grid">
+      <div><div class="mm-h">직급 배정</div><div style="display:flex;gap:8px"><select class="inp" id="mm-rank"></select><button class="btn btn-red" id="mm-rank-save">배정</button></div></div>
+      <div><div class="mm-h">상위 (추천인)</div><div id="mm-upline" class="mm-box">—</div></div>
+    </div>
+    <div class="mm-h" style="margin-top:16px">하위 조직 (직속 <span id="mm-down-n">0</span>명)</div>
+    <div class="la-body" id="mm-downline"></div>
+    <div class="mm-h" style="margin-top:16px">노드 · 스테이킹</div>
+    <div id="mm-assets" class="mm-box"></div>
+  </div>
+</div>
+
 <script src="layout.js"></script>
 <script type="module">
 import * as db from './lib/supabase.js';
@@ -339,12 +405,14 @@ const loaded = {};
 const loaders = {
   overview: loadOverview, members: loadMembers, org: loadOrg, sales: loadSales,
   withdraw: loadWithdraw, wallet: loadWallet, settle: loadSettle, notice: loadNotice,
-  rules: loadRules, token: loadToken, staking: loadStaking, sim: loadSim,
+  rules: loadRules, token: loadToken, staking: loadStaking, sim: loadSim, rank: loadRank,
   admins: loadAdmins, audit: loadAudit, exec: loadExec, recovery: loadRecovery,
 };
 
 function boot() {
   $$('#admin-tabs .atab').forEach((b) => b.addEventListener('click', () => selectTab(b.dataset.tab)));
+  $('#mem-close').addEventListener('click', () => $('#mem-modal').hidden = true);
+  $('#mem-modal').addEventListener('click', (e) => { if (e.target.id === 'mem-modal') $('#mem-modal').hidden = true; });
   loadOverview(); loaded.overview = true;
 }
 function selectTab(tab) {
@@ -400,12 +468,13 @@ function renderMembers() {
   $('#mem-count').textContent = rows.length + '명';
   $('#mem-body').innerHTML = rows.length ? rows.map((m) => {
     const st = m.status === 'suspended' ? '<span class="appst err">정지</span>' : '<span class="appst ok">활성</span>';
-    return `<tr><td><b>${esc(m.display_name) || '—'}</b><div class="muted sm">${esc(m.email)}</div></td><td>${m.node_count}</td><td>${fmt2(m.xont_balance)}</td><td>${esc(m.kyc_status || '—')}</td><td>${day(m.created_at)}</td><td>${st}${m.is_admin ? ' <span class="appst" style="background:#3a2c14;color:#f0c04a">관리자</span>' : ''}</td><td class="ta-r"><button class="la-${m.status==='suspended'?'ok':'no'}" data-op="${m.id}" data-act="${m.status==='suspended'?'active':'suspended'}">${m.status==='suspended'?'해제':'정지'}</button></td></tr>`;
+    return `<tr><td><b>${esc(m.display_name) || '—'}</b><div class="muted sm">${esc(m.email)}</div></td><td>${m.node_count}</td><td>${fmt2(m.xont_balance)}</td><td>${esc(m.kyc_status || '—')}</td><td>${day(m.created_at)}</td><td>${st}${m.is_admin ? ' <span class="appst" style="background:#3a2c14;color:#f0c04a">관리자</span>' : ''}</td><td class="ta-r"><button class="la-ok" data-detail="${m.id}">상세</button> <button class="la-${m.status==='suspended'?'ok':'no'}" data-op="${m.id}" data-act="${m.status==='suspended'?'active':'suspended'}">${m.status==='suspended'?'해제':'정지'}</button></td></tr>`;
   }).join('') : '<tr><td colspan="7" class="la-empty">회원이 없습니다.</td></tr>';
   $$('#mem-body [data-op]').forEach((b) => b.addEventListener('click', async () => {
     try { await db.adminUpdateOperator(b.dataset.op, { status: b.dataset.act }); toast('처리되었습니다'); const m = MEMBERS.find((x) => x.id === b.dataset.op); if (m) m.status = b.dataset.act; renderMembers(); }
     catch (e) { toast('실패: ' + e.message, 'err'); }
   }));
+  $$('#mem-body [data-detail]').forEach((b) => b.addEventListener('click', () => openMember(b.dataset.detail)));
 }
 
 /* ---------------- 조직도 ---------------- */
@@ -530,6 +599,75 @@ async function loadRules() {
     const patch = { node_share_pct:+$('#r-share').value, ad_reward_krw:+$('#r-krw').value, reference_price_krw:+$('#r-ref').value, sim_ads_per_user:+$('#r-ads').value, node_cap:+$('#r-cap').value, ref_l1_pct:+$('#r-l1').value, ref_l2_pct:+$('#r-l2').value, staking_apy:+$('#r-apy').value, staking_months_default:+$('#r-months').value };
     try { CFG = await db.adminUpdateConfig(patch); toast('규칙이 저장되었습니다'); } catch (e) { toast('실패: '+e.message,'err'); }
   });
+  renderCL(); $('#cl-save').addEventListener('click', saveCL);
+  renderBR(); $('#br-save').addEventListener('click', saveBR);
+  $('#br-new').addEventListener('click', () => { $('#br-id').value=''; $('#br-name').value=''; $('#br-kind').value=''; $('#br-rate').value=''; });
+}
+async function renderCL() {
+  try {
+    const cl = await db.adminListCommissionLevels();
+    $('#cl-body').innerHTML = cl.length ? cl.map((c) => `<tr><td><b>${c.level}단계</b></td><td>${c.rate_pct}%</td><td>${esc(c.label||'')}</td><td>${c.active?'<span class="appst ok">활성</span>':'<span class="muted sm">off</span>'}</td><td class="ta-r"><button class="la-ok" data-cle="${c.level}" data-rate="${c.rate_pct}" data-label="${esc(c.label||'')}">수정</button><button class="la-no" data-cld="${c.level}">삭제</button></td></tr>`).join('') : '<tr><td colspan="5" class="la-empty">단계가 없습니다.</td></tr>';
+    $$('#cl-body [data-cle]').forEach((b) => b.addEventListener('click', () => { $('#cl-level').value=b.dataset.cle; $('#cl-rate').value=b.dataset.rate; $('#cl-label').value=b.dataset.label; }));
+    $$('#cl-body [data-cld]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminDeleteCommissionLevel(+b.dataset.cld); toast('삭제됨'); renderCL(); } catch (e) { toast('실패: '+e.message,'err'); } }));
+  } catch (e) { toast('추천수당 로드 실패: '+e.message,'err'); }
+}
+async function saveCL() {
+  const lv = parseInt($('#cl-level').value); if (!lv) { toast('단계를 입력하세요','err'); return; }
+  try { await db.adminSaveCommissionLevel({ level:lv, rate_pct:$('#cl-rate').value, label:$('#cl-label').value }); toast('저장됨'); $('#cl-level').value=''; $('#cl-rate').value=''; $('#cl-label').value=''; renderCL(); }
+  catch (e) { toast('실패: '+e.message,'err'); }
+}
+async function renderBR() {
+  try {
+    const br = await db.adminListBonusRules();
+    $('#br-count').textContent = br.length + '개';
+    $('#br-body').innerHTML = br.length ? br.map((b) => `<tr><td><b>${esc(b.name)}</b></td><td>${esc(b.kind)}</td><td>${b.rate_pct}%</td><td>${b.active?'<span class="appst ok">활성</span>':'<span class="muted sm">off</span>'}</td><td class="ta-r"><button class="la-ok" data-bre="${b.id}">수정</button><button class="la-no" data-brd="${b.id}">삭제</button></td></tr>`).join('') : '<tr><td colspan="5" class="la-empty">보너스 규칙이 없습니다.</td></tr>';
+    $$('#br-body [data-bre]').forEach((btn) => btn.addEventListener('click', () => { const b = br.find((x) => x.id === btn.dataset.bre); $('#br-id').value=b.id; $('#br-name').value=b.name; $('#br-kind').value=b.kind; $('#br-rate').value=b.rate_pct; }));
+    $$('#br-body [data-brd]').forEach((btn) => btn.addEventListener('click', async () => { try { await db.adminDeleteBonusRule(btn.dataset.brd); toast('삭제됨'); renderBR(); } catch (e) { toast('실패: '+e.message,'err'); } }));
+  } catch (e) { toast('보너스 로드 실패: '+e.message,'err'); }
+}
+async function saveBR() {
+  const name = $('#br-name').value.trim(); if (!name) { toast('이름을 입력하세요','err'); return; }
+  try { await db.adminSaveBonusRule({ id:$('#br-id').value||undefined, name, kind:$('#br-kind').value, rate_pct:$('#br-rate').value }); toast('저장됨'); $('#br-new').click(); renderBR(); }
+  catch (e) { toast('실패: '+e.message,'err'); }
+}
+
+/* ---------------- 직급 관리 ---------------- */
+let RANKS = [];
+function rankNew() { ['rk-id','rk-name','rk-code','rk-benefits'].forEach((i) => $('#'+i).value=''); ['rk-sort','rk-nodes','rk-refs','rk-group','rk-bonus'].forEach((i) => $('#'+i).value='0'); $('#rk-color').value='#e8112d'; $('#rank-edit-tag').textContent='신규'; }
+async function loadRank() { $('#rk-save').addEventListener('click', saveRank); $('#rk-new').addEventListener('click', rankNew); renderRanks(); }
+async function renderRanks() {
+  try {
+    RANKS = await db.adminListRanks();
+    $('#rank-count').textContent = RANKS.length + '개';
+    $('#rank-body').innerHTML = RANKS.length ? RANKS.map((r) => `<tr><td><b style="color:${esc(r.color)}">${esc(r.name)}</b></td><td>${r.min_nodes}</td><td>${r.min_referrals}</td><td>${r.bonus_pct}%</td><td>${r.active?'<span class="appst ok">활성</span>':'<span class="muted sm">off</span>'}</td><td class="ta-r"><button class="la-ok" data-red="${r.id}">수정</button><button class="la-no" data-rdel="${r.id}">삭제</button></td></tr>`).join('') : '<tr><td colspan="6" class="la-empty">직급이 없습니다. 오후에 입력할 직급을 여기서 추가하세요.</td></tr>';
+    $$('#rank-body [data-red]').forEach((b) => b.addEventListener('click', () => { const r = RANKS.find((x) => x.id === b.dataset.red); $('#rk-id').value=r.id; $('#rk-name').value=r.name; $('#rk-code').value=r.code||''; $('#rk-sort').value=r.sort_order; $('#rk-nodes').value=r.min_nodes; $('#rk-refs').value=r.min_referrals; $('#rk-group').value=r.min_group_nodes; $('#rk-bonus').value=r.bonus_pct; $('#rk-color').value=r.color||'#e8112d'; $('#rk-benefits').value=r.benefits||''; $('#rank-edit-tag').textContent='수정'; }));
+    $$('#rank-body [data-rdel]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminDeleteRank(b.dataset.rdel); toast('삭제됨'); renderRanks(); } catch (e) { toast('실패: '+e.message,'err'); } }));
+  } catch (e) { toast('직급 로드 실패: '+e.message,'err'); }
+}
+async function saveRank() {
+  const name = $('#rk-name').value.trim(); if (!name) { toast('직급명을 입력하세요','err'); return; }
+  try { await db.adminSaveRank({ id:$('#rk-id').value||undefined, name, code:$('#rk-code').value, sort_order:$('#rk-sort').value, min_nodes:$('#rk-nodes').value, min_referrals:$('#rk-refs').value, min_group_nodes:$('#rk-group').value, bonus_pct:$('#rk-bonus').value, color:$('#rk-color').value, benefits:$('#rk-benefits').value }); toast('저장됨'); rankNew(); renderRanks(); }
+  catch (e) { toast('실패: '+e.message,'err'); }
+}
+
+/* ---------------- 회원 상세 ---------------- */
+async function openMember(id) {
+  try {
+    const d = await db.adminOperatorDetail(id);
+    if (!d.op) { toast('회원 정보 없음','err'); return; }
+    $('#mm-name').textContent = d.op.display_name || '회원';
+    $('#mm-email').textContent = (d.op.email || '') + ' · ' + (d.op.phone || '');
+    const active = d.stakes.filter((s) => s.status === 'active').reduce((a, s) => a + Number(s.amount), 0);
+    $('#mm-stats').innerHTML = statCards([['노드', d.nodes.length], ['XONT 잔액', fmt2(d.balance)], ['스테이킹', fmt2(active)], ['직속 하위', d.downline.length]]);
+    if (!RANKS.length) RANKS = await db.adminListRanks().catch(() => []);
+    $('#mm-rank').innerHTML = '<option value="">직급 없음</option>' + RANKS.map((r) => `<option value="${r.id}" ${r.id === d.op.rank_id ? 'selected' : ''}>${esc(r.name)}</option>`).join('');
+    $('#mm-rank-save').onclick = async () => { try { await db.adminAssignRank(id, $('#mm-rank').value || null); toast('직급 배정됨'); } catch (e) { toast('실패: '+e.message,'err'); } };
+    $('#mm-upline').innerHTML = d.upline ? `<b>${esc(d.upline.display_name)||'—'}</b> · ${esc(d.upline.email||'')} <span class="muted sm">(${esc(d.upline.referral_code||'')})</span>` : '없음 (최상위)';
+    $('#mm-down-n').textContent = d.downline.length;
+    $('#mm-downline').innerHTML = d.downline.length ? d.downline.map((x) => `<div class="la-row"><div class="la-who"><b>${esc(x.display_name)||'—'}</b><span>${esc(x.email||'')} · ${day(x.created_at)}</span></div><span class="muted sm">${esc(x.referral_code||'')}</span></div>`).join('') : '<div class="la-empty">하위 조직이 없습니다.</div>';
+    $('#mm-assets').innerHTML = `노드 <b>${d.nodes.length}</b>개 · 스테이킹 <b>${d.stakes.length}</b>건 · 추천코드 <b>${esc(d.op.referral_code||'')}</b>`;
+    $('#mem-modal').hidden = false;
+  } catch (e) { toast('상세 로드 실패: '+e.message,'err'); }
 }
 
 /* ---------------- 토큰 관리 ---------------- */
