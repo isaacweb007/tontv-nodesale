@@ -50,7 +50,7 @@
   const show = (t, type) => { const m = $('#msg'); m.textContent = t; m.className = 'auth-msg show ' + type; };
 
   // 이미 로그인돼 있으면 대시보드로
-  getSession().then((s) => { if (s) location.replace('dashboard.html'); }).catch(() => {});
+  getSession().then((s) => { if (s) location.replace('myoffice.html'); }).catch(() => {});
 
   $('#auth-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -62,7 +62,7 @@
     try {
       await signIn({ email, password });
       show('로그인 성공! 대시보드로 이동합니다…', 'ok');
-      location.href = 'dashboard.html';
+      location.href = 'myoffice.html';
     } catch (err) {
       show(translateErr(err), 'err');
       btn.disabled = false; btn.textContent = orig;

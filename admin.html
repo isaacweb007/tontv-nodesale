@@ -61,6 +61,7 @@
         <button class="atab" data-tab="token"><svg class="icon"><use href="#i-coins"/></svg> <span>토큰 관리</span></button>
         <button class="atab" data-tab="rank"><svg class="icon"><use href="#i-crown"/></svg> <span>총판 센터장</span></button>
         <button class="atab" data-tab="staking"><svg class="icon"><use href="#i-lock"/></svg> <span>스테이킹 관리</span></button>
+        <button class="atab" data-tab="swap"><svg class="icon"><use href="#i-refresh"/></svg> <span>XONT↔TONX 스왑</span></button>
         <button class="atab" data-tab="sim"><svg class="icon"><use href="#i-trending"/></svg> <span>보상 시뮬레이터</span></button>
         <div class="atab-grp">운영</div>
         <button class="atab" data-tab="admins"><svg class="icon"><use href="#i-shield"/></svg> <span>관리자 관리</span></button>
@@ -165,11 +166,12 @@
         <!-- 출금 -->
         <section class="apanel" data-panel="withdraw" hidden>
           <div class="atoolbar">
-            <div class="aseg" id="wd-filter"><button class="on" data-f="all">전체</button><button data-f="pending">대기</button><button data-f="paid">지급완료</button><button data-f="rejected">거절</button></div>
+            <div class="aseg" id="wd-filter"><button class="on" data-f="all">전체</button><button data-f="pending">요청</button><button data-f="approved">승인</button><button data-f="paid">지급완료</button><button data-f="rejected">거절</button></div>
+            <div class="aseg sm" id="wd-type-filter"><button class="on" data-t="all">전체 타입</button><button data-t="commission">영업수당</button><button data-t="dividend">노드배당</button></div>
             <span class="acount" id="wd-count">0건</span>
           </div>
           <div class="la-body" id="wd-body"></div>
-          <p class="amini-desc" style="margin-top:12px"><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#i-alert"/></svg> 온체인 지급은 없습니다. 운영자가 앱 밖에서 전송 후 <b>지급완료</b>로 마킹하면 XONT 잔액이 차감·기록됩니다.</p>
+          <p class="amini-desc" style="margin-top:12px"><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#i-alert"/></svg> 온체인 지급은 없습니다. 운영자가 앱 밖에서 전송 후 <b>지급완료</b>로 마킹하면 잔액이 차감·기록됩니다. 흐름: 요청 → 승인 → 지급완료.</p>
         </section>
 
         <!-- 입금·지갑 관리 -->
@@ -241,11 +243,19 @@
             <div class="mini-stats" id="settle-stats"></div>
             <p class="amini-desc" style="margin-top:8px">배당은 <b>원(fiat) 기준</b>으로 산정합니다. 실제 XONT 적립은 <b>보상 실행</b> 탭에서 회원별로 처리합니다(온체인 없음).</p>
           </div>
-          <div class="dash-card">
+          <div class="dash-card" style="margin-bottom:20px">
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 일자별 매출·노드풀</h3><span class="tagx">revenue_daily</span></div>
             <div class="atable-wrap"><table class="atable">
               <thead><tr><th>일자</th><th>광고 매출</th><th>구독 매출</th><th>노드풀</th></tr></thead>
               <tbody id="settle-body"></tbody></table></div>
+          </div>
+          <div class="dash-card">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-users"/></svg></span> 회원별 영업수당 정산</h3><span class="tagx" id="comm-count">0명</span></div>
+            <div class="atoolbar"><div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="comm-q" placeholder="이름 · 이메일 검색"></div></div>
+            <p class="amini-desc" style="margin-bottom:12px">직접(1대) · 소개(2대) 영업수당은 <b>노드판매 배분</b> 탭의 비율(현재 1대 15% · 2대 5%)로 계산되며, 수당은 USDT로 지급됩니다. 잔액에서 출금을 등록하면 <b>출금관리</b> 탭에서 승인·지급 처리합니다.</p>
+            <div class="atable-wrap"><table class="atable">
+              <thead><tr><th>회원</th><th>본인매출</th><th>직접(1대)</th><th>소개(2대)</th><th>수당합계</th><th>기지급</th><th>잔액</th><th class="ta-r">출금 등록</th></tr></thead>
+              <tbody id="comm-body"></tbody></table></div>
           </div>
         </section>
 
@@ -325,9 +335,11 @@
             </div>
             <div class="dash-card">
               <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-server"/></svg></span> XONT (노드 토큰)</h3><span class="tagx" id="t-xont-price-tag">$0</span></div>
-              <div class="tk-stat"><div class="r1"><span>총 발행 상한</span><b id="t-xont-supply">0</b></div>
+              <div class="tk-stat"><div class="r1"><span>총 발행량</span><b id="t-xont-supply">0</b></div>
                 <div class="sbar"><i id="t-xont-bar" style="width:0%"></i></div>
-                <div class="r2" style="margin-top:8px"><span>누적 발행 <b id="t-xont-mined">0</b></span><span id="t-xont-pct">0%</span></div>
+                <div class="r2" style="margin-top:8px"><span>총지급수량 <b id="t-xont-mined">0</b></span><span id="t-xont-pct">0%</span></div>
+                <div class="r2" style="margin-top:6px"><span>잔여수량 <b id="t-xont-remain">0</b></span></div>
+                <div class="r2" style="margin-top:6px"><span>발행가 <b id="t-xont-priceval">$0</b> · 시가총액 <b id="t-xont-mcap">₩0</b></span></div>
                 <div class="r2" style="margin-top:6px"><span>노드당 $1,000 = <b id="t-xont-per">0</b> XONT · 플러스 <b class="r" id="t-xont-plus">+0%</b> · 프로 <b class="r" id="t-xont-pro">+0%</b> · 맥스 <b class="r" id="t-xont-max">+0%</b></span></div></div>
             </div>
           </div>
@@ -336,12 +348,22 @@
             <div class="cfg-grid">
               <div class="cfg-f"><label>XONT 시세 ($)</label><input class="inp" id="t-price" type="number" step="0.001"></div>
               <div class="cfg-f"><label>$1,000당 지급 XONT</label><input class="inp" id="t-per" type="number" step="1"></div>
-              <div class="cfg-f"><label>총 발행 상한</label><input class="inp" id="t-supply" type="number" step="1000000"></div>
+              <div class="cfg-f"><label>총 발행량</label><input class="inp" id="t-supply" type="number" step="1000000"></div>
               <div class="cfg-f"><label>플러스 보너스 (%)</label><input class="inp" id="t-plus" type="number" step="0.1"></div>
               <div class="cfg-f"><label>프로 보너스 (%)</label><input class="inp" id="t-pro" type="number" step="0.1"></div>
               <div class="cfg-f"><label>맥스 보너스 (%)</label><input class="inp" id="t-max" type="number" step="0.1"></div>
             </div>
             <button class="btn btn-red" id="token-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 저장</button>
+          </div>
+          <div class="dash-card" style="margin-top:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-lock"/></svg></span> Lock-up · Vesting 정책</h3><span class="tagx">기본 1년 락업 후 분할 해제</span></div>
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>락업 기간 (개월)</label><input class="inp" id="t-lockup" type="number" step="1"></div>
+              <div class="cfg-f"><label>베스팅 개월수</label><input class="inp" id="t-vestmonths" type="number" step="1"></div>
+              <div class="cfg-f" style="grid-column:span 2"><label>베스팅 스케줄 (% · 콤마 구분, 합계 100)</label><input class="inp" id="t-vestsched" placeholder="35,25,15,15,10"></div>
+            </div>
+            <button class="btn btn-red" id="token-vest-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 락업·베스팅 저장</button>
+            <p class="amini-desc" style="margin-top:10px">락업 종료 후 표시된 개월 수 동안 스케줄 비율대로 순차 해제됩니다. 시장 상황에 따라 기간·비율을 조정할 수 있습니다.</p>
           </div>
         </section>
 
@@ -363,9 +385,20 @@
         <!-- 스테이킹 관리 -->
         <section class="apanel" data-panel="staking" hidden>
           <div class="mini-stats" id="stk-stats"></div>
+          <p class="amini-desc" style="margin:-6px 0 14px">노드 구매 확정 시 원금의 10%(USDT 5%/월 + XONT 5%/월, 6개월)가 자동 생성됩니다. [이달 지급] 버튼으로 월별 지급을 처리하세요.</p>
           <div class="atable-wrap"><table class="atable">
-            <thead><tr><th>회원</th><th>원금 XONT</th><th>기간</th><th>APY</th><th>시작</th><th>만기</th><th>상태</th></tr></thead>
+            <thead><tr><th>회원</th><th>원금(USDT)</th><th>월 지급률</th><th>개월차</th><th>시작</th><th>만기</th><th>상태</th><th class="ta-r">지급</th></tr></thead>
             <tbody id="stk-body"></tbody></table></div>
+        </section>
+
+        <!-- XONT↔TONX 스왑 -->
+        <section class="apanel" data-panel="swap" hidden>
+          <div class="dash-card" style="margin-bottom:16px"><div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-refresh"/></svg></span> XONT → TONX 스왑 요청</h3><span class="tagx" id="swap-count">0건</span></div>
+            <p class="amini-desc">회원이 마이오피스에서 신청한 XONT→TONX 스왑 요청을 승인/거절하고, 완료 처리 시 XONT 잔액이 차감됩니다.</p>
+          </div>
+          <div class="atable-wrap"><table class="atable">
+            <thead><tr><th>회원</th><th>XONT 수량</th><th>비율</th><th>신청일</th><th>상태</th><th class="ta-r">처리</th></tr></thead>
+            <tbody id="swap-body"></tbody></table></div>
         </section>
 
         <!-- 보상 시뮬레이터 -->
@@ -517,7 +550,7 @@ const loaded = {};
 const loaders = {
   overview: loadOverview, members: loadMembers, org: loadOrg, sales: loadSales,
   withdraw: loadWithdraw, wallet: loadWallet, settle: loadSettle, notice: loadNotice, alloc: loadAllocations,
-  rules: loadRules, token: loadToken, staking: loadStaking, sim: loadSim, rank: loadRank,
+  rules: loadRules, token: loadToken, staking: loadStaking, swap: loadSwap, sim: loadSim, rank: loadRank,
   admins: loadAdmins, audit: loadAudit, exec: loadExec, recovery: loadRecovery,
 };
 
@@ -892,28 +925,34 @@ async function setDep(id, status) {
 }
 
 /* ---------------- 출금 ---------------- */
-let WD = [], wdFilter = 'all';
+let WD = [], wdFilter = 'all', wdTypeFilter = 'all';
 async function loadWithdraw() {
   try { WD = await db.adminListWithdrawals(); renderWd();
     $$('#wd-filter button').forEach((b) => b.addEventListener('click', () => { $$('#wd-filter button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); wdFilter = b.dataset.f; renderWd(); }));
+    $$('#wd-type-filter button').forEach((b) => b.addEventListener('click', () => { $$('#wd-type-filter button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); wdTypeFilter = b.dataset.t; renderWd(); }));
   } catch (e) { toast('출금 로드 실패: ' + e.message, 'err'); }
 }
 function renderWd() {
-  const ST = { pending:['대기','wait'], approved:['승인','ok'], paid:['지급완료','ok'], rejected:['거절','err'] };
-  const rows = WD.filter((w) => wdFilter === 'all' || w.status === wdFilter);
+  const ST = { pending:['요청','wait'], approved:['승인','ok'], paid:['지급완료','ok'], rejected:['거절','err'] };
+  const WT = { commission: '영업수당', dividend: '노드배당' };
+  const rows = WD.filter((w) => (wdFilter === 'all' || w.status === wdFilter) && (wdTypeFilter === 'all' || w.wtype === wdTypeFilter));
   $('#wd-count').textContent = rows.length + '건';
   $('#wd-body').innerHTML = rows.length ? rows.map((w) => {
     const op = w.node_operators || {}; const s = ST[w.status] || [w.status, ''];
-    const acts = w.status === 'pending' || w.status === 'approved'
-      ? `<div class="la-acts"><button class="la-ok" data-paid="${w.id}">지급완료</button><button class="la-no" data-rej="${w.id}">거절</button></div>`
-      : `<span class="appst ${s[1]}">${s[0]}</span>`;
-    return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(w.address||'주소 미기재')} ${w.network?'· '+esc(w.network):''}</span></div><div class="la-qty"><b>${fmt2(w.amount_xont)}</b> XONT${w.usd_equiv?' · $'+fmt2(w.usd_equiv):''}</div>${acts}</div>`;
+    let acts;
+    if (w.status === 'pending') acts = `<div class="la-acts"><button class="la-ok" data-approve="${w.id}">승인</button><button class="la-no" data-rej="${w.id}">거절</button></div>`;
+    else if (w.status === 'approved') acts = `<div class="la-acts"><button class="la-ok" data-paid="${w.id}">지급완료</button><button class="la-no" data-rej="${w.id}">거절</button></div>`;
+    else acts = `<span class="appst ${s[1]}">${s[0]}</span>`;
+    const amountLabel = w.wtype === 'commission' ? '$' + fmt2(w.usd_equiv) : fmt2(w.amount_xont) + ' XONT' + (w.usd_equiv ? ' · $' + fmt2(w.usd_equiv) : '');
+    return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${WT[w.wtype] || w.wtype || ''} · 신청 ${day(w.requested_at)} · ${esc(w.address||'주소 미기재')} ${w.network?'· '+esc(w.network):''}</span></div><div class="la-qty"><b>${amountLabel}</b></div>${acts}</div>`;
   }).join('') : '<div class="la-empty">출금 신청이 없습니다.</div>';
+  $$('#wd-body [data-approve]').forEach((b) => b.addEventListener('click', () => procWd(b.dataset.approve, 'approved')));
   $$('#wd-body [data-paid]').forEach((b) => b.addEventListener('click', () => procWd(b.dataset.paid, 'paid')));
   $$('#wd-body [data-rej]').forEach((b) => b.addEventListener('click', () => procWd(b.dataset.rej, 'rejected')));
 }
 async function procWd(id, status) {
-  try { await db.adminProcessWithdrawal(id, status); toast(status === 'paid' ? '지급완료 처리 · 잔액 차감됨' : '거절 처리됨'); WD = await db.adminListWithdrawals(); renderWd(); }
+  const msg = { approved: '승인 처리되었습니다', paid: '지급완료 처리되었습니다', rejected: '거절 처리되었습니다' }[status] || '처리되었습니다';
+  try { await db.adminProcessWithdrawal(id, status); toast(msg); WD = await db.adminListWithdrawals(); renderWd(); }
   catch (e) { toast('실패: ' + e.message, 'err'); }
 }
 
@@ -944,6 +983,35 @@ async function loadSettle() {
     const { data: rev } = await db.supabase.from('revenue_daily').select('*').order('day', { ascending: false }).limit(30);
     $('#settle-body').innerHTML = (rev && rev.length) ? rev.map((r) => `<tr><td>${r.day}</td><td>${usd(r.ad_revenue||0)}</td><td>${usd(r.subscription_revenue||0)}</td><td class="r">${usd(r.node_pool_amount||0)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">일자별 매출 데이터가 없습니다.</td></tr>';
   } catch (e) { toast('정산 로드 실패: ' + e.message, 'err'); }
+  try {
+    COMM = await db.adminSettlementByMember();
+    renderCommissions();
+    $('#comm-q').addEventListener('input', renderCommissions);
+  } catch (e) { toast('수당 정산 로드 실패: ' + e.message, 'err'); }
+}
+let COMM = [];
+function renderCommissions() {
+  const q = ($('#comm-q').value || '').toLowerCase();
+  const rows = COMM.filter((r) => !q || (r.display_name||'').toLowerCase().includes(q) || (r.email||'').toLowerCase().includes(q));
+  $('#comm-count').textContent = rows.length + '명';
+  $('#comm-body').innerHTML = rows.length ? rows.map((r) => `<tr>
+    <td><b>${esc(r.display_name)||'—'}</b><div class="muted sm">${esc(r.email||'')}</div></td>
+    <td>$${fmt(r.own_sales_usdt)}</td>
+    <td>$${fmt2(r.direct_commission_usdt)}<div class="muted sm">매출 $${fmt(r.direct_sales_usdt)}</div></td>
+    <td>$${fmt2(r.level2_commission_usdt)}<div class="muted sm">매출 $${fmt(r.level2_sales_usdt)}</div></td>
+    <td class="r">$${fmt2(r.total_commission_usdt)}</td>
+    <td>$${fmt2(r.paid_commission_usdt)}</td>
+    <td class="r">$${fmt2(r.balance_commission_usdt)}</td>
+    <td class="ta-r"><input class="inp" style="width:90px;display:inline-block;padding:8px 10px;font-size:12px" type="number" step="0.01" id="comm-amt-${r.operator_id}" placeholder="금액"> <button class="la-ok" data-req="${r.operator_id}">등록</button></td>
+  </tr>`).join('') : '<tr><td colspan="8" class="la-empty">정산 대상 회원이 없습니다.</td></tr>';
+  $$('#comm-body [data-req]').forEach((b) => b.addEventListener('click', async () => {
+    const opId = b.dataset.req;
+    const amtInput = $('#comm-amt-' + opId);
+    const amt = Number(amtInput.value);
+    if (!amt || amt <= 0) { toast('출금 등록할 금액을 입력하세요', 'err'); return; }
+    try { await db.adminRequestCommissionWithdrawal(opId, amt); toast('출금 요청이 등록되었습니다 · 출금관리 탭에서 처리'); amtInput.value = ''; }
+    catch (e) { toast('실패: ' + e.message, 'err'); }
+  }));
 }
 
 /* ---------------- 공지 ---------------- */
@@ -1215,13 +1283,19 @@ async function openMember(id) {
       dwFin('보상 누적', fmt2(f.rewardXont)),
       dwFin('스테이킹 락업', fmt2(f.stakedActive)),
       dwFin('누적 입금(확정)', '$' + fmt(f.depositUsdt)),
+      dwFin('TONX 보상수량', '없음'),
     ].join('');
 
     $('#mm-nodes-n').textContent = d.nodes.length;
     $('#mm-nodes').innerHTML = d.nodes.length ? d.nodes.slice(0, 60).map((n) => dwRow('노드', (n.status === 'active' ? '가동중' : '대기') + ' · $' + fmt(n.price_usdt), day(n.purchased_at))).join('') : dwEmpty('노드가 없습니다.');
 
     $('#mm-stk-n').textContent = d.stakes.length;
-    $('#mm-stakes').innerHTML = d.stakes.length ? d.stakes.map((s) => dwRow(fmt2(s.amount) + ' XONT', s.months + '개월 · 연 ' + s.apy + '%', (s.status === 'active' ? '만기 ' + day(s.ends_at) : s.status), s.status === 'active' ? 'pos' : '')).join('') : dwEmpty('스테이킹이 없습니다.');
+    $('#mm-stakes').innerHTML = d.stakes.length ? d.stakes.map((s) => {
+      const rate = 'USDT ' + (s.usdt_rate_pct || 0) + '%/월 · XONT ' + (s.xont_rate_pct || 0) + '%/월';
+      const progress = (s.months_paid || 0) + '/' + (s.payout_months || s.months) + '개월차';
+      const principal = s.principal_usdt ? '$' + fmt(s.principal_usdt) + ' 원금' : fmt2(s.amount) + ' XONT';
+      return dwRow(principal + ' · ' + rate, progress + ' · 만기 ' + day(s.ends_at), s.status === 'active' ? '진행중' : (s.status === 'completed' ? '만기완료' : s.status), s.status === 'active' ? 'pos' : '');
+    }).join('') : dwEmpty('스테이킹이 없습니다.');
 
     $('#mm-deposits').innerHTML = d.deposits.length ? d.deposits.map((x) => dwRow((x.tier ? esc(x.tier) + ' · ' : '') + '노드 ' + x.quantity + '개', fmt(x.amount_usdt) + ' USDT · ' + esc(x.network || ''), depSt(x.status))).join('') : dwEmpty('입금 내역이 없습니다.');
 
@@ -1240,34 +1314,82 @@ async function loadToken() {
   $('#token-save').addEventListener('click', async () => {
     try { CFG = await db.adminUpdateConfig({ xont_price_usd:+$('#t-price').value, xont_per_1000_usd:+$('#t-per').value, xont_total_supply:+$('#t-supply').value, xont_bonus_plus_pct:+$('#t-plus').value, xont_bonus_pro_pct:+$('#t-pro').value, xont_bonus_max_pct:+$('#t-max').value }); toast('저장되었습니다'); paintToken(CFG); } catch (e) { toast('실패: '+e.message,'err'); }
   });
+  $('#token-vest-save').addEventListener('click', async () => {
+    const sched = $('#t-vestsched').value.split(',').map((x) => Number(x.trim())).filter((x) => !isNaN(x));
+    const sum = sched.reduce((a, b) => a + b, 0);
+    if (!sched.length || Math.round(sum) !== 100) { toast('베스팅 스케줄 합계는 100이어야 합니다 (현재 ' + sum + ')', 'err'); return; }
+    try {
+      CFG = await db.adminUpdateConfig({ xont_lockup_months: +$('#t-lockup').value, xont_vesting_months: +$('#t-vestmonths').value, xont_vesting_schedule: sched });
+      toast('락업·베스팅 정책이 저장되었습니다'); paintToken(CFG);
+    } catch (e) { toast('실패: ' + e.message, 'err'); }
+  });
 }
 function paintToken(c) {
   $('#t-tonx-supply').textContent = fmt(c.tonx_total_supply || 0);
   $('#t-tonx-mined').textContent = fmt(c.tonx_minted || 0);
   const supply = Number(c.xont_total_supply || 0), minted = Number(c.xont_minted || 0);
   const pct = supply > 0 ? (minted / supply * 100) : 0;
+  const price = Number(c.xont_price_usd || 0), krwRate = Number(c.krw_per_usd || 0);
   $('#t-xont-supply').textContent = fmt(supply);
   $('#t-xont-mined').textContent = fmt(minted);
+  $('#t-xont-remain').textContent = fmt(Math.max(0, supply - minted));
   $('#t-xont-pct').textContent = pct.toFixed(2) + '%';
   $('#t-xont-bar').style.width = Math.min(100, pct) + '%';
-  $('#t-xont-price-tag').textContent = '$' + (c.xont_price_usd || 0);
+  $('#t-xont-price-tag').textContent = '$' + price;
+  $('#t-xont-priceval').textContent = '$' + price;
+  $('#t-xont-mcap').textContent = won(supply * price * krwRate);
   $('#t-xont-per').textContent = fmt(c.xont_per_1000_usd || 0);
   $('#t-xont-plus').textContent = '+' + (c.xont_bonus_plus_pct || 0) + '%';
   $('#t-xont-pro').textContent = '+' + (c.xont_bonus_pro_pct || 0) + '%';
   $('#t-xont-max').textContent = '+' + (c.xont_bonus_max_pct || 0) + '%';
   $('#t-price').value = c.xont_price_usd; $('#t-per').value = c.xont_per_1000_usd;
   $('#t-supply').value = c.xont_total_supply; $('#t-plus').value = c.xont_bonus_plus_pct; $('#t-pro').value = c.xont_bonus_pro_pct; $('#t-max').value = c.xont_bonus_max_pct;
+  $('#t-lockup').value = c.xont_lockup_months; $('#t-vestmonths').value = c.xont_vesting_months;
+  $('#t-vestsched').value = Array.isArray(c.xont_vesting_schedule) ? c.xont_vesting_schedule.join(',') : '';
 }
 
 /* ---------------- 스테이킹 ---------------- */
 async function loadStaking() {
   try {
     const st = await db.adminListStakes();
-    const active = st.filter((s) => s.status === 'active');
-    const total = active.reduce((a, s) => a + Number(s.amount), 0);
-    $('#stk-stats').innerHTML = statCards([['총 스테이킹', st.length], ['활성', active.length], ['락업 XONT', fmt2(total)]]);
-    $('#stk-body').innerHTML = st.length ? st.map((s) => `<tr><td>${esc(s.node_operators?.display_name)||'—'}<div class="muted sm">${esc(s.node_operators?.email||'')}</div></td><td>${fmt2(s.amount)}</td><td>${s.months}개월</td><td>${s.apy}%</td><td>${day(s.started_at)}</td><td>${day(s.ends_at)}</td><td><span class="appst ${s.status==='active'?'ok':''}">${esc(s.status)}</span></td></tr>`).join('') : '<tr><td colspan="7" class="la-empty">스테이킹이 없습니다.</td></tr>';
+    renderStaking(st);
   } catch (e) { toast('스테이킹 로드 실패: ' + e.message, 'err'); }
+}
+function renderStaking(st) {
+  const active = st.filter((s) => s.status === 'active');
+  const totalPrincipal = active.reduce((a, s) => a + Number(s.principal_usdt || 0), 0);
+  $('#stk-stats').innerHTML = statCards([['총 스테이킹', st.length], ['활성', active.length], ['원금 합계(USDT)', '$' + fmt(totalPrincipal)]]);
+  $('#stk-body').innerHTML = st.length ? st.map((s) => {
+    const monthsPaid = s.months_paid || 0, payoutMonths = s.payout_months || s.months;
+    const canPay = s.status === 'active' && monthsPaid < payoutMonths;
+    return `<tr><td>${esc(s.node_operators?.display_name)||'—'}<div class="muted sm">${esc(s.node_operators?.email||'')}</div></td><td>$${fmt(s.principal_usdt||0)}</td><td>USDT ${s.usdt_rate_pct||0}%· XONT ${s.xont_rate_pct||0}%</td><td>${monthsPaid}/${payoutMonths}개월</td><td>${day(s.started_at)}</td><td>${day(s.ends_at)}</td><td><span class="appst ${s.status==='active'?'ok':''}">${esc(s.status)}</span></td><td class="ta-r">${canPay ? `<button class="la-ok" data-pay="${s.id}">이달 지급</button>` : '—'}</td></tr>`;
+  }).join('') : '<tr><td colspan="8" class="la-empty">스테이킹이 없습니다.</td></tr>';
+  $$('#stk-body [data-pay]').forEach((b) => b.addEventListener('click', async () => {
+    try { await db.adminPayStakeMonth(b.dataset.pay); toast('이달 지급 처리되었습니다'); renderStaking(await db.adminListStakes()); }
+    catch (e) { toast('실패: ' + e.message, 'err'); }
+  }));
+}
+
+/* ---------------- XONT↔TONX 스왑 ---------------- */
+async function loadSwap() {
+  try { renderSwap(await db.adminListSwaps()); } catch (e) { toast('스왑 로드 실패: ' + e.message, 'err'); }
+}
+function renderSwap(rows) {
+  const ST = { pending:['대기','wait'], approved:['승인','ok'], done:['완료','ok'], rejected:['거절','err'] };
+  $('#swap-count').textContent = rows.length + '건';
+  $('#swap-body').innerHTML = rows.length ? rows.map((s) => {
+    const op = s.node_operators || {}; const st = ST[s.status] || [s.status, ''];
+    const acts = s.status === 'pending'
+      ? `<button class="la-ok" data-approve="${s.id}">승인</button> <button class="la-no" data-rej="${s.id}">거절</button>`
+      : s.status === 'approved'
+      ? `<button class="la-ok" data-done="${s.id}">완료 처리</button>`
+      : `<span class="appst ${st[1]}">${st[0]}</span>`;
+    return `<tr><td>${esc(op.display_name)||'—'}<div class="muted sm">${esc(op.email||'')}</div></td><td>${fmt2(s.amount_xont)}</td><td>${s.ratio||'—'}</td><td>${day(s.requested_at)}</td><td><span class="appst ${st[1]}">${st[0]}</span></td><td class="ta-r">${acts}</td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="la-empty">스왑 요청이 없습니다.</td></tr>';
+  const reload = async () => renderSwap(await db.adminListSwaps());
+  $$('#swap-body [data-approve]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminProcessSwap(b.dataset.approve, 'approved'); toast('승인되었습니다'); reload(); } catch (e) { toast('실패: ' + e.message, 'err'); } }));
+  $$('#swap-body [data-rej]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminProcessSwap(b.dataset.rej, 'rejected'); toast('거절되었습니다'); reload(); } catch (e) { toast('실패: ' + e.message, 'err'); } }));
+  $$('#swap-body [data-done]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminProcessSwap(b.dataset.done, 'done'); toast('완료 처리 · XONT 차감됨'); reload(); } catch (e) { toast('실패: ' + e.message, 'err'); } }));
 }
 
 /* ---------------- 보상 시뮬레이터 ---------------- */

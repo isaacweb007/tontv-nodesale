@@ -68,7 +68,7 @@
   const $ = (s) => document.querySelector(s);
   const show = (t, type) => { const m = $('#msg'); m.textContent = t; m.className = 'auth-msg show ' + type; };
 
-  getSession().then((s) => { if (s) location.replace('dashboard.html'); }).catch(() => {});
+  getSession().then((s) => { if (s) location.replace('myoffice.html'); }).catch(() => {});
 
   $('#auth-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -87,7 +87,7 @@
     try {
       await signUpOperator({ name, contact, email, password, phone, referralCode });
       show('가입 완료! 대시보드로 이동합니다…', 'ok');
-      location.href = 'dashboard.html';
+      location.href = 'myoffice.html';
     } catch (err) {
       show(translateErr(err), 'err');
       btn.disabled = false; btn.textContent = orig;

@@ -102,7 +102,6 @@
       <a href="content.html" data-page="content">콘텐츠</a>
       <a href="blog.html" data-page="blog">블로그</a>
       <a href="resources.html" data-page="resources">자료실</a>
-      <a href="dashboard.html" data-page="dashboard">대시보드</a>
       <a href="myoffice.html" data-page="myoffice">마이오피스</a>
       <a href="login.html" data-page="login" id="nav-auth">로그인</a>
       <a href="admin.html" data-page="admin" class="nav-admin"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg> 어드민</a>
@@ -123,7 +122,7 @@
         <div class="fcol"><h5>둘러보기</h5>
           <a href="about.html">톤티비 소개</a><a href="content.html">콘텐츠</a>
           <a href="blog.html">블로그</a><a href="resources.html">자료실</a>
-          <a href="node.html">노드 세일</a><a href="dashboard.html">대시보드</a></div>
+          <a href="node.html">노드 세일</a><a href="myoffice.html">마이오피스</a></div>
         <div class="fcol"><h5>노드 세일</h5>
           <a href="#" data-open-modal>노드 신청하기</a><a href="node.html#staking">스테이킹</a>
           <a href="node.html#roadmap">로드맵</a><a href="node.html#risk">리스크 고지</a></div>
@@ -181,7 +180,7 @@
           <div class="rr"><span class="k">예상 XONT 지급</span><span class="v"><span id="rec-xont">1,000</span> XONT</span></div>
           <div class="rr"><span class="k">가동 시점</span><span class="v">2026. 9</span></div>
         </div>
-        <a class="btn btn-dark btn-block" href="dashboard.html" data-close-modal>내 대시보드 보기 →</a>
+        <a class="btn btn-dark btn-block" href="myoffice.html" data-close-modal>내 마이오피스 보기 →</a>
       </div></div>
     </div></div></div>`;
 
