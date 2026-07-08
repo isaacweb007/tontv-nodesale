@@ -356,7 +356,7 @@
             <button class="btn btn-red" id="token-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 저장</button>
           </div>
           <div class="dash-card" style="margin-top:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-lock"/></svg></span> Lock-up · Vesting 정책</h3><span class="tagx">기본 1년 락업 후 분할 해제</span></div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-lock"/></svg></span> Lock-up · Vesting 정책</h3><span class="tagx">기본 6개월 락업 후 분할 해제</span></div>
             <div class="cfg-grid">
               <div class="cfg-f"><label>락업 기간 (개월)</label><input class="inp" id="t-lockup" type="number" step="1"></div>
               <div class="cfg-f"><label>베스팅 개월수</label><input class="inp" id="t-vestmonths" type="number" step="1"></div>
@@ -385,7 +385,7 @@
         <!-- 스테이킹 관리 -->
         <section class="apanel" data-panel="staking" hidden>
           <div class="mini-stats" id="stk-stats"></div>
-          <p class="amini-desc" style="margin:-6px 0 14px">노드 구매 확정 시 원금의 10%(USDT 5%/월 + XONT 5%/월, 6개월)가 자동 생성됩니다. [이달 지급] 버튼으로 월별 지급을 처리하세요.</p>
+          <p class="amini-desc" style="margin:-6px 0 14px">노드 구매 확정 시 원금 대비 스테이킹이 자동 생성됩니다 — USDT 5%/월(고정, 6개월) + XONT 5%/월(티어 가중치 반영: 베이직 5.00% · 플러스 5.25% · 프로 5.35% · 맥스 5.50%). [이달 지급] 버튼으로 월별 지급을 처리하세요.</p>
           <div class="atable-wrap"><table class="atable">
             <thead><tr><th>회원</th><th>원금(USDT)</th><th>월 지급률</th><th>개월차</th><th>시작</th><th>만기</th><th>상태</th><th class="ta-r">지급</th></tr></thead>
             <tbody id="stk-body"></tbody></table></div>

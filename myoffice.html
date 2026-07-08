@@ -72,7 +72,7 @@
           <div class="r1"><span>총 발행량</span><b id="mo-xont-supply">0</b></div>
           <div class="r2" style="margin-top:8px"><span>총지급수량 <b id="mo-xont-minted">0</b></span><span id="mo-xont-remain">잔여 0</span></div>
           <div class="r2" style="margin-top:6px"><span>발행가 <b id="mo-xont-price">$0</b> · 시가총액 <b id="mo-xont-mcap">₩0</b></span></div>
-          <div class="r2" style="margin-top:6px"><span>락업 <b id="mo-lockup">12개월</b> · 이후 <b id="mo-vest">5개월</b>간 분할 해제</span></div>
+          <div class="r2" style="margin-top:6px"><span>락업 <b id="mo-lockup">6개월</b> · 이후 <b id="mo-vest">5개월</b>간 분할 해제</span></div>
         </div>
       </div>
 
@@ -91,7 +91,7 @@
               <div style="color:#f5c451;font-weight:800;font-size:16px"><span id="w-staked">0</span> XONT</div>
             </div>
           </div>
-          <div class="wnote"><svg class="icon"><use href="#i-coins"/></svg> 노드 구매 시 <b>$1,000당 <span id="w-per">10,000</span> XONT</b> · 플러스 <b class="r" id="w-bplus">+5%</b> · 프로 <b class="r" id="w-bpro">+8%</b> · 맥스 <b class="r" id="w-bmax">+10%</b> 추가</div>
+          <div class="wnote"><svg class="icon"><use href="#i-coins"/></svg> 노드 구매 시 <b>$1,000당 <span id="w-per">10,000</span> XONT</b> · 플러스 <b class="r" id="w-bplus">+5%</b> · 프로 <b class="r" id="w-bpro">+7%</b> · 맥스 <b class="r" id="w-bmax">+10%</b> 추가</div>
         </div>
 
         <!-- 스테이킹 -->
@@ -327,14 +327,14 @@ const toast = (m, t) => window.toast && window.toast(m, t);
     $('#mo-xont-remain').textContent = '잔여 ' + fmt(Math.max(0, supply - minted));
     $('#mo-xont-price').textContent = '$' + price;
     $('#mo-xont-mcap').textContent = won(supply * price * krwRate);
-    $('#mo-lockup').textContent = (cfg.xont_lockup_months || 12) + '개월';
+    $('#mo-lockup').textContent = (cfg.xont_lockup_months || 6) + '개월';
     $('#mo-vest').textContent = (cfg.xont_vesting_months || 5) + '개월';
 
     // 지갑
     $('#w-price').textContent = price;
     $('#w-per').textContent = fmt(perK);
     $('#w-bplus').textContent = '+' + (cfg.xont_bonus_plus_pct ?? 5) + '%';
-    $('#w-bpro').textContent = '+' + (cfg.xont_bonus_pro_pct ?? 8) + '%';
+    $('#w-bpro').textContent = '+' + (cfg.xont_bonus_pro_pct ?? 7) + '%';
     $('#w-bmax').textContent = '+' + (cfg.xont_bonus_max_pct ?? 10) + '%';
     $('#w-bal').textContent = fmt2(balance);
     $('#w-usd').textContent = '≈ $' + fmt2(balance * price);
