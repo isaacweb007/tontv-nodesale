@@ -14,7 +14,7 @@
   const XONT_PRICE = 0.85;                                            // demo USD price (dashboard)
   const TONX_SUPPLY = 1e10;                                           // 100억 TONX 총 발행 한도
   const VIEWER_MINT = 0.0006;                                         // 시청자 1인당 TONX 채굴 / s (demo)
-  const REF1_PCT = 0.10, REF2_PCT = 0.03;                            // 추천 보상: 1단계 10% · 2단계 3%
+  const REF1_PCT = 0.15, REF2_PCT = 0.05;                            // 추천 보상: 1단계 15% · 2단계 5% (DAO 정책)
   const toast = (m, t) => (window.toast ? window.toast(m, t) : 0);    // shared toast (defined in layout.js)
   document.documentElement.classList.add('has-js');                  // enables scroll-reveal
 
@@ -643,7 +643,7 @@
       const rl = $('#nrate-' + n.id); if (rl) rl.textContent = pnr.toFixed(3);
     });
 
-    // ---- 추천 보상 적립 (1단계 10% · 2단계 3%) ----
+    // ---- 추천 보상 적립 (1단계 15% · 2단계 5%) ----
     state.referrals.forEach(r => { r.reward += refRate(r) * dt; });
 
     // stream viewers jitter

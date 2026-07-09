@@ -909,7 +909,7 @@ function renderSales() {
   const per = Number((CFG && CFG.xont_per_1000_usd) || 0);
   $('#sales-body').innerHTML = rows.length ? rows.map((d) => {
     const op = d.node_operators || {}; const s = ST[d.status] || [d.status, ''];
-    const bpct = /프로|pro/i.test(d.tier || '') ? Number((CFG && CFG.xont_bonus_pro_pct) || 0) : /맥스|max/i.test(d.tier || '') ? Number((CFG && CFG.xont_bonus_max_pct) || 0) : 0;
+    const bpct = /플러스|plus/i.test(d.tier || '') ? Number((CFG && CFG.xont_bonus_plus_pct) || 0) : /프로|pro/i.test(d.tier || '') ? Number((CFG && CFG.xont_bonus_pro_pct) || 0) : /맥스|max/i.test(d.tier || '') ? Number((CFG && CFG.xont_bonus_max_pct) || 0) : 0;
     const grant = d.quantity * per * (1 + bpct / 100);
     const acts = d.status === 'pending'
       ? `<div class="la-acts"><button class="la-ok" data-approve="${d.id}">승인</button><button class="la-no" data-reject="${d.id}">거절</button></div>`
