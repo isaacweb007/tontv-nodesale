@@ -136,23 +136,23 @@
   <div class="wrap">
     <div class="sec-head reveal">
       <span class="eyebrow">스테이킹 리워드</span>
-      <h2>노드 구매와 동시에 <span class="r">6개월 스테이킹 리워드</span> 자동 시작</h2>
-      <p>노드 구매 확정 시 자동 생성 — 매월 원금의 <b>USDT 5%</b>(고정) + <b>XONT 5% 상당</b>(티어 가중치 반영), 노드세일즈 킥오프일로부터 <b>6개월</b>간 지급.</p>
+      <h2>노드 구매와 동시에 <span class="r"><b data-cfg="stakeMonths">6</b>개월 스테이킹 리워드</span> 자동 시작</h2>
+      <p>노드 구매 확정 시 자동 생성 — 매월 원금의 <b>USDT 5%</b>(고정) + <b>XONT 5% 상당</b>(티어 가중치 반영), 노드세일즈 킥오프일로부터 <b><b data-cfg="stakeMonths">6</b>개월</b>간 지급.</p>
     </div>
     <div class="stake-solo reveal">
       <div class="ss-apy">
-        <span class="ss-badge">6개월 스테이킹 리워드</span>
+        <span class="ss-badge"><b data-cfg="stakeMonths">6</b>개월 스테이킹 리워드</span>
         <div class="ss-num">월 <b>5+5</b><small>%</small></div>
-        <div class="ss-lock"><svg class="icon"><use href="#i-lock"/></svg> XONT 락업 6개월 · 이후 5개월 베스팅</div>
+        <div class="ss-lock"><svg class="icon"><use href="#i-lock"/></svg> XONT 락업 <b data-cfg="lockupMonths">6</b>개월 · 이후 <b data-cfg="vestMonths">5</b>개월 베스팅</div>
       </div>
       <div class="ss-facts">
-        <div class="ssf"><span class="k">월 지급</span><b>USDT 5% + XONT 5%</b><span class="e">XONT는 티어 가중 — 베이직 5.00 · 플러스 5.25 · 프로 5.35 · 맥스 5.50%</span></div>
-        <div class="ssf"><span class="k">월 XONT 수량</span><b>500 ~ 5,500 XONT</b><span class="e">베이직 500 · 플러스 1,575 · 프로 2,675 · 맥스 5,500</span></div>
-        <div class="ssf"><span class="k">6개월 이후</span><b>노드 보상 알고리즘 전환</b><span class="e">TonTV 운영수익 기반 · TONX로 수령</span></div>
-        <div class="ssf"><span class="k">노드 보상 기간</span><b>구매일로부터 5년</b><span class="e">노드별 만료일은 마이오피스에서 확인</span></div>
+        <div class="ssf"><span class="k">월 지급</span><b>USDT 5% + XONT 5%</b><span class="e">XONT는 티어 가중 — 베이직 <b data-cfg="rateBasic">5.00</b> · 플러스 <b data-cfg="ratePlus">5.25</b> · 프로 <b data-cfg="ratePro">5.35</b> · 맥스 <b data-cfg="rateMax">5.50</b>%</span></div>
+        <div class="ssf"><span class="k">월 XONT 수량</span><b><span data-cfg="xontBasic">500</span> ~ <span data-cfg="xontMax">5,500</span> XONT</b><span class="e">베이직 <b data-cfg="xontBasic">500</b> · 플러스 <b data-cfg="xontPlus">1,575</b> · 프로 <b data-cfg="xontPro">2,675</b> · 맥스 <b data-cfg="xontMax">5,500</b></span></div>
+        <div class="ssf"><span class="k"><b data-cfg="stakeMonths">6</b>개월 이후</span><b>노드 보상 알고리즘 전환</b><span class="e">TonTV 운영수익 기반 · TONX로 수령</span></div>
+        <div class="ssf"><span class="k">노드 보상 기간</span><b>구매일로부터 <b data-cfg="rewardYears">5</b>년</b><span class="e">노드별 만료일은 마이오피스에서 확인</span></div>
       </div>
     </div>
-    <div class="tier-note reveal">※ 스테이킹 리워드는 <b>노드세일즈 킥오프일로부터 6개월 한정</b>이며, 이후 TonTV 운영수익 기반 노드 보상 알고리즘으로 전환됩니다. <b>노드 보상은 노드 구매일로부터 5년간 유지</b>됩니다. 수령한 XONT는 <b>수령일로부터 6개월 락업 후 5개월간 베스팅</b>(35 · 25 · 15 · 15 · 10%)으로 해제됩니다. 명목 수치이며 보장되지 않습니다(토큰 가치 연동) · 자세한 내역은 <b><a href="myoffice.html" style="color:var(--red)">마이오피스</a></b>에서 확인하세요.</div>
+    <div class="tier-note reveal">※ 스테이킹 리워드는 <b>노드세일즈 킥오프일로부터 <b data-cfg="stakeMonths">6</b>개월 한정</b>이며, 이후 TonTV 운영수익 기반 노드 보상 알고리즘으로 전환됩니다. <b>노드 보상은 노드 구매일로부터 <b data-cfg="rewardYears">5</b>년간 유지</b>됩니다. 수령한 XONT는 <b>수령일로부터 <b data-cfg="lockupMonths">6</b>개월 락업 후 <b data-cfg="vestMonths">5</b>개월간 베스팅</b>(<span data-cfg="vestSched">35 · 25 · 15 · 15 · 10</span>%)으로 해제됩니다. 명목 수치이며 보장되지 않습니다(토큰 가치 연동) · 자세한 내역은 <b><a href="myoffice.html" style="color:var(--red)">마이오피스</a></b>에서 확인하세요.</div>
   </div>
 </section>
 
@@ -162,16 +162,16 @@
     <div class="sec-head reveal">
       <span class="eyebrow">함께 키우는 네트워크</span>
       <h2>2단계 <span class="r">추천 보상</span></h2>
-      <p>내가 소개한 1레벨 <b class="r">15%</b>, 그 아래 2레벨 <b class="r">5%</b> — 노드 판매금액 기준으로 <b>USDT</b> 지급.</p>
+      <p>내가 소개한 1레벨 <b class="r"><b data-cfg="ref1">15</b>%</b>, 그 아래 2레벨 <b class="r"><b data-cfg="ref2">5</b>%</b> — 노드 판매금액 기준으로 <b>USDT</b> 지급.</p>
     </div>
     <div class="ref reveal">
       <div class="card me"><div class="ic"><svg class="icon"><use href="#i-user-check"/></svg></div><div class="t">나</div><div class="s">노드 사업자</div></div>
       <span class="arr"><svg class="icon"><use href="#i-chevron-r"/></svg></span>
-      <div class="card"><div class="ic"><svg class="icon"><use href="#i-user"/></svg></div><div class="t">1레벨 <b class="r">15%</b></div><div class="s">내가 직접 소개</div></div>
+      <div class="card"><div class="ic"><svg class="icon"><use href="#i-user"/></svg></div><div class="t">1레벨 <b class="r"><b data-cfg="ref1">15</b>%</b></div><div class="s">내가 직접 소개</div></div>
       <span class="arr"><svg class="icon"><use href="#i-chevron-r"/></svg></span>
-      <div class="card"><div class="ic"><svg class="icon"><use href="#i-users"/></svg></div><div class="t">2레벨 <b class="r">5%</b></div><div class="s">1레벨이 소개</div></div>
+      <div class="card"><div class="ic"><svg class="icon"><use href="#i-users"/></svg></div><div class="t">2레벨 <b class="r"><b data-cfg="ref2">5</b>%</b></div><div class="s">1레벨이 소개</div></div>
     </div>
-    <p class="ref-note reveal">피추천자가 구매한 <b>노드 판매금액</b>의 1레벨 15% · 2레벨 5%가 <span class="r">USDT로 나에게 지급</span>됩니다. 예: 맥스($10,000) 판매 시 1레벨 $1,500 · 2레벨 $500.
+    <p class="ref-note reveal">피추천자가 구매한 <b>노드 판매금액</b>의 1레벨 <b data-cfg="ref1">15</b>% · 2레벨 <b data-cfg="ref2">5</b>%가 <span class="r">USDT로 나에게 지급</span>됩니다. 예: 맥스($10,000) 판매 시 1레벨 <span data-cfg="ref1Max">$1,500</span> · 2레벨 <span data-cfg="ref2Max">$500</span>.
       <small>※ 추천 보상은 2레벨까지만 적용됩니다 (무한 다단계 아님)</small></p>
   </div>
 </section>
@@ -240,5 +240,60 @@
 
 <script src="layout.js"></script>
 <script src="app.js"></script>
+
+<!-- 정책 수치 동기화: 어드민 설정(token_config · revenue_allocations)을 읽어 문구를 채운다.
+     HTML 에 현재값을 기본으로 써 두었으므로, 조회 실패 시에도 화면은 그대로 유지된다. -->
+<script type="module">
+  import { supabase } from './lib/supabase.js';
+
+  const fmt = (n) => Number(n).toLocaleString('en-US');
+  const usd = (n) => '$' + fmt(Math.round(n));
+
+  try {
+    const [{ data: cfg }, { data: alloc }] = await Promise.all([
+      supabase.from('token_config').select('*').eq('id', 1).maybeSingle(),
+      supabase.from('revenue_allocations').select('item_name, pct, active').eq('kind', 'commission'),
+    ]);
+    if (!cfg) throw new Error('config unavailable');
+
+    const pct = (name) => {
+      const r = (alloc || []).find((x) => x.item_name === name && x.active !== false);
+      return r ? Number(r.pct) : null;
+    };
+    const ref1 = pct('영업 1대'), ref2 = pct('영업 2대');
+
+    // 티어별 월 XONT 요율 = 5% × (1 + 보너스) · 월 수량 = 원금 × 요율 ÷ XONT 시세
+    const price = Number(cfg.xont_price_usd) || 0.1;
+    const rate = (bonus) => 5 * (1 + Number(bonus || 0) / 100);
+    const qty = (principal, bonus) => (principal * rate(bonus) / 100) / price;
+
+    const v = {
+      stakeMonths:  cfg.staking_months_default,
+      lockupMonths: cfg.xont_lockup_months,
+      vestMonths:   cfg.xont_vesting_months,
+      vestSched:    Array.isArray(cfg.xont_vesting_schedule) ? cfg.xont_vesting_schedule.join(' · ') : null,
+      rewardYears:  cfg.node_reward_years,
+      rateBasic: rate(0).toFixed(2),
+      ratePlus:  rate(cfg.xont_bonus_plus_pct).toFixed(2),
+      ratePro:   rate(cfg.xont_bonus_pro_pct).toFixed(2),
+      rateMax:   rate(cfg.xont_bonus_max_pct).toFixed(2),
+      xontBasic: fmt(qty(1000, 0)),
+      xontPlus:  fmt(qty(3000, cfg.xont_bonus_plus_pct)),
+      xontPro:   fmt(qty(5000, cfg.xont_bonus_pro_pct)),
+      xontMax:   fmt(qty(10000, cfg.xont_bonus_max_pct)),
+      ref1, ref2,
+      ref1Max: ref1 != null ? usd(10000 * ref1 / 100) : null,
+      ref2Max: ref2 != null ? usd(10000 * ref2 / 100) : null,
+    };
+
+    for (const [key, val] of Object.entries(v)) {
+      if (val === null || val === undefined || val === '') continue;   // 값 없으면 기본 문구 유지
+      document.querySelectorAll(`[data-cfg="${key}"]`).forEach((el) => { el.textContent = val; });
+    }
+  } catch (e) {
+    // 정적 기본값을 그대로 노출 (콘솔에만 남김)
+    console.warn('정책 수치 동기화 건너뜀:', e && e.message);
+  }
+</script>
 </body>
 </html>
