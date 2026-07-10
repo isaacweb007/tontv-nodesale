@@ -1881,3 +1881,213 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .sim-note{display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:11.5px;color:#8a909b;line-height:1.55}
 .sim-note .icon{width:14px;height:14px;color:#f5c451;flex:0 0 auto;margin-top:2px}
 .sim-note b{color:#cfd2d8}
+
+/* =========================================================
+   테마 토글 버튼 (운영자 콘솔 헤더) — 다크/라이트 공용
+   ========================================================= */
+.theme-toggle{display:inline-flex;align-items:center;gap:7px;background:#1d1f24;border:1px solid #2a2d34;color:#cdd1d8;font-size:12.5px;font-weight:700;padding:9px 14px;border-radius:11px;cursor:pointer;transition:background .16s var(--ease),border-color .2s,color .15s,transform .15s}
+.theme-toggle:hover{border-color:#3a3d45;color:#fff}
+.theme-toggle:active{transform:scale(.97)}
+.theme-toggle .icon{width:16px;height:16px;flex:0 0 auto}
+.theme-toggle .moon{display:none}
+.theme-toggle:focus-visible{outline:2px solid var(--red-2);outline-offset:2px}
+
+/* =========================================================
+   ADMIN · 라이트 모드 (운영자 콘솔 전용, .admin-light 스코프)
+   다크 모드 규칙은 그대로 두고 이 블록이 우선 적용되어 덮어씀.
+   .admin-light 클래스는 admin.html 이 <html> 에만 부여하므로
+   다른 페이지(마이오피스 등)에는 전혀 영향 없음.
+   ========================================================= */
+.admin-light .admin{
+  --l-surface:#ffffff; --l-surface-2:#f1f4f8; --l-surface-3:#e8ecf2;
+  --l-border:#e0e4ea; --l-border-2:#c7cdd6;
+  --l-text:#1a1c20; --l-text-2:#4b515c; --l-text-3:#727884;
+  background:linear-gradient(180deg,#eef1f5,#e6e9ef);
+  color:var(--l-text); color-scheme:light;
+}
+.admin-light .admin h2,
+.admin-light .admin-head h2{color:var(--l-text)}
+
+/* 크럼(인라인 스타일이라 !important 필요) */
+.admin-light .crumb a{color:var(--l-text-3)!important}
+.admin-light .crumb span{color:var(--l-text-2)!important}
+
+/* 본문 주요 텍스트 (다크에서 흰색 계열이던 것) */
+.admin-light .asearch input,
+.admin-light .atable .ta-num,
+.admin-light .atable b,
+.admin-light .mini-stats .ms .v,
+.admin-light .metric .v,
+.admin-light .dlabel b,
+.admin-light .tk-stat .r1 b,
+.admin-light .tk-stat .r3 .v,
+.admin-light .ms-big,
+.admin-light .pernode .v,
+.admin-light .wrow .wn,
+.admin-light .wrow .wb,
+.admin-light .rc-code,
+.admin-light .ref-total .v,
+.admin-light .donut .cc .v,
+.admin-light .dw-name,
+.admin-light .dw-stat .dws-v,
+.admin-light .dw-v,
+.admin-light .dw-v b,
+.admin-light .dw-fincard .dw-fv,
+.admin-light .dw-r-main b,
+.admin-light .dw-sec>h4,
+.admin-light .la-who b,
+.admin-light .tn-row b,
+.admin-light .alloc-gh b,
+.admin-light .alloc-legend .lg b,
+.admin-light .dash-card .ch h3,
+.admin-light .inp{color:var(--l-text)}
+
+/* 보조/뮤트 텍스트 (다크의 옅은 회색은 흰 배경에서 대비 부족 → 진하게) */
+.admin-light .admin-head p,
+.admin-light .admin-who .op .id,
+.admin-light .atab,
+.admin-light .aseg button,
+.admin-light .acount,
+.admin-light .atable thead th,
+.admin-light .atable .mono,
+.admin-light .atable .muted,
+.admin-light .metric .mh,
+.admin-light .metric .sub,
+.admin-light .field label,
+.admin-light .cfg-f label,
+.admin-light .amini-desc,
+.admin-light .amini-desc b,
+.admin-light .amini-label,
+.admin-light .mini-stats .ms .l,
+.admin-light .mini-stats .ms .v .u,
+.admin-light .dlabel,
+.admin-light .atoggle,
+.admin-light .tk-stat .r1,
+.admin-light .tk-stat .r2,
+.admin-light .tk-stat .r3 .l,
+.admin-light .pernode .l,
+.admin-light .pernode .v .u,
+.admin-light .donut .cc .l,
+.admin-light .rc-l,
+.admin-light .rc-link span,
+.admin-light .wrow .wa,
+.admin-light .la-who span,
+.admin-light .la-qty,
+.admin-light .la-qty .dist-pct,
+.admin-light .dw-k,
+.admin-light .dw-dim,
+.admin-light .dw-subh,
+.admin-light .dw-stat .dws-h,
+.admin-light .dw-fincard .dw-fl,
+.admin-light .dw-r-main span,
+.admin-light .dw-sec>h4 .dw-cnt,
+.admin-light .tn-meta,
+.admin-light .alloc-sub,
+.admin-light .alloc-legend .lg,
+.admin-light .ref-total .usd,
+.admin-light .empty,
+.admin-light .dw-empty,
+.admin-light .dash-note,
+.admin-light .dash-card .ch .tagx,
+.admin-light .dist-sep{color:var(--l-text-3)}
+
+/* 호버 시 흰색으로 바뀌던 텍스트 */
+.admin-light .atab:hover,
+.admin-light .aseg button:hover,
+.admin-light .mo-tabs button:hover,
+.admin-light .dw-x:hover{color:var(--l-text)}
+.admin-light .atab.on{background:rgba(232,17,45,.10);color:var(--red)}
+
+/* 카드/사이드 등 볼록 표면 → 흰색 */
+.admin-light .admin-side,
+.admin-light .dash-card,
+.admin-light .mini-stats .ms,
+.admin-light .metric,
+.admin-light .dw-stat{background:var(--l-surface);border-color:var(--l-border)}
+
+/* 오목/입력/헤더 표면 → 옅은 회색 */
+.admin-light .asearch,
+.admin-light .aseg,
+.admin-light .inp,
+.admin-light .apf,
+.admin-light .wrow,
+.admin-light .adm-gate,
+.admin-light .atable thead th,
+.admin-light .mo-tabs button,
+.admin-light .tn-row,
+.admin-light .dw-kv,
+.admin-light .dw-fincard,
+.admin-light .dw-row,
+.admin-light .ref-plan .rp-chip,
+.admin-light .la-row,
+.admin-light .pernode .pn,
+.admin-light .mn-stat{background:var(--l-surface-2);border-color:var(--l-border)}
+
+/* 테두리만 라이트로 */
+.admin-light .atable-wrap,
+.admin-light .atable td,
+.admin-light .run-row,
+.admin-light .dw-actions,
+.admin-light .dw-kvrow,
+.admin-light .alloc-gh,
+.admin-light .tn-kids{border-color:var(--l-border)}
+
+/* 테이블 행 호버 */
+.admin-light .atable tbody tr:hover{background:var(--l-surface-3)}
+
+/* 고스트/보조 버튼 */
+.admin-light .act.no,
+.admin-light .btn-ghost-dark,
+.admin-light .rc-copy.ghost,
+.admin-light .dw-x,
+.admin-light .tn-toggle,
+.admin-light .netpill.sm{background:var(--l-surface-2);border-color:var(--l-border);color:var(--l-text-2)}
+.admin-light .btn-ghost-dark:hover,
+.admin-light .rc-copy.ghost:hover,
+.admin-light .dw-x:hover,
+.admin-light .tn-toggle:hover{background:var(--l-surface-3);border-color:var(--l-border-2)}
+
+/* 아바타 셀 · 지갑 아이콘 */
+.admin-light .avx{background:#eef1f6;border-color:var(--l-border);color:var(--l-text-2)}
+.admin-light .wrow .widx{background:#eef1f6}
+
+/* 레벨 배지(골드) */
+.admin-light .tn-lvl{background:rgba(240,185,11,.16);color:#8a6d00}
+
+/* 스위치 오프 상태 */
+.admin-light .atoggle .tk{background:#cdd3db;border-color:#bcc3cc}
+.admin-light .atoggle .tk::after{background:#fff}
+
+/* 진행바 / 코드칩 / 도넛 중앙 */
+.admin-light .tk-stat .sbar{background:#e2e6ec;border-color:var(--l-border)}
+.admin-light .rc-code{background:var(--l-surface-2);border-color:#c9cfd8;color:var(--l-text)}
+.admin-light .donut::before{background:var(--l-surface)}
+
+/* 드로어(회원 상세) */
+.admin-light .adm-drawer-panel{background:linear-gradient(180deg,#ffffff,#f4f6f9);border-left-color:var(--l-border)}
+.admin-light .dw-head{background:linear-gradient(180deg,#ffffff,rgba(255,255,255,.88));border-bottom-color:var(--l-border)}
+.admin-light .dw-empty{background:var(--l-surface-2);border-color:var(--l-border);color:var(--l-text-3)}
+
+/* 호버 테두리 강조 */
+.admin-light .dash-card:hover,
+.admin-light .metric:hover,
+.admin-light .am-metrics .metric:hover,
+.admin-light .wrow:hover{border-color:var(--l-border-2)}
+.admin-light .tn-row.clickable:hover{background:var(--l-surface-3);border-color:var(--l-border-2)}
+
+/* 배분 바 트랙 · 날짜 입력 네이티브 스킴 */
+.admin-light .alloc-bar{background:var(--l-surface-3)}
+.admin-light .dist-dates .inp{color-scheme:light}
+
+/* 거절 버튼 · 드로어 카운트 배지 · 준비중 플레이스홀더 */
+.admin-light .la-no{background:var(--l-surface-2);color:var(--l-text-2)}
+.admin-light .la-no:hover{background:var(--l-surface-3)}
+.admin-light .dw-sec>h4 .dw-cnt{background:var(--l-surface-2);color:var(--l-text-3)}
+.admin-light .ph-soon{background:var(--l-surface-2);border-color:#c9cfd8;color:var(--l-text-2)}
+.admin-light .ph-soon h3{color:var(--l-text)}
+
+/* 라이트 모드 토글 버튼 스타일 */
+.admin-light .theme-toggle{background:#fff;border-color:var(--l-border);color:var(--l-text-2)}
+.admin-light .theme-toggle:hover{border-color:var(--l-border-2);color:var(--l-text)}
+.admin-light .theme-toggle .sun{display:none}
+.admin-light .theme-toggle .moon{display:inline-flex}
