@@ -247,13 +247,30 @@
           <div class="dash-card" style="margin-bottom:20px">
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-pie"/></svg></span> 이번 배당 풀 (원 기준 · 시뮬 파라미터)</h3><span class="tagx">시청자 리워드 20% ÷ N</span></div>
             <div class="mini-stats" id="settle-stats"></div>
-            <p class="amini-desc" style="margin-top:8px">배당은 <b>원(fiat) 기준</b>으로 산정합니다. 실제 XONT 적립은 <b>보상 실행</b> 탭에서 회원별로 처리합니다(온체인 없음).</p>
+            <p class="amini-desc" style="margin-top:8px">아래 카드는 시뮬레이션 파라미터 기준 추정치입니다. 실제 분배는 <b>노드 보상 분배</b> 카드에서 일자별 노드풀을 TONX로 환산해 처리합니다(오프체인 원장).</p>
           </div>
           <div class="dash-card" style="margin-bottom:20px">
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 일자별 매출·노드풀</h3><span class="tagx">revenue_daily</span></div>
             <div class="atable-wrap"><table class="atable">
               <thead><tr><th>일자</th><th>광고 매출</th><th>구독 매출</th><th>노드풀</th></tr></thead>
               <tbody id="settle-body"></tbody></table></div>
+          </div>
+
+          <!-- 노드 보상 분배 (운영수익 → TONX) -->
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-server"/></svg></span> 노드 보상 분배</h3><span class="tagx" id="nr-start">—</span></div>
+            <p class="amini-desc">해당 일자의 <b>노드풀(USD)</b>을 TONX로 환산해 그날 유효한 노드(활성 · 구매 후 5년 이내)에 <b>÷N 균등 분배</b>합니다. 킥오프+6개월 이후 일자만 가능하며, 같은 날짜는 한 번만 분배됩니다.</p>
+            <div class="dist-controls">
+              <div class="dist-dates">
+                <input class="inp" type="date" id="nr-day">
+                <button class="btn btn-ghost-dark" id="nr-preview"><svg class="icon"><use href="#i-eye"/></svg> 미리보기</button>
+                <button class="btn btn-red" id="nr-run" disabled><svg class="icon"><use href="#i-check"/></svg> 분배 실행</button>
+              </div>
+            </div>
+            <div class="mini-stats" id="nr-stats" style="margin-top:14px"></div>
+            <div class="atable-wrap" style="margin-top:14px"><table class="atable">
+              <thead><tr><th>일자</th><th>노드풀(USD)</th><th class="ta-r">총 TONX</th><th>유효 노드</th><th class="ta-r">노드당 TONX</th><th>수령자</th><th>실행 시각</th></tr></thead>
+              <tbody id="nr-runs"></tbody></table></div>
           </div>
           <div class="dash-card">
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-users"/></svg></span> 회원별 영업수당 정산</h3><span class="tagx" id="comm-count">0명</span></div>
@@ -1010,12 +1027,69 @@ async function loadSettle() {
     const { data: rev } = await db.supabase.from('revenue_daily').select('*').order('day', { ascending: false }).limit(30);
     $('#settle-body').innerHTML = (rev && rev.length) ? rev.map((r) => `<tr><td>${r.day}</td><td>${usd(r.ad_revenue||0)}</td><td>${usd(r.subscription_revenue||0)}</td><td class="r">${usd(r.node_pool_amount||0)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">일자별 매출 데이터가 없습니다.</td></tr>';
   } catch (e) { toast('정산 로드 실패: ' + e.message, 'err'); }
+
+  try { await initNodeRewards(); } catch (e) { toast('노드 보상 로드 실패: ' + e.message, 'err'); }
   try {
     COMM = await db.adminSettlementByMember();
     renderCommissions();
     $('#comm-q').addEventListener('input', renderCommissions);
   } catch (e) { toast('수당 정산 로드 실패: ' + e.message, 'err'); }
 }
+
+/* ---- 노드 보상 분배 (운영수익 → TONX) ---- */
+let nrBound = false;
+async function initNodeRewards() {
+  const dayEl = $('#nr-day'), runBtn = $('#nr-run');
+  if (!dayEl.value) dayEl.value = new Date().toISOString().slice(0, 10);
+
+  async function renderRuns() {
+    const runs = await db.adminListNodeRewardRuns();
+    $('#nr-runs').innerHTML = runs.length ? runs.map((r) => `<tr>
+      <td>${r.day}</td><td>${usd(r.node_pool_usd)}</td>
+      <td class="ta-r ta-num r">${fmt2(r.tonx_total)}</td>
+      <td>${fmt(r.eligible_nodes)}개</td>
+      <td class="ta-r ta-num">${fmt2(r.per_node_tonx)}</td>
+      <td>${fmt(r.recipients)}명</td><td>${dt(r.executed_at)}</td></tr>`).join('')
+      : '<tr><td colspan="7" class="la-empty">아직 분배 이력이 없습니다.</td></tr>';
+  }
+
+  async function preview() {
+    runBtn.disabled = true;
+    const p = await db.adminPreviewNodeReward(dayEl.value);
+    if (!p) { $('#nr-stats').innerHTML = ''; return; }
+    $('#nr-start').textContent = '분배 시작 가능일 ' + p.starts_on;
+    $('#nr-stats').innerHTML = statCards([
+      ['노드풀', usd(p.node_pool_usd)],
+      ['환산 TONX', fmt2(p.tonx_total)],
+      ['유효 노드', fmt(p.eligible_nodes) + '개'],
+      ['노드당 TONX', fmt2(p.per_node_tonx)],
+    ]);
+    runBtn.disabled = !p.allowed;
+    if (p.already_done) toast(dayEl.value + ' 은(는) 이미 분배되었습니다', 'err');
+    else if (dayEl.value < p.starts_on) toast('킥오프+6개월(' + p.starts_on + ') 이후부터 분배할 수 있습니다', 'err');
+    else if (!Number(p.node_pool_usd)) toast('해당 일자의 노드풀 금액이 없습니다', 'err');
+    else if (!Number(p.eligible_nodes)) toast('해당 일자에 보상 대상 노드가 없습니다', 'err');
+  }
+
+  if (!nrBound) {
+    nrBound = true;
+    $('#nr-preview').addEventListener('click', () => preview().catch((e) => toast('미리보기 실패: ' + e.message, 'err')));
+    dayEl.addEventListener('change', () => { runBtn.disabled = true; $('#nr-stats').innerHTML = ''; });
+    runBtn.addEventListener('click', async () => {
+      if (!confirm(dayEl.value + ' 일자 노드 보상을 분배합니다. 되돌릴 수 없습니다. 진행할까요?')) return;
+      runBtn.disabled = true; const orig = runBtn.textContent; runBtn.textContent = '분배 중…';
+      try {
+        const r = await db.adminDistributeNodeReward(dayEl.value);
+        toast(`분배 완료 · ${fmt(r.recipients)}명에게 총 ${fmt2(r.tonx_total)} TONX`);
+        await renderRuns(); await preview();
+      } catch (e) { toast('분배 실패: ' + e.message, 'err'); runBtn.disabled = false; }
+      finally { runBtn.textContent = orig; }
+    });
+  }
+  await renderRuns();
+  await preview().catch(() => {});
+}
+
 let COMM = [];
 function renderCommissions() {
   const q = ($('#comm-q').value || '').toLowerCase();

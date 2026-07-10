@@ -62,7 +62,7 @@
         <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-server"/></svg> 내 구매 노드</div><div class="bv" id="mo-mynodes">0<span class="u">개</span></div><div class="bs" id="mo-myshare">노드풀 0%</div></div>
         <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-lock"/></svg> 스테이킹 현황</div><div class="bv" id="mo-stake-usdt">$0</div><div class="bs" id="mo-stake-xont">XONT 0</div></div>
         <div class="bcard2 hi"><div class="bh"><svg class="icon"><use href="#i-coins"/></svg> XONT 총보유</div><div class="bv r" id="mo-xont-total">0</div><div class="bs" id="mo-xont-usd">≈ $0</div></div>
-        <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-trending"/></svg> 노드 배당수익</div><div class="bv" id="mo-dividend">0</div><div class="bs">XONT 누적</div></div>
+        <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-trending"/></svg> 노드 보상 (TONX)</div><div class="bv" id="mo-dividend">0</div><div class="bs" id="mo-dividend-sub">운영수익 분배 누적</div></div>
       </div>
 
       <!-- XONT 발행 정보 -->
@@ -304,7 +304,6 @@ const toast = (m, t) => window.toast && window.toast(m, t);
     const cap = Number(cfg.node_cap || 50000) || 50000;
     const krwRate = Number(cfg.krw_per_usd || 1500);
     const supply = Number(cfg.xont_total_supply || 0), minted = Number(cfg.xont_minted || 0);
-    const dividendTotal = (dividends || []).reduce((a, t) => a + Number(t.amount || 0), 0);
 
     const stakePrincipalUsdt = (stakes || []).filter((s) => s.status === 'active' && Number(s.principal_usdt) > 0).reduce((a, s) => a + Number(s.principal_usdt), 0);
 
@@ -321,7 +320,10 @@ const toast = (m, t) => window.toast && window.toast(m, t);
     $('#mo-stake-xont').textContent = stkActive.length ? `${paidMo}/${totalMo}개월 지급` : '리워드 없음';
     $('#mo-xont-total').textContent = fmt2(balance);
     $('#mo-xont-usd').textContent = '≈ $' + fmt2(balance * price);
-    $('#mo-dividend').textContent = fmt2(dividendTotal);
+    $('#mo-dividend').textContent = fmt2(bal.tonx || 0);
+    $('#mo-dividend-sub').textContent = (dividends || []).length
+      ? `운영수익 분배 ${(dividends || []).length}회 누적`
+      : '2027-01-10부터 분배 시작';
 
     $('#mo-xont-pricetag').textContent = '$' + price;
     $('#mo-xont-supply').textContent = fmt(supply);
