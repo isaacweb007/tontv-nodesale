@@ -2010,6 +2010,11 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .admin-light .dw-x:hover{color:var(--l-text)}
 /* 사이드탭 호버 배경(다크값 #24262c)을 밝게 — 안 덮으면 검은 블록이 됨 */
 .admin-light .atab:hover{background:var(--l-surface-3)}
+/* 선택된 세그먼트 버튼은 레드 배경 위 흰 글씨 유지.
+   (위의 `.admin-light .aseg button` 뮤트 색이 특이도로 `.aseg button.on` 을 덮어
+    빨강 위 회색 글씨가 되는 문제) */
+.admin-light .aseg button.on,
+.admin-light .aseg button.on:hover{color:#fff}
 /* 활성 탭은 호버 중에도 레드 틴트 유지 */
 .admin-light .atab.on,
 .admin-light .atab.on:hover{background:rgba(232,17,45,.10);color:var(--red)}
@@ -2128,9 +2133,12 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .admin-light .tl-row .r{color:var(--l-text)}
 .admin-light .tl-row span{color:var(--l-text-3)}
 
-/* 시뮬레이션 시나리오 버튼 (선택된 .on 은 레드 유지) */
+/* 시뮬레이션 시나리오 버튼 */
 .admin-light .sim-scen button{background:var(--l-surface-2);border-color:var(--l-border);color:var(--l-text-2)}
 .admin-light .sim-scen button:hover{border-color:var(--l-border-2)}
+/* 선택 상태는 레드 유지 — 위 규칙이 특이도로 `.sim-scen button.on` 을 덮어
+   라이트에서 선택/비선택이 구분되지 않던 문제 */
+.admin-light .sim-scen button.on{background:var(--red);border-color:var(--red);color:#fff}
 
 /* 조직도 그래프 (SVG 캔버스) */
 .admin-light .org-graph-wrap{background:radial-gradient(circle at 50% -10%,#fbfcfd,#e9edf2 72%);border-color:var(--l-border)}
