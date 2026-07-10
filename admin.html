@@ -130,7 +130,7 @@
             <div class="aseg" id="org-view-tabs">
               <button class="on" data-ov="tree">트리</button>
               <button data-ov="graph">그래프</button>
-              <button data-ov="rewards">추천수당 내역</button>
+              <button data-ov="rewards">영업수당 내역</button>
             </div>
             <button class="btn btn-ghost-dark" id="org-toggle-all" style="padding:9px 14px;font-size:12.5px">전체 펼치기/접기</button>
           </div>
@@ -153,7 +153,7 @@
           </div>
 
           <div class="dash-card org-view" data-oview="rewards" hidden>
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> 추천수당 내역</h3><span class="tagx" id="org-meta">—</span></div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> 영업수당 내역</h3><span class="tagx" id="org-meta">—</span></div>
             <div class="atable-wrap"><table class="atable">
               <thead><tr><th>수령자</th><th>내용</th><th class="ta-r">지급 XONT</th><th>일시</th></tr></thead>
               <tbody id="org-body"></tbody></table></div>
@@ -258,7 +258,7 @@
           <div class="dash-card">
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-users"/></svg></span> 회원별 영업수당 정산</h3><span class="tagx" id="comm-count">0명</span></div>
             <div class="atoolbar"><div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="comm-q" placeholder="이름 · 이메일 검색"></div></div>
-            <p class="amini-desc" style="margin-bottom:12px">직접(1대) · 소개(2대) 영업수당은 <b>노드판매 배분</b> 탭의 비율(현재 1대 15% · 2대 5%)로 계산되며, 수당은 USDT로 지급됩니다. 잔액에서 출금을 등록하면 <b>출금관리</b> 탭에서 승인·지급 처리합니다.</p>
+            <p class="amini-desc" style="margin-bottom:12px">직접(1대) · 소개(2대) 영업수당은 <b>노드판매 배분</b> 탭의 비율(현재 1대 15% · 2대 5%)로 계산되며, 노드 판매 <b>승인 시 USDT로 자동 지급</b>됩니다. 총판 센터장 10%도 동일하게 자동 지급됩니다. 잔액에서 출금을 등록하면 <b>출금관리</b> 탭에서 승인·지급 처리합니다.</p>
             <div class="atable-wrap"><table class="atable">
               <thead><tr><th>회원</th><th>본인매출</th><th>직접(1대)</th><th>소개(2대)</th><th>수당합계</th><th>기지급</th><th>잔액</th><th class="ta-r">출금 등록</th></tr></thead>
               <tbody id="comm-body"></tbody></table></div>
@@ -377,7 +377,7 @@
         <section class="apanel" data-panel="rank" hidden>
           <div class="dash-card" style="margin-bottom:20px">
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-crown"/></svg></span> 총판 센터장 지정</h3><span class="tagx">매출 배분 10% 수령 역할 · 승급 사다리 아님</span></div>
-            <p class="amini-desc">직급 체계는 없습니다. <b>총판 센터장</b>은 노드판매 배분(영업수당 10%)을 받는 지정 역할이며, 회원을 검색해 지정/해제합니다. 실제 지급은 <b>보상 실행</b> 탭에서 처리하세요.</p>
+            <p class="amini-desc">직급 체계는 없습니다. <b>총판 센터장</b>은 노드판매 배분(영업수당 10%)을 받는 지정 역할이며, 회원을 검색해 지정/해제합니다. 지정 후에는 하위 조직의 노드 판매가 승인될 때 <b>판매금액의 10%가 USDT로 자동 지급</b>됩니다(구매자 기준 최근접 상위 센터장 1인). 상위에 센터장이 없으면 미지급됩니다.</p>
             <div class="atoolbar" style="margin-top:14px"><div class="asearch"><svg class="icon"><use href="#i-search"/></svg><input id="rk-q" placeholder="이름 · 이메일 검색"></div></div>
           </div>
           <div class="dash-card">
@@ -816,7 +816,8 @@ function renderOrgTree() {
 function renderOrgRewards(rewards) {
   const total = rewards.reduce((a, x) => a + Number(x.amount || 0), 0);
   $('#org-meta').textContent = rewards.length + '건 · 총 $' + fmt2(total) + ' USDT';
-  $('#org-body').innerHTML = rewards.length ? rewards.map((x) => `<tr><td><b>${esc(x.node_operators?.display_name) || '—'}</b><div class="muted sm">${esc(x.node_operators?.email || '')}</div></td><td>${x.level ? x.level + '레벨' : '추천수당'}<div class="muted sm">${esc(x.counterparty || '')}</div></td><td class="ta-r" style="color:var(--st-ok,#5ee08a);font-weight:800">+$${fmt2(x.amount)}</td><td>${dt(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">추천수당 내역이 없습니다.</td></tr>';
+  const kindLabel = (x) => x.kind === 'center_head' ? '총판 센터장 10%' : (x.level ? x.level + '레벨 ' + (x.level === 1 ? '15' : '5') + '%' : '추천수당');
+  $('#org-body').innerHTML = rewards.length ? rewards.map((x) => `<tr><td><b>${esc(x.node_operators?.display_name) || '—'}</b><div class="muted sm">${esc(x.node_operators?.email || '')}</div></td><td>${kindLabel(x)}<div class="muted sm">${esc(x.counterparty || '')}</div></td><td class="ta-r" style="color:var(--st-ok,#5ee08a);font-weight:800">+$${fmt2(x.amount)}</td><td>${dt(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">영업수당 내역이 없습니다.</td></tr>';
 }
 
 /* ---- 조직 그래프 (SVG, 순수 클라이언트 레이아웃) ---- */
@@ -1306,6 +1307,7 @@ async function openMember(id) {
       dwFin('USDT 잔액', '$' + fmt2(f.usdtBalance), true),
       dwFin('노드 지급 누적', fmt2(f.grantedXont) + ' XONT'),
       dwFin('추천수당 누적', '$' + fmt2(f.referralUsdt)),
+      dwFin('센터장 수당 누적', '$' + fmt2(f.centerHeadUsdt)),
       dwFin('스테이킹 USDT 누적', '$' + fmt2(f.stakingUsdt)),
       dwFin('보상 누적', fmt2(f.rewardXont) + ' XONT'),
       dwFin('누적 입금(확정)', '$' + fmt(f.depositUsdt)),
