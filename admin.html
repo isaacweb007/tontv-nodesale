@@ -1172,6 +1172,7 @@ async function initNodeRewards() {
     ]);
     runBtn.disabled = !p.allowed;
     if (p.already_done) toast(dayEl.value + ' 은(는) 이미 분배되었습니다', 'err');
+    else if (p.is_future) toast('미래 일자는 분배할 수 없습니다', 'err');
     else if (dayEl.value < p.starts_on) toast('킥오프+6개월(' + p.starts_on + ') 이후부터 분배할 수 있습니다', 'err');
     else if (!Number(p.node_pool_usd)) toast('해당 일자의 노드풀 금액이 없습니다', 'err');
     else if (!Number(p.eligible_nodes)) toast('해당 일자에 보상 대상 노드가 없습니다', 'err');
