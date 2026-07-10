@@ -1902,10 +1902,18 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
    .admin-light 클래스는 admin.html 이 <html> 에만 부여하므로
    다른 페이지(마이오피스 등)에는 전혀 영향 없음.
    ========================================================= */
-.admin-light .admin{
+/* 변수는 <html>(.admin-light) 에 정의한다.
+   회원 상세 드로어(#mem-modal)·토스트 등은 .admin 섹션 바깥에 있어
+   .admin 에 정의하면 상속되지 않아 오버라이드가 무효가 된다. */
+.admin-light{
   --l-surface:#ffffff; --l-surface-2:#f1f4f8; --l-surface-3:#e8ecf2;
   --l-border:#e0e4ea; --l-border-2:#c7cdd6;
   --l-text:#1a1c20; --l-text-2:#4b515c; --l-text-3:#6b7280;
+  /* 상태색 — 다크의 파스텔톤은 흰 배경에서 대비가 낮아 진한 톤으로 대체.
+     인라인 style 에서도 var(--st-*, 다크값) 형태로 참조한다. */
+  --st-ok:#15803d; --st-warn:#8a6d00; --st-bad:#b91c1c;
+}
+.admin-light .admin{
   background:linear-gradient(180deg,#eef1f5,#e6e9ef);
   color:var(--l-text); color-scheme:light;
 }
@@ -2090,6 +2098,39 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 /* 티어별 판매 분포 바 트랙 · 목록 스크롤바 */
 .admin-light .tier-bar{background:var(--l-surface-3)}
 .admin-light .nodelist::-webkit-scrollbar-thumb{background:#c7cdd6}
+
+/* 상태 배지 · 델타 — 파스텔 글자색을 진한 톤으로 (틴트 배경은 유지) */
+.admin-light .appst.wait{color:var(--st-warn);background:rgba(245,196,81,.20);border-color:rgba(245,196,81,.45)}
+.admin-light .appst.ok{color:var(--st-ok);background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.40)}
+.admin-light .appst.err{color:var(--st-bad);background:rgba(232,17,45,.10);border-color:rgba(232,17,45,.35)}
+.admin-light .dwb.green{color:var(--st-ok)}
+.admin-light .dwb.red{color:var(--st-bad)}
+.admin-light .dwb.gold{color:var(--st-warn);background:rgba(245,196,81,.20)}
+.admin-light .dwb.gray{background:var(--l-surface-3);color:var(--l-text-2)}
+.admin-light .mdelta.up,
+.admin-light .tagx.on,
+.admin-light .wrow .ws,
+.admin-light .metric .up,
+.admin-light .atable .ta-num.rneg{color:var(--st-ok)}
+.admin-light .mdelta.down{color:var(--st-bad)}
+.admin-light .tk-stat .r2 b{color:var(--st-warn)}
+
+/* 회원 상세 드로어 — 잔여 항목 */
+.admin-light .dw-r-tag{color:var(--l-text-2)}
+.admin-light .dw-r-tag.pos{color:var(--st-ok)}
+.admin-light .dw-r-tag.neg{color:var(--st-bad)}
+.admin-light .dw-fincard.hi{background:linear-gradient(160deg,#fff5f6,#ffe9ec);border-color:#f3c6cd}
+.admin-light .dw-fincard.hi .dw-fv{color:var(--st-bad)}
+
+/* 티어 범례 (개요) */
+.admin-light .tl-row{border-top-color:var(--l-border)}
+.admin-light .tl-row b,
+.admin-light .tl-row .r{color:var(--l-text)}
+.admin-light .tl-row span{color:var(--l-text-3)}
+
+/* 시뮬레이션 시나리오 버튼 (선택된 .on 은 레드 유지) */
+.admin-light .sim-scen button{background:var(--l-surface-2);border-color:var(--l-border);color:var(--l-text-2)}
+.admin-light .sim-scen button:hover{border-color:var(--l-border-2)}
 
 /* 조직도 그래프 (SVG 캔버스) */
 .admin-light .org-graph-wrap{background:radial-gradient(circle at 50% -10%,#fbfcfd,#e9edf2 72%);border-color:var(--l-border)}

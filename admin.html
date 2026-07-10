@@ -23,7 +23,7 @@
 <section class="admin" id="admin" style="padding-top:108px">
   <div class="wrap">
     <div class="crumb" style="font-size:12.5px;color:#8a909b;margin-bottom:16px;display:flex;gap:9px;align-items:center">
-      <a href="index.html" style="color:#8a909b">홈</a><span style="opacity:.4">/</span><span style="color:#cfd2d8">운영자 어드민</span>
+      <a href="index.html" style="color:var(--l-text-3,#8a909b)">홈</a><span style="opacity:.4">/</span><span style="color:var(--l-text-2,#cfd2d8)">운영자 어드민</span>
     </div>
 
     <div class="admin-head">
@@ -616,7 +616,7 @@ async function loadOverview() {
     $('#o-todo').innerHTML = todo.length ? todo.map((x) => `<div class="la-row"><div class="la-who"><b><svg class="icon" style="vertical-align:-.15em;color:var(--red-2)"><use href="#${x.ic}"/></svg> ${esc(x.t)}</b></div><button class="la-ok" data-go="${x.go}">이동</button></div>`).join('') : '<div class="la-empty">처리할 항목이 없습니다.</div>';
     $$('#o-todo [data-go]').forEach((b) => b.addEventListener('click', () => selectTab(b.dataset.go)));
     const audit = await db.adminListAudit().catch(() => []);
-    $('#o-audit').innerHTML = audit.length ? audit.slice(0, 8).map((a) => `<div class="la-row"><div class="la-who"><b>${esc(a.action)}</b><span>${esc(a.target_table || '')} ${esc(a.target_id || '')}</span></div><span style="color:#8a909b;font-size:12px">${dt(a.created_at)}</span></div>`).join('') : '<div class="la-empty">로그가 없습니다.</div>';
+    $('#o-audit').innerHTML = audit.length ? audit.slice(0, 8).map((a) => `<div class="la-row"><div class="la-who"><b>${esc(a.action)}</b><span>${esc(a.target_table || '')} ${esc(a.target_id || '')}</span></div><span style="color:var(--l-text-3,#8a909b);font-size:12px">${dt(a.created_at)}</span></div>`).join('') : '<div class="la-empty">로그가 없습니다.</div>';
 
     const [sales, ops] = await Promise.all([db.adminListConfirmedSales().catch(() => []), db.adminOperatorGrowth().catch(() => [])]);
     renderOverviewTrends(sales, ops);
@@ -816,7 +816,7 @@ function renderOrgTree() {
 function renderOrgRewards(rewards) {
   const total = rewards.reduce((a, x) => a + Number(x.amount || 0), 0);
   $('#org-meta').textContent = rewards.length + '건 · 총 ' + fmt2(total) + ' XONT';
-  $('#org-body').innerHTML = rewards.length ? rewards.map((x) => `<tr><td><b>${esc(x.node_operators?.display_name) || '—'}</b><div class="muted sm">${esc(x.node_operators?.email || '')}</div></td><td>${esc(x.counterparty || '추천수당')}</td><td class="ta-r" style="color:#5ee08a;font-weight:800">+${fmt2(x.amount)}</td><td>${dt(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">추천수당 내역이 없습니다.</td></tr>';
+  $('#org-body').innerHTML = rewards.length ? rewards.map((x) => `<tr><td><b>${esc(x.node_operators?.display_name) || '—'}</b><div class="muted sm">${esc(x.node_operators?.email || '')}</div></td><td>${esc(x.counterparty || '추천수당')}</td><td class="ta-r" style="color:var(--st-ok,#5ee08a);font-weight:800">+${fmt2(x.amount)}</td><td>${dt(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">추천수당 내역이 없습니다.</td></tr>';
 }
 
 /* ---- 조직 그래프 (SVG, 순수 클라이언트 레이아웃) ---- */
@@ -939,7 +939,7 @@ function renderSales() {
     const acts = d.status === 'pending'
       ? `<div class="la-acts"><button class="la-ok" data-approve="${d.id}">승인</button><button class="la-no" data-reject="${d.id}">거절</button></div>`
       : `<span class="appst ${s[1]}">${s[0]}</span>`;
-    return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone||'')}</span></div><div class="la-qty">${d.tier ? esc(d.tier)+' · ' : ''}노드 <b>${d.quantity}</b>개 · ${fmt(d.amount_usdt)} USDT · 지급 <b class="r">${fmt(grant)}</b> XONT${bpct ? ' <span style="color:#7ee0a8">(+'+bpct+'%)</span>' : ''}${d.network ? ' · <b>'+esc(d.network)+'</b>' : ''}</div>${acts}</div>`;
+    return `<div class="la-row"><div class="la-who"><b>${esc(op.display_name) || '—'}</b><span>${esc(op.email)} · ${esc(op.phone||'')}</span></div><div class="la-qty">${d.tier ? esc(d.tier)+' · ' : ''}노드 <b>${d.quantity}</b>개 · ${fmt(d.amount_usdt)} USDT · 지급 <b class="r">${fmt(grant)}</b> XONT${bpct ? ' <span style="color:var(--st-ok,#7ee0a8)">(+'+bpct+'%)</span>' : ''}${d.network ? ' · <b>'+esc(d.network)+'</b>' : ''}</div>${acts}</div>`;
   }).join('') : '<div class="la-empty">신청이 없습니다.</div>';
   $$('#sales-body [data-approve]').forEach((b) => b.addEventListener('click', () => setDep(b.dataset.approve, 'confirmed')));
   $$('#sales-body [data-reject]').forEach((b) => b.addEventListener('click', () => setDep(b.dataset.reject, 'failed')));
@@ -991,7 +991,7 @@ async function loadWallet() {
       catch (e) { toast('실패: ' + e.message, 'err'); }
     });
     const tx = await db.adminListTransactions();
-    $('#tx-body').innerHTML = tx.length ? tx.map((t) => `<tr><td>${esc(t.kind)}</td><td>${esc(t.node_operators?.display_name || '—')}</td><td>${t.direction==='in'?'<span style="color:#5ee08a">입금</span>':'<span style="color:var(--red-2)">출금</span>'}</td><td>${fmt2(t.amount)}</td><td>${esc(t.counterparty||'—')}</td><td>${dt(t.created_at)}</td></tr>`).join('') : '<tr><td colspan="6" class="la-empty">원장이 비어 있습니다.</td></tr>';
+    $('#tx-body').innerHTML = tx.length ? tx.map((t) => `<tr><td>${esc(t.kind)}</td><td>${esc(t.node_operators?.display_name || '—')}</td><td>${t.direction==='in'?'<span style="color:var(--st-ok,#5ee08a)">입금</span>':'<span style="color:var(--red-2)">출금</span>'}</td><td>${fmt2(t.amount)}</td><td>${esc(t.counterparty||'—')}</td><td>${dt(t.created_at)}</td></tr>`).join('') : '<tr><td colspan="6" class="la-empty">원장이 비어 있습니다.</td></tr>';
   } catch (e) { toast('지갑 로드 실패: ' + e.message, 'err'); }
 }
 
@@ -1249,7 +1249,7 @@ const dwStat = (icon, label, val) => `<div class="dw-stat"><div class="dws-h"><s
 const dwFin = (label, val, hi) => `<div class="dw-fincard${hi ? ' hi' : ''}"><div class="dw-fl">${label}</div><div class="dw-fv">${val}</div></div>`;
 const dwRow = (a, b, c, cls) => `<div class="dw-row"><div class="dw-r-main"><b>${a}</b><span>${b}</span></div><div class="dw-r-tag ${cls || ''}">${c || ''}</div></div>`;
 const dwEmpty = (m) => `<div class="dw-empty">${m}</div>`;
-const depSt = (s) => ({ pending: '<span style="color:#f5c451">대기</span>', confirmed: '<span style="color:#5ee08a">승인</span>', failed: '<span style="color:#ff8a96">거절</span>' }[s] || s);
+const depSt = (s) => ({ pending: '<span style="color:var(--st-warn,#f5c451)">대기</span>', confirmed: '<span style="color:var(--st-ok,#5ee08a)">승인</span>', failed: '<span style="color:var(--st-bad,#ff8a96)">거절</span>' }[s] || s);
 
 async function openMember(id) {
   const dw = $('#mem-modal');
@@ -1289,7 +1289,7 @@ async function openMember(id) {
       dwKV('추천인 코드', esc(o.referred_by_code || '—')),
       dwKV('지갑 주소', o.wallet_address ? esc(o.wallet_address) : '<span class="dw-dim">미등록</span>'),
       dwKV('KYC', KYC[o.kyc_status] || o.kyc_status || '—'),
-      dwKV('상태', o.status === 'suspended' ? '<span style="color:#ff8a96">정지</span>' : '<span style="color:#5ee08a">활성</span>'),
+      dwKV('상태', o.status === 'suspended' ? '<span style="color:var(--st-bad,#ff8a96)">정지</span>' : '<span style="color:var(--st-ok,#5ee08a)">활성</span>'),
       dwKV('권한', (o.is_admin ? '관리자' : '') + (o.is_center_head ? (o.is_admin ? ' · 총판센터장' : '총판센터장') : '') || '일반 회원'),
       dwKV('가입일', dt(o.created_at)),
     ].join('');
