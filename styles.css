@@ -1901,7 +1901,7 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .admin-light .admin{
   --l-surface:#ffffff; --l-surface-2:#f1f4f8; --l-surface-3:#e8ecf2;
   --l-border:#e0e4ea; --l-border-2:#c7cdd6;
-  --l-text:#1a1c20; --l-text-2:#4b515c; --l-text-3:#727884;
+  --l-text:#1a1c20; --l-text-2:#4b515c; --l-text-3:#6b7280;
   background:linear-gradient(180deg,#eef1f5,#e6e9ef);
   color:var(--l-text); color-scheme:light;
 }
@@ -1996,7 +1996,11 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .admin-light .aseg button:hover,
 .admin-light .mo-tabs button:hover,
 .admin-light .dw-x:hover{color:var(--l-text)}
-.admin-light .atab.on{background:rgba(232,17,45,.10);color:var(--red)}
+/* 사이드탭 호버 배경(다크값 #24262c)을 밝게 — 안 덮으면 검은 블록이 됨 */
+.admin-light .atab:hover{background:var(--l-surface-3)}
+/* 활성 탭은 호버 중에도 레드 틴트 유지 */
+.admin-light .atab.on,
+.admin-light .atab.on:hover{background:rgba(232,17,45,.10);color:var(--red)}
 
 /* 카드/사이드 등 볼록 표면 → 흰색 */
 .admin-light .admin-side,
@@ -2079,12 +2083,29 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .admin-light .alloc-bar{background:var(--l-surface-3)}
 .admin-light .dist-dates .inp{color-scheme:light}
 
+/* 티어별 판매 분포 바 트랙 · 목록 스크롤바 */
+.admin-light .tier-bar{background:var(--l-surface-3)}
+.admin-light .nodelist::-webkit-scrollbar-thumb{background:#c7cdd6}
+
 /* 거절 버튼 · 드로어 카운트 배지 · 준비중 플레이스홀더 */
 .admin-light .la-no{background:var(--l-surface-2);color:var(--l-text-2)}
 .admin-light .la-no:hover{background:var(--l-surface-3)}
 .admin-light .dw-sec>h4 .dw-cnt{background:var(--l-surface-2);color:var(--l-text-3)}
 .admin-light .ph-soon{background:var(--l-surface-2);border-color:#c9cfd8;color:var(--l-text-2)}
 .admin-light .ph-soon h3{color:var(--l-text)}
+
+/* 상단 네비게이션 — .admin 바깥이라 별도 처리.
+   다크에선 투명 배경 + 흰 글씨(스크롤해야 .scrolled 로 어두워짐)라
+   라이트 모드에선 글씨가 안 보임 → 항상 밝은 배경 + 어두운 글씨로 고정 */
+.admin-light .nav{background:rgba(255,255,255,.86);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--line)}
+.admin-light .brand-word .logo{color:var(--ink)}
+.admin-light .brand-div{background:var(--line)}
+.admin-light .brand .tag{color:var(--muted)}
+.admin-light .nav-links a{color:var(--text-soft)}
+.admin-light .nav-links a:hover,
+.admin-light .nav-links a.active{color:var(--red)}
+.admin-light .nav-ghost-sm{color:var(--ink)}
+.admin-light .burger span{background:var(--ink)}
 
 /* 라이트 모드 토글 버튼 스타일 */
 .admin-light .theme-toggle{background:#fff;border-color:var(--l-border);color:var(--l-text-2)}

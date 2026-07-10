@@ -672,7 +672,7 @@ function renderTierBar(sales) {
   sales.forEach((r) => { const t = (r.tier || 'basic').toLowerCase(); totals[t] = (totals[t] || 0) + Number(r.amount_usdt || 0); });
   const grand = Object.values(totals).reduce((a, b) => a + b, 0);
   const present = order.filter((t) => totals[t]);
-  $('#tier-bar').innerHTML = present.length ? present.map((t) => `<span style="width:${(totals[t] / grand * 100).toFixed(2)}%;background:${colorMap[t]}" title="${labelMap[t]} ${(totals[t] / grand * 100).toFixed(1)}%"></span>`).join('') : '<span style="width:100%;background:#2a2d34"></span>';
+  $('#tier-bar').innerHTML = present.length ? present.map((t) => `<span style="width:${(totals[t] / grand * 100).toFixed(2)}%;background:${colorMap[t]}" title="${labelMap[t]} ${(totals[t] / grand * 100).toFixed(1)}%"></span>`).join('') : '<span style="width:100%;background:var(--l-surface-3,#2a2d34)"></span>';
   $('#tier-legend').innerHTML = present.length ? present.map((t) => `<div class="tl-row"><i style="background:${colorMap[t]}"></i><b>${labelMap[t]}</b><span>${fmt2(totals[t])} USDT</span><span class="r">${(totals[t] / grand * 100).toFixed(1)}%</span></div>`).join('') : '<div class="la-empty">판매 데이터가 없습니다.</div>';
   $('#tier-total').textContent = grand ? fmt2(grand) + ' USDT' : '—';
 }
