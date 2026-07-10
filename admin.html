@@ -250,9 +250,25 @@
             <p class="amini-desc" style="margin-top:8px">아래 카드는 시뮬레이션 파라미터 기준 추정치입니다. 실제 분배는 <b>노드 보상 분배</b> 카드에서 일자별 노드풀을 TONX로 환산해 처리합니다(오프체인 원장).</p>
           </div>
           <div class="dash-card" style="margin-bottom:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 일자별 매출·노드풀</h3><span class="tagx">revenue_daily</span></div>
-            <div class="atable-wrap"><table class="atable">
-              <thead><tr><th>일자</th><th>광고 매출</th><th>구독 매출</th><th>노드풀</th></tr></thead>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-clock"/></svg></span> 일자별 매출·노드풀 입력</h3><span class="tagx" id="rv-mode">신규</span></div>
+            <p class="amini-desc">노드 보상 분배의 <b>재원</b>이 되는 값입니다. 금액은 모두 <b>USD</b> 기준. 같은 날짜를 다시 저장하면 덮어씁니다. 이미 분배된 일자는 노드풀 변경·삭제가 차단됩니다.</p>
+            <div class="cfg-grid">
+              <div class="cfg-f"><label>일자</label><input class="inp" type="date" id="rv-day"></div>
+              <div class="cfg-f"><label>광고 매출 ($)</label><input class="inp" id="rv-ad" type="number" step="0.01"></div>
+              <div class="cfg-f"><label>구독 매출 ($)</label><input class="inp" id="rv-sub" type="number" step="0.01"></div>
+              <div class="cfg-f"><label>토큰 매출 ($)</label><input class="inp" id="rv-token" type="number" step="0.01"></div>
+              <div class="cfg-f"><label>노드풀 ($)</label><input class="inp" id="rv-pool" type="number" step="0.01"></div>
+            </div>
+            <div class="run-row" style="margin-top:0;padding-top:0;border-top:none">
+              <label class="atoggle"><input type="checkbox" id="rv-auto" checked><span class="tk"></span> 노드풀 자동계산 — (광고 + 구독) × 노드몫 <b class="r" id="rv-share">20</b>%</label>
+              <span class="dlabel">환산 <b class="r" id="rv-tonx">0</b> TONX</span>
+            </div>
+            <div class="set-save-row">
+              <button class="btn btn-red" id="rv-save"><svg class="icon"><use href="#i-check"/></svg> 저장</button>
+              <button class="btn btn-ghost-dark" id="rv-new">새로 입력</button>
+            </div>
+            <div class="atable-wrap" style="margin-top:16px"><table class="atable">
+              <thead><tr><th>일자</th><th>광고 매출</th><th>구독 매출</th><th>토큰 매출</th><th class="ta-r">노드풀</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
               <tbody id="settle-body"></tbody></table></div>
           </div>
 
@@ -1024,9 +1040,9 @@ async function loadSettle() {
     const V = ps && ps.viewers ? Number(ps.viewers) : 1000000;
     const dailyFiat = V * ads * krw, poolFiat = dailyFiat * share;
     $('#settle-stats').innerHTML = statCards([['기준 시청자', fmt(V)], ['일 리워드 재원', won(dailyFiat)], ['노드풀(20%)/일', won(poolFiat)], ['노드풀/월', won(poolFiat * 30)]]);
-    const { data: rev } = await db.supabase.from('revenue_daily').select('*').order('day', { ascending: false }).limit(30);
-    $('#settle-body').innerHTML = (rev && rev.length) ? rev.map((r) => `<tr><td>${r.day}</td><td>${usd(r.ad_revenue||0)}</td><td>${usd(r.subscription_revenue||0)}</td><td class="r">${usd(r.node_pool_amount||0)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">일자별 매출 데이터가 없습니다.</td></tr>';
   } catch (e) { toast('정산 로드 실패: ' + e.message, 'err'); }
+
+  try { await initRevenueEditor(); } catch (e) { toast('매출 입력 로드 실패: ' + e.message, 'err'); }
 
   try { await initNodeRewards(); } catch (e) { toast('노드 보상 로드 실패: ' + e.message, 'err'); }
   try {
@@ -1034,6 +1050,96 @@ async function loadSettle() {
     renderCommissions();
     $('#comm-q').addEventListener('input', renderCommissions);
   } catch (e) { toast('수당 정산 로드 실패: ' + e.message, 'err'); }
+}
+
+/* ---- 일자별 매출·노드풀 입력 (revenue_daily) ---- */
+let rvBound = false, RV_RUNS = new Set();
+async function initRevenueEditor() {
+  const c = await cfg();
+  const share = Number(c.node_share_pct || 20);
+  const krw = Number(c.krw_per_usd || 1500), ref = Number(c.reference_price_krw || 100);
+  $('#rv-share').textContent = share;
+
+  const el = (id) => $('#' + id);
+  const num = (id) => Number(el(id).value) || 0;
+
+  function recalc() {
+    if (el('rv-auto').checked) {
+      el('rv-pool').value = ((num('rv-ad') + num('rv-sub')) * share / 100).toFixed(2);
+      el('rv-pool').readOnly = true;
+    } else { el('rv-pool').readOnly = false; }
+    const tonx = ref > 0 ? num('rv-pool') * krw / ref : 0;
+    $('#rv-tonx').textContent = fmt2(tonx);
+  }
+
+  function resetForm() {
+    el('rv-day').value = new Date().toISOString().slice(0, 10);
+    ['rv-ad', 'rv-sub', 'rv-token'].forEach((i) => (el(i).value = ''));
+    el('rv-auto').checked = true;
+    $('#rv-mode').textContent = '신규';
+    recalc();
+  }
+
+  function fillForm(r) {
+    el('rv-day').value = r.day;
+    el('rv-ad').value = r.ad_revenue ?? '';
+    el('rv-sub').value = r.subscription_revenue ?? '';
+    el('rv-token').value = r.token_revenue ?? '';
+    el('rv-auto').checked = false;
+    el('rv-pool').value = r.node_pool_amount ?? '';
+    $('#rv-mode').textContent = RV_RUNS.has(r.day) ? '분배 완료 · 노드풀 잠김' : '수정';
+    recalc();
+  }
+
+  async function renderTable() {
+    const [rows, runs] = await Promise.all([db.adminListRevenueDaily(60), db.adminListNodeRewardRuns()]);
+    RV_RUNS = new Set(runs.map((r) => r.day));
+    $('#settle-body').innerHTML = rows.length ? rows.map((r) => {
+      const done = RV_RUNS.has(r.day);
+      return `<tr>
+        <td><b>${r.day}</b></td><td>${usd(r.ad_revenue || 0)}</td><td>${usd(r.subscription_revenue || 0)}</td>
+        <td>${usd(r.token_revenue || 0)}</td><td class="ta-r ta-num r">${usd(r.node_pool_amount || 0)}</td>
+        <td><span class="appst ${done ? 'ok' : 'wait'}">${done ? '분배 완료' : '미분배'}</span></td>
+        <td class="ta-r"><button class="act no" data-rv-edit="${r.day}">편집</button>${done ? '' : `<button class="act no" data-rv-del="${r.day}">삭제</button>`}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="7" class="la-empty">일자별 매출 데이터가 없습니다. 위에서 입력하세요.</td></tr>';
+
+    $$('#settle-body [data-rv-edit]').forEach((b) => b.addEventListener('click', async () => {
+      const row = (await db.adminListRevenueDaily(60)).find((x) => x.day === b.dataset.rvEdit);
+      if (row) { fillForm(row); $('#rv-day').scrollIntoView({ block: 'center' }); }
+    }));
+    $$('#settle-body [data-rv-del]').forEach((b) => b.addEventListener('click', async () => {
+      if (!confirm(b.dataset.rvDel + ' 일자 매출 데이터를 삭제할까요?')) return;
+      try { await db.adminDeleteRevenueDaily(b.dataset.rvDel); toast('삭제되었습니다'); await renderTable(); }
+      catch (e) { toast('삭제 실패: ' + e.message, 'err'); }
+    }));
+  }
+
+  if (!rvBound) {
+    rvBound = true;
+    ['rv-ad', 'rv-sub'].forEach((i) => el(i).addEventListener('input', recalc));
+    el('rv-pool').addEventListener('input', recalc);
+    el('rv-auto').addEventListener('change', recalc);
+    el('rv-day').addEventListener('change', () => {
+      $('#rv-mode').textContent = RV_RUNS.has(el('rv-day').value) ? '분배 완료 · 노드풀 잠김' : '신규/수정';
+    });
+    $('#rv-new').addEventListener('click', resetForm);
+    $('#rv-save').addEventListener('click', async () => {
+      if (!el('rv-day').value) { toast('일자를 선택하세요', 'err'); return; }
+      const btn = $('#rv-save'); btn.disabled = true;
+      try {
+        await db.adminUpsertRevenueDaily({
+          day: el('rv-day').value, ad_revenue: num('rv-ad'), subscription_revenue: num('rv-sub'),
+          token_revenue: num('rv-token'), node_pool_amount: num('rv-pool'),
+        });
+        toast(el('rv-day').value + ' 매출이 저장되었습니다');
+        await renderTable();
+      } catch (e) { toast('저장 실패: ' + e.message, 'err'); }
+      finally { btn.disabled = false; }
+    });
+  }
+  resetForm();
+  await renderTable();
 }
 
 /* ---- 노드 보상 분배 (운영수익 → TONX) ---- */
