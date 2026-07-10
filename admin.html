@@ -323,31 +323,17 @@
         <!-- 보상 규칙 -->
         <section class="apanel" data-panel="rules" hidden>
           <div class="dash-card">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-sliders"/></svg></span> 보상 규칙 (배당·추천·스테이킹)</h3><span class="tagx" id="rules-meta"></span></div>
+            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-sliders"/></svg></span> 보상 규칙 (배당·시뮬레이션)</h3><span class="tagx" id="rules-meta"></span></div>
             <div class="cfg-grid">
               <div class="cfg-f"><label>노드 몫 (%)</label><input class="inp" id="r-share" type="number" step="0.1"></div>
               <div class="cfg-f"><label>광고 1개당 리워드 재원 (원)</label><input class="inp" id="r-krw" type="number" step="1"></div>
               <div class="cfg-f"><label>TONX 기준가 (원)</label><input class="inp" id="r-ref" type="number" step="1"></div>
               <div class="cfg-f"><label>유저당 광고/일</label><input class="inp" id="r-ads" type="number" step="1"></div>
               <div class="cfg-f"><label>노드 총 수 (÷N)</label><input class="inp" id="r-cap" type="number" step="1000"></div>
-              <div class="cfg-f"><label>1단계 추천 (%)</label><input class="inp" id="r-l1" type="number" step="0.1"></div>
-              <div class="cfg-f"><label>2단계 추천 (%)</label><input class="inp" id="r-l2" type="number" step="0.1"></div>
-              <div class="cfg-f"><label>스테이킹 APY (연 %)</label><input class="inp" id="r-apy" type="number" step="0.1"></div>
               <div class="cfg-f"><label>스테이킹 기본 개월</label><input class="inp" id="r-months" type="number" step="1"></div>
             </div>
+            <p class="amini-desc" style="margin-top:12px">※ <b>추천수당(1대·2대)과 총판 센터장 비율</b>은 <b>노드판매 배분</b> 탭에서 관리합니다. 지급 로직이 그 값을 직접 읽으므로, 여기서 따로 설정하지 않습니다.</p>
             <button class="btn btn-red" id="rules-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 규칙 저장</button>
-          </div>
-          <div class="dash-card" style="margin-bottom:20px">
-            <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-share"/></svg></span> 추천수당 (다단계 %)</h3><span class="tagx">단계별 추천 보상률</span></div>
-            <div class="atable-wrap"><table class="atable">
-              <thead><tr><th>단계</th><th>보상률(%)</th><th>라벨</th><th>상태</th><th class="ta-r">관리</th></tr></thead>
-              <tbody id="cl-body"></tbody></table></div>
-            <div class="cfg-grid" style="margin-top:14px">
-              <div class="cfg-f"><label>단계</label><input class="inp" id="cl-level" type="number" placeholder="3"></div>
-              <div class="cfg-f"><label>보상률 (%)</label><input class="inp" id="cl-rate" type="number" step="0.1" placeholder="0"></div>
-              <div class="cfg-f"><label>라벨</label><input class="inp" id="cl-label" placeholder="예: 3단계"></div>
-            </div>
-            <button class="btn btn-red" id="cl-save" style="margin-top:6px">단계 추가/수정</button>
           </div>
           <div class="dash-card">
             <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-coins"/></svg></span> 보너스 규칙</h3><span class="tagx" id="br-count">0개</span></div>
@@ -1247,29 +1233,15 @@ async function saveAnn() {
 async function loadRules() {
   const c = await cfg();
   $('#r-share').value=c.node_share_pct; $('#r-krw').value=c.ad_reward_krw; $('#r-ref').value=c.reference_price_krw;
-  $('#r-ads').value=c.sim_ads_per_user; $('#r-cap').value=c.node_cap; $('#r-l1').value=c.ref_l1_pct; $('#r-l2').value=c.ref_l2_pct;
-  $('#r-apy').value=c.staking_apy; $('#r-months').value=c.staking_months_default;
-  $('#rules-meta').textContent = `노드몫 ${c.node_share_pct}% · 기준가 ${c.reference_price_krw}원 · APY ${c.staking_apy}%`;
+  $('#r-ads').value=c.sim_ads_per_user; $('#r-cap').value=c.node_cap; $('#r-months').value=c.staking_months_default;
+  $('#rules-meta').textContent = `노드몫 ${c.node_share_pct}% · TONX 기준가 ${c.reference_price_krw}원`;
   $('#rules-save').addEventListener('click', async () => {
-    const patch = { node_share_pct:+$('#r-share').value, ad_reward_krw:+$('#r-krw').value, reference_price_krw:+$('#r-ref').value, sim_ads_per_user:+$('#r-ads').value, node_cap:+$('#r-cap').value, ref_l1_pct:+$('#r-l1').value, ref_l2_pct:+$('#r-l2').value, staking_apy:+$('#r-apy').value, staking_months_default:+$('#r-months').value };
+    // 추천수당·센터장 비율은 revenue_allocations(노드판매 배분 탭)이 단일 출처이므로 여기서 저장하지 않는다.
+    const patch = { node_share_pct:+$('#r-share').value, ad_reward_krw:+$('#r-krw').value, reference_price_krw:+$('#r-ref').value, sim_ads_per_user:+$('#r-ads').value, node_cap:+$('#r-cap').value, staking_months_default:+$('#r-months').value };
     try { CFG = await db.adminUpdateConfig(patch); toast('규칙이 저장되었습니다'); } catch (e) { toast('실패: '+e.message,'err'); }
   });
-  renderCL(); $('#cl-save').addEventListener('click', saveCL);
   renderBR(); $('#br-save').addEventListener('click', saveBR);
   $('#br-new').addEventListener('click', () => { $('#br-id').value=''; $('#br-name').value=''; $('#br-kind').value=''; $('#br-rate').value=''; });
-}
-async function renderCL() {
-  try {
-    const cl = await db.adminListCommissionLevels();
-    $('#cl-body').innerHTML = cl.length ? cl.map((c) => `<tr><td><b>${c.level}단계</b></td><td>${c.rate_pct}%</td><td>${esc(c.label||'')}</td><td>${c.active?'<span class="appst ok">활성</span>':'<span class="muted sm">off</span>'}</td><td class="ta-r"><button class="la-ok" data-cle="${c.level}" data-rate="${c.rate_pct}" data-label="${esc(c.label||'')}">수정</button><button class="la-no" data-cld="${c.level}">삭제</button></td></tr>`).join('') : '<tr><td colspan="5" class="la-empty">단계가 없습니다.</td></tr>';
-    $$('#cl-body [data-cle]').forEach((b) => b.addEventListener('click', () => { $('#cl-level').value=b.dataset.cle; $('#cl-rate').value=b.dataset.rate; $('#cl-label').value=b.dataset.label; }));
-    $$('#cl-body [data-cld]').forEach((b) => b.addEventListener('click', async () => { try { await db.adminDeleteCommissionLevel(+b.dataset.cld); toast('삭제됨'); renderCL(); } catch (e) { toast('실패: '+e.message,'err'); } }));
-  } catch (e) { toast('추천수당 로드 실패: '+e.message,'err'); }
-}
-async function saveCL() {
-  const lv = parseInt($('#cl-level').value); if (!lv) { toast('단계를 입력하세요','err'); return; }
-  try { await db.adminSaveCommissionLevel({ level:lv, rate_pct:$('#cl-rate').value, label:$('#cl-label').value }); toast('저장됨'); $('#cl-level').value=''; $('#cl-rate').value=''; $('#cl-label').value=''; renderCL(); }
-  catch (e) { toast('실패: '+e.message,'err'); }
 }
 async function renderBR() {
   try {
