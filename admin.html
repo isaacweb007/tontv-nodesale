@@ -330,9 +330,10 @@
               <div class="cfg-f"><label>TONX 기준가 (원)</label><input class="inp" id="r-ref" type="number" step="1"></div>
               <div class="cfg-f"><label>유저당 광고/일</label><input class="inp" id="r-ads" type="number" step="1"></div>
               <div class="cfg-f"><label>노드 총 수 (÷N)</label><input class="inp" id="r-cap" type="number" step="1000"></div>
-              <div class="cfg-f"><label>스테이킹 기본 개월</label><input class="inp" id="r-months" type="number" step="1"></div>
+              <div class="cfg-f"><label>스테이킹 리워드 개월</label><input class="inp" id="r-months" type="number" step="1" min="1"></div>
             </div>
-            <p class="amini-desc" style="margin-top:12px">※ <b>추천수당(1대·2대)과 총판 센터장 비율</b>은 <b>노드판매 배분</b> 탭에서 관리합니다. 지급 로직이 그 값을 직접 읽으므로, 여기서 따로 설정하지 않습니다.</p>
+            <p class="amini-desc" style="margin-top:12px">※ <b>추천수당(1대·2대)과 총판 센터장 비율</b>은 <b>노드판매 배분</b> 탭에서 관리합니다. 지급 로직이 그 값을 직접 읽으므로, 여기서 따로 설정하지 않습니다.<br>
+              ※ <b>스테이킹 리워드 개월</b>은 두 가지를 동시에 결정합니다 — 앞으로 승인되는 노드의 <b>스테이킹 지급 기간</b>, 그리고 <b>노드 보상 분배 시작일</b>(킥오프 + 이 개월수). <b>이미 생성된 스테이킹은 바뀌지 않습니다.</b></p>
             <button class="btn btn-red" id="rules-save" style="margin-top:6px"><svg class="icon"><use href="#i-check"/></svg> 규칙 저장</button>
           </div>
           <div class="dash-card">
@@ -1234,11 +1235,20 @@ async function loadRules() {
   const c = await cfg();
   $('#r-share').value=c.node_share_pct; $('#r-krw').value=c.ad_reward_krw; $('#r-ref').value=c.reference_price_krw;
   $('#r-ads').value=c.sim_ads_per_user; $('#r-cap').value=c.node_cap; $('#r-months').value=c.staking_months_default;
-  $('#rules-meta').textContent = `노드몫 ${c.node_share_pct}% · TONX 기준가 ${c.reference_price_krw}원`;
+  $('#rules-meta').textContent = `노드몫 ${c.node_share_pct}% · TONX 기준가 ${c.reference_price_krw}원 · 스테이킹 ${c.staking_months_default}개월`;
   $('#rules-save').addEventListener('click', async () => {
     // 추천수당·센터장 비율은 revenue_allocations(노드판매 배분 탭)이 단일 출처이므로 여기서 저장하지 않는다.
-    const patch = { node_share_pct:+$('#r-share').value, ad_reward_krw:+$('#r-krw').value, reference_price_krw:+$('#r-ref').value, sim_ads_per_user:+$('#r-ads').value, node_cap:+$('#r-cap').value, staking_months_default:+$('#r-months').value };
-    try { CFG = await db.adminUpdateConfig(patch); toast('규칙이 저장되었습니다'); } catch (e) { toast('실패: '+e.message,'err'); }
+    const months = +$('#r-months').value;
+    if (!Number.isInteger(months) || months < 1) { toast('스테이킹 리워드 개월은 1 이상의 정수여야 합니다', 'err'); return; }
+    // 이 값은 분배 시작일(킥오프+N개월)도 함께 움직이므로 변경 시 한 번 확인한다.
+    const prev = Number(CFG?.staking_months_default ?? c.staking_months_default);
+    if (months !== prev && !confirm(`스테이킹 리워드 개월을 ${prev} → ${months}(으)로 바꿉니다.\n앞으로 승인되는 노드의 지급 기간과 노드 보상 분배 시작일이 함께 바뀝니다.\n(이미 생성된 스테이킹은 그대로입니다)\n\n진행할까요?`)) return;
+    const patch = { node_share_pct:+$('#r-share').value, ad_reward_krw:+$('#r-krw').value, reference_price_krw:+$('#r-ref').value, sim_ads_per_user:+$('#r-ads').value, node_cap:+$('#r-cap').value, staking_months_default:months };
+    try {
+      CFG = await db.adminUpdateConfig(patch);
+      $('#rules-meta').textContent = `노드몫 ${CFG.node_share_pct}% · TONX 기준가 ${CFG.reference_price_krw}원 · 스테이킹 ${CFG.staking_months_default}개월`;
+      toast('규칙이 저장되었습니다');
+    } catch (e) { toast('실패: '+e.message,'err'); }
   });
   renderBR(); $('#br-save').addEventListener('click', saveBR);
   $('#br-new').addEventListener('click', () => { $('#br-id').value=''; $('#br-name').value=''; $('#br-kind').value=''; $('#br-rate').value=''; });
