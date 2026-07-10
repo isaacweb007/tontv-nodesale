@@ -1762,6 +1762,10 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 .org-graph-wrap.dragging #og-canvas{transition:none}
 #org-graph-svg{display:block}
 .og-node{cursor:pointer}
+/* 노드 도형 색 — 인라인 속성 대신 CSS로 (테마 전환 가능) */
+.og-node rect{fill:#1b1e23;stroke:#2a2d34;stroke-width:1.3}
+.og-node.og-root rect{stroke:#e5484d;stroke-width:2}
+.og-node.og-head rect{stroke:#f5c451;stroke-width:2}
 .og-node .og-name{fill:#eef0f3;font-size:12.5px;font-weight:800;font-family:var(--font)}
 .og-node .og-meta{fill:#8a909b;font-size:10.5px;font-family:var(--font)}
 .og-node:hover rect{filter:brightness(1.3)}
@@ -2086,6 +2090,19 @@ textarea.inp{resize:vertical;font-family:inherit;line-height:1.5}
 /* 티어별 판매 분포 바 트랙 · 목록 스크롤바 */
 .admin-light .tier-bar{background:var(--l-surface-3)}
 .admin-light .nodelist::-webkit-scrollbar-thumb{background:#c7cdd6}
+
+/* 조직도 그래프 (SVG 캔버스) */
+.admin-light .org-graph-wrap{background:radial-gradient(circle at 50% -10%,#fbfcfd,#e9edf2 72%);border-color:var(--l-border)}
+.admin-light .og-node rect{fill:var(--l-surface);stroke:#ccd2da}
+.admin-light .og-node.og-root rect{stroke:var(--red)}
+.admin-light .og-node.og-head rect{stroke:#b8860b}
+.admin-light .og-node .og-name{fill:var(--l-text)}
+.admin-light .og-node .og-meta{fill:var(--l-text-3)}
+/* 흰 노드는 밝기를 올려도 변화가 없으므로 살짝 어둡게 + 테두리 강조 */
+.admin-light .og-node:hover rect{filter:none;fill:var(--l-surface-3);stroke:var(--l-border-2)}
+.admin-light .og-node.og-root:hover rect{stroke:var(--red)}
+.admin-light .og-node.og-head:hover rect{stroke:#b8860b}
+.admin-light .og-edge{stroke:#bfc6d0}
 
 /* 거절 버튼 · 드로어 카운트 배지 · 준비중 플레이스홀더 */
 .admin-light .la-no{background:var(--l-surface-2);color:var(--l-text-2)}

@@ -856,9 +856,10 @@ function renderOrgGraph() {
   }).join('');
   const nodes = pos.map((p) => {
     const n = p.node;
-    const stroke = n.is_center_head ? '#f5c451' : (p.depth === 0 ? '#e5484d' : '#2a2d34');
-    return `<g class="og-node" data-op="${n.id}">
-      <rect x="${p.x}" y="${p.y}" width="${OG_W}" height="${OG_H}" rx="10" fill="#1b1e23" stroke="${stroke}" stroke-width="${n.is_center_head || p.depth === 0 ? 2 : 1.3}"/>
+    // 색상은 CSS(.og-node.og-head / .og-root)에서 지정 — 다크·라이트 테마 전환을 위해 인라인 색을 두지 않는다
+    const kind = n.is_center_head ? 'og-head' : (p.depth === 0 ? 'og-root' : '');
+    return `<g class="og-node ${kind}" data-op="${n.id}">
+      <rect x="${p.x}" y="${p.y}" width="${OG_W}" height="${OG_H}" rx="10"/>
       <text x="${p.x + 12}" y="${p.y + 24}" class="og-name">${esc(trunc(n.display_name || n.email || '—', 16))}</text>
       <text x="${p.x + 12}" y="${p.y + 42}" class="og-meta">${n.is_center_head ? '총판센터장 · ' : ''}노드 ${n.node_count} · 하위 ${(ORG_CHILDREN[n.id] || []).length}</text>
     </g>`;
