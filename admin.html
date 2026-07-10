@@ -815,8 +815,8 @@ function renderOrgTree() {
 
 function renderOrgRewards(rewards) {
   const total = rewards.reduce((a, x) => a + Number(x.amount || 0), 0);
-  $('#org-meta').textContent = rewards.length + '건 · 총 ' + fmt2(total) + ' XONT';
-  $('#org-body').innerHTML = rewards.length ? rewards.map((x) => `<tr><td><b>${esc(x.node_operators?.display_name) || '—'}</b><div class="muted sm">${esc(x.node_operators?.email || '')}</div></td><td>${esc(x.counterparty || '추천수당')}</td><td class="ta-r" style="color:var(--st-ok,#5ee08a);font-weight:800">+${fmt2(x.amount)}</td><td>${dt(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">추천수당 내역이 없습니다.</td></tr>';
+  $('#org-meta').textContent = rewards.length + '건 · 총 $' + fmt2(total) + ' USDT';
+  $('#org-body').innerHTML = rewards.length ? rewards.map((x) => `<tr><td><b>${esc(x.node_operators?.display_name) || '—'}</b><div class="muted sm">${esc(x.node_operators?.email || '')}</div></td><td>${x.level ? x.level + '레벨' : '추천수당'}<div class="muted sm">${esc(x.counterparty || '')}</div></td><td class="ta-r" style="color:var(--st-ok,#5ee08a);font-weight:800">+$${fmt2(x.amount)}</td><td>${dt(x.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="la-empty">추천수당 내역이 없습니다.</td></tr>';
 }
 
 /* ---- 조직 그래프 (SVG, 순수 클라이언트 레이아웃) ---- */
@@ -1303,10 +1303,11 @@ async function openMember(id) {
 
     $('#mm-finance').innerHTML = [
       dwFin('XONT 잔액', fmt2(f.balance), true),
-      dwFin('노드 지급 누적', fmt2(f.grantedXont)),
-      dwFin('추천수당 누적', fmt2(f.referralXont)),
-      dwFin('보상 누적', fmt2(f.rewardXont)),
-      dwFin('스테이킹 락업', fmt2(f.stakedActive)),
+      dwFin('USDT 잔액', '$' + fmt2(f.usdtBalance), true),
+      dwFin('노드 지급 누적', fmt2(f.grantedXont) + ' XONT'),
+      dwFin('추천수당 누적', '$' + fmt2(f.referralUsdt)),
+      dwFin('스테이킹 USDT 누적', '$' + fmt2(f.stakingUsdt)),
+      dwFin('보상 누적', fmt2(f.rewardXont) + ' XONT'),
       dwFin('누적 입금(확정)', '$' + fmt(f.depositUsdt)),
       dwFin('TONX 보상수량', '없음'),
     ].join('');

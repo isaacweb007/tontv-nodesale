@@ -14,7 +14,8 @@
   const XONT_PRICE = 0.85;                                            // demo USD price (dashboard)
   const TONX_SUPPLY = 1e10;                                           // 100억 TONX 총 발행 한도
   const VIEWER_MINT = 0.0006;                                         // 시청자 1인당 TONX 채굴 / s (demo)
-  const REF1_PCT = 0.15, REF2_PCT = 0.05;                            // 추천 보상: 1단계 15% · 2단계 5% (DAO 정책)
+  const REF1_PCT = 0.15, REF2_PCT = 0.05;                            // 추천 보상: 1레벨 15% · 2레벨 5% (DAO 정책)
+  const NODE_PRICE_USD = 1000;                                       // 노드 1개 $1,000 — 수당은 판매금액 기준 USDT
   const toast = (m, t) => (window.toast ? window.toast(m, t) : 0);    // shared toast (defined in layout.js)
   document.documentElement.classList.add('has-js');                  // enables scroll-reveal
 
@@ -394,16 +395,16 @@
       { amt: 1000, mo: 12, apy: 24, reward: 58.10 },
     ],
     nodes: [],
-    // 내가 추천한 노드 사업자 (2단계) — 1단계 직접 추천, 2단계는 1단계가 추천
+    // 내가 추천한 노드 사업자 (2레벨) — reward 는 노드 판매금액 × 레벨 비율 (USDT, 1회성)
     referrals: [
-      { name: '김민준', addr: 'EQAb…3kT', tier: 1, nodes: 8,  reward: 4218.5 },
-      { name: '최예나', addr: 'UQC7…9xR', tier: 1, nodes: 12, reward: 6531.2 },
-      { name: '이서연', addr: 'EQDe…1mP', tier: 1, nodes: 5,  reward: 2740.8 },
-      { name: '박지후', addr: 'UQF2…7kL', tier: 1, nodes: 3,  reward: 1602.3 },
-      { name: '정도윤', addr: 'EQGh…4nQ', tier: 2, nodes: 6,  reward: 980.4 },
-      { name: '오시우', addr: 'UQK9…2vT', tier: 2, nodes: 4,  reward: 651.7 },
-      { name: '한소율', addr: 'EQLm…8wC', tier: 2, nodes: 2,  reward: 326.1 },
-    ],
+      { name: '김민준', addr: 'EQAb…3kT', tier: 1, nodes: 8  },
+      { name: '최예나', addr: 'UQC7…9xR', tier: 1, nodes: 12 },
+      { name: '이서연', addr: 'EQDe…1mP', tier: 1, nodes: 5  },
+      { name: '박지후', addr: 'UQF2…7kL', tier: 1, nodes: 3  },
+      { name: '정도윤', addr: 'EQGh…4nQ', tier: 2, nodes: 6  },
+      { name: '오시우', addr: 'UQK9…2vT', tier: 2, nodes: 4  },
+      { name: '한소율', addr: 'EQLm…8wC', tier: 2, nodes: 2  },
+    ].map(r => ({ ...r, reward: r.nodes * NODE_PRICE_USD * (r.tier === 1 ? REF1_PCT : REF2_PCT) })),
   };
   // 노드는 균등 채굴(÷N) — 현재 채굴 속도는 모두 같고, 누적은 가동 시점에 따라 다름
   const nodeSeed = [9820, 7640, 5210, 3180, 1290];
@@ -456,8 +457,7 @@
   const perNodeRate  = () => viewerRate() / state.totalNodes;      // 노드 1개 XONT 채굴 / s (÷N 균등)
   const myRate       = () => perNodeRate() * state.myNodes;        // 내 지갑 XONT 채굴 / s
   const perNodeToday = () => state.tonxToday / state.totalNodes;   // 노드 1개 오늘 채굴 (÷N)
-  // 추천 보상 적립 속도(/s): 피추천자 노드의 XONT 채굴에서 1·2단계 비율 환원
-  const refRate = r => (r.tier === 1 ? REF1_PCT : REF2_PCT) * r.nodes * perNodeRate();
+  // 추천 보상은 노드 판매 시 1회 확정되는 USDT 수당이므로 시간에 따라 적립되지 않는다.
 
   /* ---- count-up intro for big metrics ---- */
   function countUp(el, target, dur = 1400, pre = '', suf = '') {
@@ -502,12 +502,12 @@
           <div class="ridx b${r.tier}">${r.tier}</div>
           <div>
             <div class="rn">${r.name} <span class="rmask">${r.addr}</span></div>
-            <div class="rs2"><span class="badge-sm b${r.tier}">${r.tier}단계</span> · 노드 ${r.nodes}개</div>
+            <div class="rs2"><span class="badge-sm b${r.tier}">${r.tier}레벨</span> · 노드 ${r.nodes}개</div>
           </div>
         </div>
         <div class="rr">
-          <div class="rx">+<span id="rfr-${i}">${fmt2(r.reward)}</span> <span class="u">XONT</span></div>
-          <div class="rl2">내 보상 적립</div>
+          <div class="rx">+$<span id="rfr-${i}">${fmt2(r.reward)}</span> <span class="u">USDT</span></div>
+          <div class="rl2">노드판매 ${r.tier === 1 ? '15' : '5'}%</div>
         </div>
       </div>`).join('');
   }
@@ -538,12 +538,12 @@
     const total = w1 + w2;
     $('#r1-people') && ($('#r1-people').textContent = p1 + '명');
     $('#r1-nodes')  && ($('#r1-nodes').textContent  = fmt(n1) + '개');
-    $('#r1-reward') && ($('#r1-reward').textContent = fmt2(w1) + ' XONT');
+    $('#r1-reward') && ($('#r1-reward').textContent = '$' + fmt2(w1));
     $('#r2-people') && ($('#r2-people').textContent = p2 + '명');
     $('#r2-nodes')  && ($('#r2-nodes').textContent  = fmt(n2) + '개');
-    $('#r2-reward') && ($('#r2-reward').textContent = fmt2(w2) + ' XONT');
+    $('#r2-reward') && ($('#r2-reward').textContent = '$' + fmt2(w2));
     $('#ref-total-x')   && ($('#ref-total-x').textContent   = fmt2(total));
-    $('#ref-total-usd') && ($('#ref-total-usd').textContent = '≈ $' + fmt2(total * XONT_PRICE) + ' · 익월 10일 지급');
+    $('#ref-total-usd') && ($('#ref-total-usd').textContent = 'USDT · 노드 판매금액 기준 1레벨 15% · 2레벨 5%');
     $('#ref-people-count') && ($('#ref-people-count').textContent = (p1 + p2) + '명 · 노드 ' + fmt(n1 + n2) + '개');
   }
 
@@ -643,8 +643,7 @@
       const rl = $('#nrate-' + n.id); if (rl) rl.textContent = pnr.toFixed(3);
     });
 
-    // ---- 추천 보상 적립 (1단계 15% · 2단계 5%) ----
-    state.referrals.forEach(r => { r.reward += refRate(r) * dt; });
+    // 추천 보상(USDT)은 노드 판매 시 1회 확정 — 채굴처럼 시간에 따라 적립되지 않는다.
 
     // stream viewers jitter
     STREAMS.forEach((s, i) => { s.v = clamp(s.v + rand(-40, 55), 2000, 99999); const el = $('#sv-' + i); if (el) el.textContent = fmt(s.v); });

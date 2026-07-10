@@ -87,29 +87,25 @@
               <div class="usd" id="w-usd">≈ $0.00</div>
             </div>
             <div style="text-align:right">
-              <div class="l" style="justify-content:flex-end">스테이킹 중</div>
-              <div style="color:#f5c451;font-weight:800;font-size:16px"><span id="w-staked">0</span> XONT</div>
+              <div class="l" style="justify-content:flex-end">USDT 잔액</div>
+              <div style="color:#f5c451;font-weight:800;font-size:16px">$<span id="w-usdt">0.00</span></div>
+              <div class="usd">추천수당 · 스테이킹 지급</div>
             </div>
           </div>
           <div class="wnote"><svg class="icon"><use href="#i-coins"/></svg> 노드 구매 시 <b>$1,000당 <span id="w-per">10,000</span> XONT</b> · 플러스 <b class="r" id="w-bplus">+5%</b> · 프로 <b class="r" id="w-bpro">+7%</b> · 맥스 <b class="r" id="w-bmax">+10%</b> 추가</div>
         </div>
 
-        <!-- 스테이킹 -->
+        <!-- 스테이킹 리워드 (노드 구매 시 자동 생성 · 6개월 한정) -->
         <div class="dash-card" id="stake-card">
-          <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-lock"/></svg></span> XONT 스테이킹</h3><span class="tagx">연 <b class="r" id="s-apy">60</b>% · 기본 1년</span></div>
+          <div class="ch"><h3><span class="em"><svg class="icon"><use href="#i-lock"/></svg></span> 스테이킹 리워드</h3><span class="tagx">킥오프일로부터 <b class="r">6개월</b> 한정</span></div>
           <div class="stake-info">
-            <div class="si"><span class="k">월 지급</span><span class="v">원금의 <b class="r">5%</b> <em>절반 USD · 절반 XONT</em></span></div>
-            <div class="si"><span class="k">락업 기간</span><span class="v"><b id="s-term">12개월 (1년)</b></span></div>
+            <div class="si"><span class="k">월 지급</span><span class="v"><b class="r">USDT 5%</b> <em>+ XONT 5% 상당(티어 가중)</em></span></div>
+            <div class="si"><span class="k">지급 기간</span><span class="v"><b id="s-term">6개월</b></span></div>
           </div>
-          <div class="field">
-            <label>스테이킹 수량</label>
-            <div class="inp-amt"><input type="text" inputmode="decimal" id="s-amt" placeholder="0"><span class="unit">XONT</span><button class="max" id="s-max">MAX</button></div>
-            <div class="balhint"><span>보유 <b id="s-bal">0</b> XONT</span><span id="s-est">예상 연 수익 —</span></div>
-          </div>
-          <button class="btn btn-red btn-block" id="s-btn">스테이킹하기</button>
+          <p class="amini-desc">노드 구매가 확정되면 자동으로 생성됩니다. 6개월 이후에는 TonTV 운영수익 기반 노드 보상 알고리즘으로 전환됩니다.</p>
           <div class="active-stakes">
-            <div class="t">진행 중인 스테이킹</div>
-            <div class="stake-list" id="s-list"><div class="s-empty">아직 스테이킹이 없습니다.</div></div>
+            <div class="t">내 스테이킹 리워드</div>
+            <div class="stake-list" id="s-list"><div class="s-empty">아직 스테이킹 리워드가 없습니다.</div></div>
           </div>
         </div>
       </div>
@@ -137,7 +133,7 @@
           <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-user-check"/></svg> 직속 회원</div><div class="bv" id="mo-direct">0<span class="u">명</span></div><div class="bs">1대 직접 추천</div></div>
           <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-users"/></svg> 전체 조직</div><div class="bv" id="mo-total">0<span class="u">명</span></div><div class="bs">산하 누적</div></div>
           <div class="bcard2"><div class="bh"><svg class="icon"><use href="#i-server"/></svg> 그룹 노드</div><div class="bv" id="mo-gnodes">0</div><div class="bs">산하 노드 합계</div></div>
-          <div class="bcard2 hi"><div class="bh"><svg class="icon"><use href="#i-coins"/></svg> 추천수당 누적</div><div class="bv r" id="mo-earn">0</div><div class="bs">XONT</div></div>
+          <div class="bcard2 hi"><div class="bh"><svg class="icon"><use href="#i-coins"/></svg> 추천수당 누적</div><div class="bv r" id="mo-earn">0</div><div class="bs">USDT · 1대 15% · 2대 5%</div></div>
         </div>
         <div id="mo-plan" class="ref-plan"></div>
       </div>
@@ -257,7 +253,7 @@ const toast = (m, t) => window.toast && window.toast(m, t);
   const session = await db.getSession().catch(() => null);
   if (!session) { location.replace('login.html'); return; }
   try {
-    const [prof, ref, stats, tree, coms, cls, cfg, balance, myNodeCount, stakes, dividends, swaps] = await Promise.all([
+    const [prof, ref, stats, tree, coms, cls, cfg, bal, myNodeCount, stakes, dividends, swaps] = await Promise.all([
       db.getMyProfile().catch(() => null),
       db.getMyReferralSummary().catch(() => null),
       db.getMyOrgStats().catch(() => ({ direct_count:0, total_count:0, group_nodes:0, my_nodes:0 })),
@@ -265,7 +261,7 @@ const toast = (m, t) => window.toast && window.toast(m, t);
       db.getMyCommissions().catch(() => []),
       db.getCommissionLevels().catch(() => []),
       db.getTokenConfig().catch(() => ({})),
-      db.getWalletBalance().catch(() => 0),
+      db.getWalletBalances().catch(() => ({ xont: 0, usdt: 0 })),
       db.getMyNodeCount().catch(() => 0),
       db.getMyStakes().catch(() => []),
       db.getMyNodeDividends().catch(() => []),
@@ -281,7 +277,7 @@ const toast = (m, t) => window.toast && window.toast(m, t);
     $('#mo-direct').innerHTML = fmt(stats.direct_count) + '<span class="u">명</span>';
     $('#mo-total').innerHTML = fmt(stats.total_count) + '<span class="u">명</span>';
     $('#mo-gnodes').textContent = fmt(stats.group_nodes);
-    $('#mo-earn').textContent = fmt2(ref ? ref.referral_earned : 0);
+    $('#mo-earn').textContent = '$' + fmt2(ref ? ref.referral_earned : 0);   // USDT
 
     const act = (cls || []).filter((c) => c.active !== false);
     $('#mo-plan').innerHTML = act.length ? '<div class="rp-title" style="margin-top:12px">추천수당 플랜</div><div class="ref-plan">' + act.map((c) => `<span class="rp-chip">${esc(c.label || c.level + '단계')} <b>${c.rate_pct}%</b></span>`).join('') + '</div>' : '';
@@ -302,21 +298,23 @@ const toast = (m, t) => window.toast && window.toast(m, t);
 
     /* ---------------- 핵심 지표 · XONT · 스테이킹 · 스왑 · 시뮬레이션 (구 대시보드 이식) ---------------- */
     const price = Number(cfg.xont_price_usd || 0.1);
+    const balance = Number(bal.xont || 0), usdtBalance = Number(bal.usdt || 0);
     const perK = Number(cfg.xont_per_1000_usd || 10000);
     const sharePct = Number(cfg.node_share_pct || 20);
-    const apy = Number(cfg.staking_apy || 60);
     const cap = Number(cfg.node_cap || 50000) || 50000;
     const krwRate = Number(cfg.krw_per_usd || 1500);
     const supply = Number(cfg.xont_total_supply || 0), minted = Number(cfg.xont_minted || 0);
     const dividendTotal = (dividends || []).reduce((a, t) => a + Number(t.amount || 0), 0);
 
-    const stakeStakedXont = (stakes || []).filter((s) => s.status === 'active' && Number(s.amount) > 0).reduce((a, s) => a + Number(s.amount), 0);
     const stakePrincipalUsdt = (stakes || []).filter((s) => s.status === 'active' && Number(s.principal_usdt) > 0).reduce((a, s) => a + Number(s.principal_usdt), 0);
 
     $('#mo-mynodes').innerHTML = fmt(myNodeCount) + '<span class="u">개</span>';
     $('#mo-myshare').textContent = '노드풀 ' + (myNodeCount / cap * 100).toFixed(4) + '%';
+    const stkActive = (stakes || []).filter((s) => Number(s.principal_usdt) > 0);
+    const paidMo = stkActive.reduce((a, s) => Math.max(a, Number(s.months_paid || 0)), 0);
+    const totalMo = stkActive.length ? Number(stkActive[0].payout_months || 6) : 6;
     $('#mo-stake-usdt').textContent = '$' + fmt(stakePrincipalUsdt);
-    $('#mo-stake-xont').textContent = 'XONT ' + fmt2(stakeStakedXont);
+    $('#mo-stake-xont').textContent = stkActive.length ? `${paidMo}/${totalMo}개월 지급` : '리워드 없음';
     $('#mo-xont-total').textContent = fmt2(balance);
     $('#mo-xont-usd').textContent = '≈ $' + fmt2(balance * price);
     $('#mo-dividend').textContent = fmt2(dividendTotal);
@@ -338,13 +336,10 @@ const toast = (m, t) => window.toast && window.toast(m, t);
     $('#w-bmax').textContent = '+' + (cfg.xont_bonus_max_pct ?? 10) + '%';
     $('#w-bal').textContent = fmt2(balance);
     $('#w-usd').textContent = '≈ $' + fmt2(balance * price);
-    $('#w-staked').textContent = fmt2(stakeStakedXont);
+    $('#w-usdt').textContent = fmt2(usdtBalance);
 
-    // 스테이킹 정보
-    $('#s-apy').textContent = apy;
-    const months = Number(cfg.staking_months_default || 12);
-    $('#s-term').textContent = months + '개월' + (months === 12 ? ' (1년)' : '');
-    $('#s-bal').textContent = fmt2(balance);
+    // 스테이킹 리워드 (6개월 한정)
+    $('#s-term').textContent = Number(cfg.staking_months_default || 6) + '개월';
 
     // ---- 노드 수익 시뮬레이션 ----
     const ads = Number(cfg.sim_ads_per_user || 10);
@@ -392,66 +387,25 @@ const toast = (m, t) => window.toast && window.toast(m, t);
       return `<tr><td>${vLabel(V)}</td><td>${fmtKrw(s.perNodeFiat * 30)}</td><td class="r">${fmtKrw(s.perNodeFiat * 365)}</td><td>${fmtT(s.perNodeT * 365)}</td><td class="r">${fmtKrw(s.perNodeT * 365 * 1000)}</td></tr>`;
     }).join('');
 
-    // ---- 스테이킹 예상 수익 ----
+    // ---- 스테이킹 리워드 목록 (노드 구매 시 자동 생성 · 읽기 전용) ----
     let curBalance = balance, curStakes = stakes;
-    const estEl = $('#s-est'), amtEl = $('#s-amt');
-    function calcEst() {
-      const a = parseFloat(amtEl.value) || 0;
-      if (a <= 0) { estEl.textContent = '예상 연 수익 —'; return; }
-      const yearXont = a * apy / 100;
-      const halfUsd = yearXont / 2 * price;
-      const halfXont = yearXont / 2;
-      estEl.innerHTML = '연 <b class="r">$' + fmt2(halfUsd) + ' + ' + fmt(halfXont) + ' XONT</b>';
-    }
-    amtEl.addEventListener('input', calcEst);
-    $('#s-max').addEventListener('click', () => { amtEl.value = Math.floor(curBalance); calcEst(); });
-
-    // ---- 스테이킹 목록 렌더 (노드구매 자동스테이킹 + 직접 스테이킹 모두 표시) ----
     function renderStakes() {
       const box = $('#s-list');
-      const active = curStakes.filter((s) => s.status !== 'withdrawn');
-      if (!active.length) { box.innerHTML = '<div class="s-empty">아직 스테이킹이 없습니다.</div>'; return; }
+      const active = curStakes.filter((s) => s.status !== 'withdrawn' && Number(s.principal_usdt) > 0);
+      if (!active.length) { box.innerHTML = '<div class="s-empty">아직 스테이킹 리워드가 없습니다.</div>'; return; }
       box.innerHTML = active.map((s) => {
         const end = s.ends_at ? new Date(s.ends_at) : null;
         const dday = end ? Math.max(0, Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
-        if (Number(s.principal_usdt) > 0) {
-          const monthsPaid = s.months_paid || 0, payoutMonths = s.payout_months || 6;
-          return `<div class="s-row">
-            <div class="sl"><b>$${fmt(s.principal_usdt)} 노드 스테이킹</b><span>USDT ${s.usdt_rate_pct||0}%/월 · XONT ${s.xont_rate_pct||0}%/월 · ${monthsPaid}/${payoutMonths}개월차</span></div>
-            <div class="sr"><span>만기</span><b class="r">D-${dday}</b></div>
-          </div>`;
-        }
-        const start = new Date(s.started_at);
-        const monthsElapsed = Math.max(0, Math.min(s.months, (Date.now() - start.getTime()) / (1000 * 60 * 60 * 24 * 30)));
-        const accXont = Number(s.amount) * (Number(s.apy) / 12 / 100) * monthsElapsed;
+        const monthsPaid = s.months_paid || 0, payoutMonths = s.payout_months || 6;
+        const usdtMo = Number(s.principal_usdt) * Number(s.usdt_rate_pct || 0) / 100;
+        const xontMo = price ? (Number(s.principal_usdt) * Number(s.xont_rate_pct || 0) / 100) / price : 0;
         return `<div class="s-row">
-          <div class="sl"><b>${fmt2(s.amount)} XONT</b><span>${s.months}개월 · 연 ${s.apy}% · 만기 D-${dday}</span></div>
-          <div class="sr"><span>적립</span><b class="r">$${fmt2(accXont / 2 * price)} + ${fmt(accXont / 2)} XONT</b></div>
+          <div class="sl"><b>$${fmt(s.principal_usdt)} 노드 리워드</b><span>월 $${fmt2(usdtMo)} + ${fmt(xontMo)} XONT · ${monthsPaid}/${payoutMonths}개월 지급</span></div>
+          <div class="sr"><span>종료</span><b class="r">D-${dday}</b></div>
         </div>`;
       }).join('');
     }
     renderStakes();
-
-    $('#s-btn').addEventListener('click', async () => {
-      const a = parseFloat(amtEl.value) || 0;
-      if (a <= 0) { toast('스테이킹 수량을 입력하세요', 'err'); return; }
-      if (a > curBalance) { toast('보유 XONT가 부족합니다', 'err'); return; }
-      const btn = $('#s-btn'); const orig = btn.textContent; btn.disabled = true; btn.textContent = '처리 중…';
-      try {
-        await db.createStake({ amountXont: a, months });
-        toast(`${fmt2(a)} XONT 스테이킹 완료 · 연 ${apy}%`);
-        curBalance = await db.getWalletBalance();
-        curStakes = await db.getMyStakes();
-        $('#w-bal').textContent = fmt2(curBalance); $('#w-usd').textContent = '≈ $' + fmt2(curBalance * price);
-        $('#s-bal').textContent = fmt2(curBalance);
-        $('#mo-xont-total').textContent = fmt2(curBalance); $('#mo-xont-usd').textContent = '≈ $' + fmt2(curBalance * price);
-        const nowStaked = curStakes.filter((s) => s.status === 'active' && Number(s.amount) > 0).reduce((x, s) => x + Number(s.amount), 0);
-        $('#w-staked').textContent = fmt2(nowStaked);
-        amtEl.value = ''; calcEst(); renderStakes();
-      } catch (e) {
-        toast('스테이킹 실패: ' + (e && e.message || e), 'err');
-      } finally { btn.disabled = false; btn.textContent = orig; }
-    });
 
     // ---- XONT → TONX 스왑 ----
     let curSwaps = swaps;
